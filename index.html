@@ -6,21 +6,34 @@
     <title>Login - Quiz Legends</title>
     <style>
         body { background: #010a13; color: white; font-family: sans-serif; text-align: center; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-box { border: 2px solid #c89b3c; padding: 30px; background: #091428; border-radius: 10px; width: 300px; box-shadow: 0 0 20px rgba(200, 155, 60, 0.2); }
-        h2 { color: #c89b3c; text-transform: uppercase; letter-spacing: 2px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; box-sizing: border-box; }
-        button { background: #c89b3c; color: black; padding: 12px; width: 100%; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        #msg { margin-top: 15px; font-size: 13px; color: #ff4444; }
+        .login-box { border: 2px solid #c89b3c; padding: 35px; background: #091428; border-radius: 10px; width: 320px; box-shadow: 0 0 25px rgba(200, 155, 60, 0.2); }
+        h2 { color: #c89b3c; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; font-size: 22px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; box-sizing: border-box; font-size: 16px; }
+        input:focus { outline: none; border-color: #fff; box-shadow: 0 0 5px #c89b3c; }
+        button { background: #c89b3c; color: black; padding: 14px; width: 100%; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 15px; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #e2b75a; transform: scale(1.02); }
+        .footer-links { margin-top: 20px; font-size: 14px; color: #888; }
+        .footer-links a { color: #c89b3c; text-decoration: none; font-weight: bold; }
+        .footer-links a:hover { text-decoration: underline; }
+        #msg { margin-top: 15px; font-size: 13px; color: #ff4444; min-height: 18px; }
     </style>
 </head>
 <body>
 
     <div class="login-box">
         <h2>ENTRAR</h2>
-        <input type="text" id="user" placeholder="Usuário (Ex: IanFelix)">
-        <input type="password" id="pass" placeholder="Senha">
-        <button id="btnLogin">ACESSAR CONTA</button>
+        
+        <input type="text" id="user" placeholder="Nome de Usuário">
+        <input type="password" id="pass" placeholder="Sua Senha">
+        
+        <button id="btnLogin">ACESSAR MINHA CONTA</button>
+        
         <div id="msg"></div>
+
+        <div class="footer-links">
+            Não tem uma conta?<br>
+            <a href="cadastro.html">Cadastre-se agora</a>
+        </div>
     </div>
 
     <script type="module">
@@ -43,11 +56,16 @@
             const usuarioInput = document.getElementById('user').value.trim();
             const senhaInput = document.getElementById('pass').value;
             const msg = document.getElementById('msg');
+            const btn = document.getElementById('btnLogin');
 
             if (!usuarioInput || !senhaInput) {
                 msg.innerText = "Preencha todos os campos!";
                 return;
             }
+
+            btn.disabled = true;
+            btn.innerText = "AUTENTICANDO...";
+            msg.innerText = "";
 
             try {
                 const docRef = doc(db, "usuarios", usuarioInput);
@@ -56,18 +74,22 @@
                 if (snap.exists()) {
                     const dados = snap.data();
                     if (dados.senha === senhaInput) {
-                        // Salva o nome do usuário para usar na próxima página
                         localStorage.setItem("usuarioLogado", usuarioInput);
-                        // Redireciona para a página de resgate
                         window.location.href = "resgate.html";
                     } else {
                         msg.innerText = "Senha incorreta!";
+                        btn.disabled = false;
+                        btn.innerText = "ACESSAR MINHA CONTA";
                     }
                 } else {
                     msg.innerText = "Usuário não encontrado!";
+                    btn.disabled = false;
+                    btn.innerText = "ACESSAR MINHA CONTA";
                 }
             } catch (e) {
-                msg.innerText = "Erro ao conectar!";
+                msg.innerText = "Erro ao conectar com o servidor.";
+                btn.disabled = false;
+                btn.innerText = "ACESSAR MINHA CONTA";
             }
         };
     </script>
