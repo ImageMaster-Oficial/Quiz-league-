@@ -13,32 +13,22 @@
         html, body { 
             font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #051421 0%, #010a13 100%);
             color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
-            height: 100vh; width: 100vw; overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior-y: contain;
         }
-
-        .app-container { 
-            flex: 1; display: flex; flex-direction: column; padding: 10px 0; gap: 10px; 
-            width: 94%; max-width: 400px; box-sizing: border-box; justify-content: flex-start;
-        }
+        .app-container { flex: 1; display: flex; flex-direction: column; padding: 5px 0; gap: 8px; width: 94%; max-width: 400px; box-sizing: border-box; }
         
-        /* CABEÇALHO EQUILIBRADO: NOME ESQUERDA | GOLD DIREITA */
-        .header-section { 
-            display: flex; justify-content: space-between; align-items: center; 
-            width: 100%; padding: 5px 2px; flex-shrink: 0; 
-        }
+        /* HEADER ORIGINAL */
+        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; flex-shrink: 0; width: 100%; box-sizing: border-box; }
         .title-legends h1 {
-            font-size: 1.2rem; margin: 0; color: var(--gold); text-transform: uppercase;
+            font-size: 1.1rem; margin: 0; color: var(--gold); text-transform: uppercase;
             background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .coin-badge { 
-            border: 1px solid var(--gold); padding: 4px 12px; background: rgba(1, 14, 28, 0.8); 
-            color: var(--gold); font-weight: bold; font-size: 0.9rem; border-radius: 2px;
-        }
+        .coin-badge { border: 1px solid var(--gold); padding: 3px 10px; background: rgba(1, 10, 19, 0.8); color: var(--gold); font-weight: bold; font-size: 0.8rem; }
         
-        /* QUADROS HEXAGONAIS */
+        /* FRAME HEXAGONAL ORIGINAL */
         .hex-frame {
-            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 15px; 
+            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px 15px; 
             display: flex; flex-direction: column; box-sizing: border-box;
             clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
@@ -47,39 +37,42 @@
             pointer-events: none; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
 
-        /* CONTEÚDO DO QUIZ */
-        #perguntaTexto { text-align: center; font-size: 0.95rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 12px; }
+        /* BLOCO SUPERIOR (SUBIDO) */
+        #perguntaTexto { text-align: center; font-size: 0.9rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0; }
         .option-btn { 
-            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 10px; 
-            margin: 3px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem;
+            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 8px; 
+            margin: 2px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem;
         }
         
-        .video-section { margin-top: 10px; border-top: 1px solid rgba(200, 155, 60, 0.2); padding-top: 10px; text-align: center; }
+        .video-section { margin-top: 8px; border-top: 1px solid rgba(200, 155, 60, 0.2); padding-top: 8px; text-align: center; }
         .video-btn { 
             background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
             color: #f0e6d2; padding: 10px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.75rem;
         }
 
-        /* SELETOR DE RESGATE EQUILIBRADO */
+        /* BLOCO INFERIOR (RESGATE) */
         .resgate-selector { display: flex; justify-content: space-between; gap: 6px; margin: 10px 0; }
         .resgate-opt {
             flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold);
-            padding: 12px 2px; /* Reduzido para equilíbrio */
-            font-size: 0.75rem; font-weight: bold; cursor: pointer; text-align: center;
+            padding: 15px 2px; /* Aumentado levemente para preencher mais o espaço */
+            font-size: 0.75rem; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s;
         }
         .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); box-shadow: 0 0 10px var(--gold); }
 
-        .progress-bg { background: #000; height: 10px; border: 1px solid var(--gold-dark); }
+        .progress-bg { background: #000; height: 8px; border: 1px solid var(--gold-dark); }
         .progress-fill { background: var(--gold); height: 100%; width: 0%; transition: 0.7s; }
         
-        input { width: 100%; padding: 10px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 8px 0; box-sizing: border-box; font-size: 0.85rem; text-align: center; }
-        #btnResgate { padding: 12px !important; font-size: 0.9rem !important; background: var(--lol-blue); border: 1px solid var(--gold); color: var(--gold); width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase;}
+        input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 8px 0; box-sizing: border-box; font-size: 0.85rem; text-align: center; }
+        
+        #btnResgateOriginal { 
+            background: var(--lol-blue); border: 1px solid var(--gold); color: var(--gold); 
+            padding: 12px; width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
 
         /* BANNER DE RODAPÉ */
         .ad-banner-footer {
             height: var(--ad-space); width: 100%; background: #000; display: flex; align-items: center; 
             justify-content: center; color: var(--gold); font-size: 0.75rem; border-top: 2px solid var(--gold); flex-shrink: 0;
-            margin-top: auto;
         }
         #adOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
     </style>
@@ -94,32 +87,32 @@
         
         <div class="hex-frame">
             <div id="quizContent">
-                <p id="perguntaTexto">Aguardando Nexus...</p>
+                <p id="perguntaTexto">Sincronizando...</p>
                 <div id="opcoes"></div>
-                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 5px;"></p>
+                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.7rem; color: var(--gold); font-weight: bold; margin-top: 5px;"></p>
             </div>
 
             <div class="video-section">
-                <span style="font-size: 0.65rem; color: var(--gold); display: block; margin-bottom: 5px; font-weight: bold;">LIMITE DIÁRIO: <span id="limitDiario">0/35</span></span>
+                <span style="font-size: 0.6rem; color: var(--gold); display: block; margin-bottom: 5px; font-weight: bold;">LIMITE DIÁRIO: <span id="limitDiario">0/35</span></span>
                 <button id="btnVideo" class="video-btn" disabled>📺 ASSISTIR VÍDEO (300 GOLD)</button>
             </div>
         </div>
 
         <div class="hex-frame">
             <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--gold); margin: 4px 0;">
                 <span id="txtMeta">Meta: 15.8k</span>
                 <span id="txtPorcentagem">0%</span>
             </div>
             
             <div class="resgate-selector">
-                <div class="resgate-opt active" onclick="setResgate(this, 15800)">R$ 0,50</div>
-                <div class="resgate-opt" onclick="setResgate(this, 31500)">R$ 1,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 150000)">R$ 5,00</div>
+                <div class="resgate-opt active" onclick="setResgate(this, 15800)">R$ 0,50 PIX</div>
+                <div class="resgate-opt" onclick="setResgate(this, 31500)">R$ 1,00 PIX</div>
+                <div class="resgate-opt" onclick="setResgate(this, 150000)">R$ 5,00 PIX</div>
             </div>
 
-            <input type="text" id="chavePix" placeholder="CHAVE PIX PARA RESGATE">
-            <button id="btnResgate">SOLICITAR RESGATE</button>
+            <input type="text" id="chavePix" placeholder="DIGITE SUA CHAVE PIX">
+            <button id="btnResgateOriginal">SOLICITAR RESGATE</button>
         </div>
     </div>
 
@@ -144,27 +137,15 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let usuarioLogado = localStorage.getItem("usuarioLogado");
+        if (!usuarioLogado) window.location.href = "index.html";
+        const userRef = doc(db, "usuarios", usuarioLogado);
 
         const REQUISITO_ACERTOS = 10;
         const REQUISITO_VIDEOS = 3;
         const LIMITE_DIARIO = 35;
-
         let metaAtual = 15800;
-        let usuarioLogado = localStorage.getItem("usuarioLogado");
-        if (!usuarioLogado) window.location.href = "index.html";
-
-        const userRef = doc(db, "usuarios", usuarioLogado);
         let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje;
-        let jogoInicializado = false;
-
-        const perguntasBase = [
-            { q: "Quem é o cego de Ionia?", a: ["Jax", "Lee Sin", "Yi", "Yone"], correct: "Lee Sin" },
-            { q: "Região de Garen e Lux?", a: ["Noxus", "Ionia", "Demacia", "Piltover"], correct: "Demacia" },
-            { q: "Qual a irmã da Jinx?", a: ["Vi", "Lux", "Caitlyn", "Diana"], correct: "Vi" },
-            { q: "Qual campeão usa um poste?", a: ["Darius", "Jax", "Garen", "Sion"], correct: "Jax" },
-            { q: "Quem criou o Blitzcrank?", a: ["Viktor", "Jayce", "Ekko", "Singed"], correct: "Viktor" },
-            { q: "Qual o nome do urso da Annie?", a: ["Daisy", "Tibbers", "Willump", "Skarner"], correct: "Tibbers" }
-        ];
 
         onSnapshot(userRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -173,73 +154,30 @@
                 acertosNoCiclo = data.acertos || 0;
                 videosAssistidos = data.videosAssistidos || 0;
                 totalVideosHoje = data.totalVideosHoje || 0;
-                atualizarInterface();
-                if (!jogoInicializado) { jogoInicializado = true; carregarQuestao(); }
+                
+                document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
+                document.getElementById('limitDiario').innerText = `${totalVideosHoje}/${LIMITE_DIARIO}`;
+                let progresso = Math.min((goldDB / metaAtual) * 100, 100);
+                document.getElementById('progressBar').style.width = progresso + "%";
+                document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
+
+                const btnVideo = document.getElementById('btnVideo');
+                const aviso = document.getElementById('avisoStatusQuiz');
+                if (acertosNoCiclo < REQUISITO_ACERTOS) {
+                    btnVideo.disabled = true;
+                    aviso.innerHTML = `FALTAM <span style="color:#28a745">${REQUISITO_ACERTOS - acertosNoCiclo}</span> ACERTOS`;
+                } else {
+                    btnVideo.disabled = false;
+                    aviso.innerHTML = `ASSISTA <span style="color:#28a745">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS`;
+                }
             }
         });
-
-        function atualizarInterface() {
-            document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/${LIMITE_DIARIO}`;
-            let progresso = Math.min((goldDB / metaAtual) * 100, 100);
-            document.getElementById('progressBar').style.width = progresso + "%";
-            document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
-            const btnVideo = document.getElementById('btnVideo');
-            const aviso = document.getElementById('avisoStatusQuiz');
-            if (totalVideosHoje >= LIMITE_DIARIO) {
-                btnVideo.disabled = true; aviso.innerText = "LIMITE ATINGIDO!";
-            } else if (acertosNoCiclo < REQUISITO_ACERTOS) {
-                btnVideo.disabled = true; aviso.innerHTML = `FALTAM <span style="color:#28a745">${REQUISITO_ACERTOS - acertosNoCiclo}</span> ACERTOS`;
-            } else {
-                btnVideo.disabled = false; aviso.innerHTML = `ASSISTA <span style="color:#28a745">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS`;
-            }
-        }
 
         window.setResgate = (el, valor) => {
             metaAtual = valor;
             document.querySelectorAll('.resgate-opt').forEach(opt => opt.classList.remove('active'));
             el.classList.add('active');
-            atualizarInterface();
-        }
-
-        function carregarQuestao() {
-            const container = document.getElementById('opcoes');
-            const textoQuestao = document.getElementById('perguntaTexto');
-            if (acertosNoCiclo >= REQUISITO_ACERTOS) {
-                textoQuestao.innerText = "Fase de Vídeos!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold); font-size:0.8rem; font-weight:bold;'>Assista os vídeos para continuar.</p>`;
-                return;
-            }
-            const q = perguntasBase[Math.floor(Math.random() * perguntasBase.length)];
-            textoQuestao.innerText = q.q;
-            container.innerHTML = "";
-            q.a.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn"; btn.innerText = opt;
-                btn.onclick = async () => {
-                    if (opt === q.correct) {
-                        btn.style.backgroundColor = "var(--correct)";
-                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) });
-                    } else { btn.style.backgroundColor = "var(--wrong)"; }
-                    setTimeout(carregarQuestao, 800);
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        document.getElementById('btnVideo').onclick = () => {
-            document.getElementById('adOverlay').style.display = 'flex';
-            let tempo = 5;
-            const timer = setInterval(async () => {
-                tempo--; document.getElementById('adTimer').innerText = tempo;
-                if (tempo <= 0) {
-                    clearInterval(timer); document.getElementById('adOverlay').style.display = 'none';
-                    let novoVideosAssistidos = videosAssistidos + 1;
-                    let updates = { saldo: increment(300), totalVideosHoje: increment(1), videosAssistidos: novoVideosAssistidos };
-                    if (novoVideosAssistidos >= REQUISITO_VIDEOS) { updates.acertos = 0; updates.videosAssistidos = 0; }
-                    await updateDoc(userRef, updates); carregarQuestao();
-                }
-            }, 1000);
+            document.getElementById('txtMeta').innerText = `Meta: ${(valor/1000).toFixed(1)}k`;
         };
     </script>
 </body>
