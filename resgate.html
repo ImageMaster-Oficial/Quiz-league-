@@ -8,14 +8,15 @@
         :root { 
             --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
             --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 75px; --correct: #28a745; --wrong: #dc3545;
+            --ad-space: 70px; --correct: #28a745; --wrong: #dc3545;
         }
         html, body { 
             font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #051421 0%, #010a13 100%);
             color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior-y: contain;
         }
-        .app-container { flex: 1; display: flex; flex-direction: column; padding: 10px 0; gap: 8px; width: 94%; max-width: 400px; box-sizing: border-box; }
+        .app-container { flex: 1; display: flex; flex-direction: column; padding: 10px 0; gap: 10px; width: 94%; max-width: 400px; box-sizing: border-box; }
+        
         .header-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; flex-shrink: 0; width: 100%; box-sizing: border-box; }
         .title-legends h1 {
             font-size: 1.1rem; margin: 0; color: var(--gold); text-transform: uppercase;
@@ -25,7 +26,7 @@
         .coin-badge { border: 1px solid var(--gold); padding: 4px 10px; background: rgba(1, 10, 19, 0.8); color: var(--gold); font-weight: bold; font-size: 0.8rem; }
         
         .hex-frame {
-            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; flex: 1;
+            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 15px; 
             display: flex; flex-direction: column; justify-content: center; box-sizing: border-box;
             clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
@@ -34,36 +35,43 @@
             pointer-events: none; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
 
+        /* BLOCO SUPERIOR (QUIZ + VÍDEO) */
+        .quiz-frame { flex: 1.5; }
+        #perguntaTexto { text-align: center; font-size: 0.95rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0; }
         .option-btn { 
-            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 10px; 
-            margin: 4px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
+            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 8px; 
+            margin: 3px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem;
         }
-        .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; color: white !important; }
-        .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; color: white !important; }
         
-        /* ESTILO DO BOTÃO DE VÍDEO E LIMITE */
-        .video-wrapper { text-align: center; margin-bottom: 8px; width: 100%; }
-        .limit-label { font-size: 0.65rem; color: var(--gold); display: block; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        .video-section { margin-top: 15px; border-top: 1px solid rgba(200, 155, 60, 0.3); padding-top: 10px; text-align: center; }
+        .limit-label { font-size: 0.6rem; color: var(--gold); display: block; margin-bottom: 4px; font-weight: bold; }
         .video-btn { 
             background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
+            color: #f0e6d2; padding: 10px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
         }
-        .video-btn:disabled { background: #1a1a1a !important; border-color: #444 !important; color: #666 !important; cursor: not-allowed; filter: grayscale(1); }
 
+        /* BLOCO INFERIOR (RESGATE) */
+        .resgate-frame { flex: 0; padding: 12px; }
         .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
         .resgate-opt {
             flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold);
             padding: 6px 2px; font-size: 0.65rem; font-weight: bold; cursor: pointer; text-align: center;
-            transition: 0.3s;
         }
         .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); box-shadow: 0 0 8px var(--gold); }
 
-        .progress-bg { background: #000; height: 10px; border: 1px solid var(--gold-dark); margin-top: 4px; }
+        .btn-correct { background-color: var(--correct) !important; color: white !important; }
+        .btn-wrong { background-color: var(--wrong) !important; color: white !important; }
+        .progress-bg { background: #000; height: 8px; border: 1px solid var(--gold-dark); margin-top: 4px; }
         .progress-fill { background: var(--gold); height: 100%; width: 0%; transition: 0.7s; }
         
         input { width: 100%; padding: 8px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 6px 0; box-sizing: border-box; font-size: 0.8rem; }
-        #avisoStatusQuiz { text-align: center; font-size: 0.8rem; color: var(--gold); font-weight: bold; margin-top: 8px; text-transform: uppercase; }
-        .contador-verde { color: #28a745; font-size: 1rem; }
+        #avisoStatusQuiz { text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 5px; }
+        .contador-verde { color: #28a745; }
+
+        .ad-banner-footer {
+            height: var(--ad-space); width: 100%; background: #000; display: flex; align-items: center; 
+            justify-content: center; color: var(--gold); font-size: 0.7rem; border-top: 2px solid var(--gold); flex-shrink: 0;
+        }
         #adOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -75,23 +83,23 @@
             <div class="coin-badge">🟡 <span id="goldAmount">...</span> GOLD</div>
         </div>
         
-        <div class="hex-frame">
+        <div class="hex-frame quiz-frame">
             <div id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0;">Sincronizando Nexus...</p>
+                <p id="perguntaTexto">Sincronizando...</p>
                 <div id="opcoes"></div>
                 <p id="avisoStatusQuiz"></p>
             </div>
+
+            <div class="video-section">
+                <span class="limit-label">LIMITE DIÁRIO: <span id="limitDiario">0/35</span> VÍDEOS</span>
+                <button id="btnVideo" class="video-btn" disabled>📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
+            </div>
         </div>
 
-        <div class="hex-frame" style="flex: 0;">
-            <div class="video-wrapper">
-                <span class="limit-label">Limite Diário: <span id="limitDiario">0/35</span> Vídeos</span>
-                <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
-            </div>
-
+        <div class="hex-frame resgate-frame">
             <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--gold); margin: 4px 0;">
-                <span id="txtMeta">Meta: 15.8k Gold</span>
+            <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--gold); margin: 4px 0;">
+                <span id="txtMeta">Meta: 15.8k</span>
                 <span id="txtPorcentagem">0%</span>
             </div>
             
@@ -102,7 +110,7 @@
             </div>
 
             <input type="text" id="chavePix" placeholder="CHAVE PIX PARA RECEBER">
-            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%;">SOLICITAR RESGATE PIX</button>
+            <button class="option-btn" id="btnResgate" style="margin:0; background:var(--lol-blue); border-color:var(--gold); width:100%;">SOLICITAR RESGATE</button>
         </div>
     </div>
 
@@ -180,10 +188,10 @@
                 aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
             } else if (acertosNoCiclo < REQUISITO_ACERTOS) {
                 btnVideo.disabled = true;
-                aviso.innerHTML = `ACERTE <span class="contador-verde">${REQUISITO_ACERTOS - acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEOS`;
+                aviso.innerHTML = `FALTAM <span class="contador-verde">${REQUISITO_ACERTOS - acertosNoCiclo}</span> ACERTOS`;
             } else {
                 btnVideo.disabled = false;
-                aviso.innerHTML = `ASSISTA <span class="contador-verde">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS PARA VOLTAR AO QUIZ`;
+                aviso.innerHTML = `ASSISTA <span class="contador-verde">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS`;
             }
         }
 
@@ -199,8 +207,8 @@
             const textoQuestao = document.getElementById('perguntaTexto');
 
             if (acertosNoCiclo >= REQUISITO_ACERTOS) {
-                textoQuestao.innerText = "Meta de acertos atingida!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista ${REQUISITO_VIDEOS} vídeos para liberar o Quiz.<br><br>Vídeos assistidos: ${videosAssistidos}/${REQUISITO_VIDEOS}</p>`;
+                textoQuestao.innerText = "Ciclo de Questões Completo!";
+                container.innerHTML = `<p style='text-align:center; color:var(--gold); font-size:0.8rem;'>Assista os vídeos abaixo para resetar.<br>Vídeos: ${videosAssistidos}/${REQUISITO_VIDEOS}</p>`;
                 return;
             }
 
@@ -213,6 +221,8 @@
                 btn.className = "option-btn";
                 btn.innerText = opt;
                 btn.onclick = async () => {
+                    const botoes = container.querySelectorAll('button');
+                    botoes.forEach(b => b.style.pointerEvents = 'none');
                     if (opt === q.correct) {
                         btn.classList.add('btn-correct');
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) });
@@ -256,17 +266,21 @@
         document.getElementById('btnResgate').onclick = async () => {
             const pix = document.getElementById('chavePix').value;
             if (goldDB < metaAtual) return alert("SALDO INSUFICIENTE!");
-            if (pix.length < 5) return alert("INSIRA UMA CHAVE PIX!");
+            if (pix.length < 5) return alert("CHAVE PIX INVÁLIDA!");
+            
+            const btn = document.getElementById('btnResgate');
+            btn.disabled = true;
 
             try {
-                const sAntes = goldDB;
-                const sDepois = goldDB - metaAtual;
                 await addDoc(collection(db, "pedidos_resgate"), {
-                    user: usuarioLogado, pix: pix, gold_antes: sAntes, gold_depois: sDepois, data: new Date().toLocaleString('pt-BR')
+                    user: usuarioLogado, pix: pix, 
+                    gold_antes: goldDB, gold_depois: goldDB - metaAtual, 
+                    data: new Date().toLocaleString('pt-BR')
                 });
                 await updateDoc(userRef, { saldo: increment(-metaAtual) });
                 alert("PEDIDO ENVIADO!");
             } catch (e) { alert("ERRO: " + e.message); }
+            btn.disabled = false;
         };
     </script>
 </body>
