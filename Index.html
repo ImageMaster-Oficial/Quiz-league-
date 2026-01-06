@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste GitHub x Firebase</title>
+</head>
+<body>
+    <h2>TESTE DE RESGATE</h2>
+    <input type="text" id="chave" placeholder="Chave Pix">
+    <button id="btn">TESTAR AGORA</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
+            authDomain: "quizlegends-f58fc.firebaseapp.com",
+            projectId: "quizlegends-f58fc",
+            storageBucket: "quizlegends-f58fc.firebasestorage.app",
+            messagingSenderId: "1050463164018",
+            appId: "1:1050463164018:web:91de002b8afc8e678f54eb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('btn').onclick = async () => {
+            const btn = document.getElementById('btn');
+            btn.innerText = "ENVIANDO PELO GITHUB...";
+            
+            try {
+                await addDoc(collection(db, "pedidos_resgate"), {
+                    pix: document.getElementById('chave').value,
+                    origem: "GitHub Pages",
+                    data: new Date().toISOString()
+                });
+                alert("✅ FUNCIONOU NO GITHUB!");
+                btn.innerText = "ENVIADO COM SUCESSO";
+            } catch (e) {
+                alert("ERRO NO GITHUB: " + e.message);
+                btn.innerText = "ERRO";
+            }
+        };
+    </script>
+</body>
+</html>
