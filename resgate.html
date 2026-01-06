@@ -34,15 +34,6 @@
             pointer-events: none; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
 
-        .video-container { margin-bottom: 8px; text-align: center; }
-        .limit-text { font-size: 0.65rem; color: var(--gold); margin-bottom: 4px; display: block; text-transform: uppercase; font-weight: bold; }
-
-        .video-btn { 
-            background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; padding: 10px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
-        }
-        .video-btn:disabled { background: #1a1a1a !important; border-color: #444 !important; color: #666 !important; cursor: not-allowed; filter: grayscale(1); }
-
         .option-btn { 
             background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 10px; 
             margin: 4px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
@@ -50,6 +41,15 @@
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; color: white !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; color: white !important; }
         
+        /* ESTILO DO BOTÃO DE VÍDEO E LIMITE */
+        .video-wrapper { text-align: center; margin-bottom: 8px; width: 100%; }
+        .limit-label { font-size: 0.65rem; color: var(--gold); display: block; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        .video-btn { 
+            background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
+            color: #f0e6d2; padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
+        }
+        .video-btn:disabled { background: #1a1a1a !important; border-color: #444 !important; color: #666 !important; cursor: not-allowed; filter: grayscale(1); }
+
         .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
         .resgate-opt {
             flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold);
@@ -74,11 +74,6 @@
             <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
             <div class="coin-badge">🟡 <span id="goldAmount">...</span> GOLD</div>
         </div>
-
-        <div class="video-container">
-            <span class="limit-text">Limite Diário: <span id="limitDiario">0/35</span> Vídeos</span>
-            <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
-        </div>
         
         <div class="hex-frame">
             <div id="quizContent">
@@ -89,6 +84,11 @@
         </div>
 
         <div class="hex-frame" style="flex: 0;">
+            <div class="video-wrapper">
+                <span class="limit-label">Limite Diário: <span id="limitDiario">0/35</span> Vídeos</span>
+                <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
+            </div>
+
             <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
             <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--gold); margin: 4px 0;">
                 <span id="txtMeta">Meta: 15.8k Gold</span>
@@ -129,8 +129,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const REQUISITO_ACERTOS = 10; // Mudou para 10
-        const REQUISITO_VIDEOS = 3;  // Precisa de 3 vídeos
+        const REQUISITO_ACERTOS = 10;
+        const REQUISITO_VIDEOS = 3;
         const LIMITE_DIARIO = 35;
 
         let metaAtual = 15800;
@@ -175,10 +175,9 @@
             const btnVideo = document.getElementById('btnVideo');
             const aviso = document.getElementById('avisoStatusQuiz');
 
-            // LÓGICA DE BLOQUEIO
             if (totalVideosHoje >= LIMITE_DIARIO) {
                 btnVideo.disabled = true;
-                aviso.innerText = "LIMITE DIÁRIO ATINGIDO! VOLTE AMANHÃ.";
+                aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
             } else if (acertosNoCiclo < REQUISITO_ACERTOS) {
                 btnVideo.disabled = true;
                 aviso.innerHTML = `ACERTE <span class="contador-verde">${REQUISITO_ACERTOS - acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEOS`;
@@ -201,7 +200,7 @@
 
             if (acertosNoCiclo >= REQUISITO_ACERTOS) {
                 textoQuestao.innerText = "Meta de acertos atingida!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista ${REQUISITO_VIDEOS} vídeos para liberar mais perguntas.<br><br>Vídeos concluídos: ${videosAssistidos}/${REQUISITO_VIDEOS}</p>`;
+                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista ${REQUISITO_VIDEOS} vídeos para liberar o Quiz.<br><br>Vídeos assistidos: ${videosAssistidos}/${REQUISITO_VIDEOS}</p>`;
                 return;
             }
 
@@ -243,7 +242,6 @@
                         videosAssistidos: novoVideosAssistidos
                     };
 
-                    // Se completou os 3 vídeos, reseta o ciclo de acertos
                     if (novoVideosAssistidos >= REQUISITO_VIDEOS) {
                         updates.acertos = 0;
                         updates.videosAssistidos = 0;
