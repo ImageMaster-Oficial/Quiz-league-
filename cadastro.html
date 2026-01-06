@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Quiz Legends</title>
+    <style>
+        body { background: #010a13; color: white; font-family: sans-serif; text-align: center; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-box { border: 2px solid #c89b3c; padding: 30px; background: #091428; border-radius: 10px; width: 300px; box-shadow: 0 0 20px rgba(200, 155, 60, 0.2); }
+        h2 { color: #c89b3c; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; box-sizing: border-box; }
+        button { background: #c89b3c; color: black; padding: 12px; width: 100%; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        .link { margin-top: 15px; font-size: 13px; }
+        .link a { color: #c89b3c; text-decoration: none; }
+        #msg { margin-top: 15px; font-size: 13px; color: #ff4444; }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>CRIAR CONTA</h2>
+        <input type="text" id="user" placeholder="Escolha um Usuário">
+        <input type="password" id="pass" placeholder="Escolha uma Senha">
+        <button id="btnCadastrar">CRIAR MINHA CONTA</button>
+        
+        <div class="link">
+            Já tem conta? <a href="index.html">Faça Login</a>
+        </div>
+        <div id="msg"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
+            authDomain: "quizlegends-f58fc.firebaseapp.com",
+            projectId: "quizlegends-f58fc",
+            storageBucket: "quizlegends-f58fc.firebasestorage.app",
+            messagingSenderId: "1050463164018",
+            appId: "1:1050463164018:web:91de002b8afc8e678f54eb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('btnCadastrar').onclick = async () => {
+            const usuarioInput = document.getElementById('user').value.trim();
+            const senhaInput = document.getElementById('pass').value;
+            const msg = document.getElementById('msg');
+
+            if (usuarioInput.length < 3 || senhaInput.length < 3) {
+                msg.innerText = "Usuário e senha devem ter pelo menos 3 caracteres!";
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "usuarios", usuarioInput);
+                const snap = await getDoc(docRef);
+
+                if (snap.exists()) {
+                    msg.innerText = "Este nome de usuário já está em uso!";
+                } else {
+                    // CRIA O USUÁRIO NO BANCO
+                    await setDoc(docRef, {
+                        saldo: 0, // Começa com zero
+                        senha: senhaInput
+                    });
+                    
+                    alert("Conta criada com sucesso!");
+                    window.location.href = "index.html";
+                }
+            } catch (e) {
+                msg.innerText = "Erro ao criar conta!";
+                console.error(e);
+            }
+        };
+    </script>
+</body>
+</html>
