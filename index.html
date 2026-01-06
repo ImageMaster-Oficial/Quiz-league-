@@ -3,31 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico Quiz Legends</title>
+    <title>Resgate - IanFelix</title>
     <style>
         body { background: #010a13; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
         .caixa { border: 2px solid #c89b3c; padding: 20px; background: #091428; border-radius: 10px; max-width: 400px; margin: 0 auto; }
-        .gold-valor { font-size: 36px; font-weight: bold; color: #fff; margin: 10px 0; }
-        #status { margin-top: 20px; padding: 10px; background: rgba(255, 0, 0, 0.2); border-radius: 5px; color: #ffca28; font-size: 14px; border: 1px solid #c89b3c; }
-        .info { color: #888; font-size: 12px; margin-top: 10px; }
+        .gold-valor { font-size: 36px; font-weight: bold; color: #fff; margin: 15px 0; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; box-sizing: border-box; }
+        button { background: #c89b3c; color: black; padding: 15px; width: 100%; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        #status { margin-top: 15px; font-size: 13px; color: #c89b3c; }
     </style>
 </head>
 <body>
 
     <div class="caixa">
-        <h2 style="color: #c89b3c;">VERIFICANDO SISTEMA</h2>
-        <div class="usuario-badge">Buscando: <b>IanFelix</b></div>
+        <h2 style="color: #c89b3c;">BEM-VINDO</h2>
+        <div style="font-size: 14px; color: #888;">Usuário: <b>IanFelix</b></div>
         
         <div class="gold-valor">🟡 <span id="saldo_tela">...</span></div>
 
-        <div id="status">Iniciando conexão...</div>
+        <input type="text" id="chave" placeholder="Sua chave Pix">
+        <button id="btn">SOLICITAR RESGATE</button>
         
-        <div class="info">Verifique a mensagem acima para saber o que ajustar no Firebase.</div>
+        <div id="status">Sincronizando...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -41,34 +43,52 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Referência que estamos testando
+        // AQUI ESTÁ A MUDANÇA: Agora o código busca IanFelix (sem espaço)
         const usuarioRef = doc(db, "usuarios", "IanFelix");
 
-        // MONITORAR COM DIAGNÓSTICO REAL
+        // MOSTRAR SALDO
         onSnapshot(usuarioRef, (snapshot) => {
-            const tela = document.getElementById('saldo_tela');
-            const status = document.getElementById('status');
-
             if (snapshot.exists()) {
-                const dados = snapshot.data();
-                
-                // Verifica se o campo 'saldo' existe (exatamente com esse nome)
-                if (dados.saldo !== undefined) {
-                    const valor = Number(dados.saldo);
-                    tela.innerText = valor.toLocaleString('pt-BR');
-                    status.style.background = "rgba(0, 255, 0, 0.1)";
-                    status.innerText = "✅ TUDO OK! O campo 'saldo' foi encontrado.";
-                } else {
-                    tela.innerText = "CAMPO?";
-                    status.innerText = "❌ ERRO: O documento 'IanFelix' existe, mas não achei o campo escrito 'saldo' (minúsculo) dentro dele.";
-                }
+                const valor = Number(snapshot.data().saldo) || 0;
+                document.getElementById('saldo_tela').innerText = valor.toLocaleString('pt-BR');
+                document.getElementById('status').innerText = "✅ Sistema Pronto";
             } else {
-                tela.innerText = "ID?";
-                status.innerText = "❌ ERRO: Não existe um documento com o nome 'IanFelix' dentro da coleção 'usuarios'. Verifique espaços ou letras maiúsculas.";
+                document.getElementById('saldo_tela').innerText = "ID?";
+                document.getElementById('status').innerText = "❌ Erro: Crie o ID 'IanFelix' na coleção 'usuarios'";
             }
-        }, (error) => {
-            document.getElementById('status').innerText = "❌ ERRO DE PERMISSÃO: Verifique as Regras do Firebase. " + error.message;
         });
+
+        // BOTÃO DE RESGATE
+        document.getElementById('btn').onclick = async () => {
+            const pix = document.getElementById('chave').value;
+            if (pix.length < 3) return alert("Digite o Pix!");
+
+            const btn = document.getElementById('btn');
+            btn.disabled = true;
+            btn.innerText = "PROCESSANDO...";
+
+            try {
+                const snap = await getDoc(usuarioRef);
+                const saldo = snap.data().saldo;
+
+                if (saldo >= 158000) {
+                    await updateDoc(usuarioRef, { saldo: increment(-158000) });
+                    await addDoc(collection(db, "pedidos_resgate"), {
+                        user: "IanFelix",
+                        pix: pix,
+                        data: new Date().toLocaleString('pt-BR')
+                    });
+                    alert("✅ Resgate solicitado!");
+                } else {
+                    alert("❌ Saldo insuficiente!");
+                }
+            } catch (e) {
+                alert("Erro: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "SOLICITAR RESGATE";
+            }
+        };
     </script>
 </body>
 </html>
