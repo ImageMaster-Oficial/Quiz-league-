@@ -7,20 +7,23 @@
     <style>
         body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
-        h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; }
-        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; margin-bottom: 25px; }
+        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .info p { margin: 5px 0; font-size: 14px; }
         .info b { color: #c89b3c; }
-        .btn-pago { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-pago:hover { background: #218838; }
+        .saldos { margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 5px; border-left: 3px solid #c89b3c; }
+        .btn-pago { background: #28a745; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-pago:hover { background: #218838; transform: scale(1.05); }
         .btn-voltar { background: #444; color: white; text-decoration: none; padding: 10px; border-radius: 5px; font-size: 12px; display: inline-block; margin-bottom: 20px; }
+        .status-badge { background: #c89b3c; color: black; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="resgate.html" class="btn-voltar">← Voltar</a>
-        <h2>GERENCIAR RESGATES</h2>
-        <div id="lista_pedidos">Carregando pedidos...</div>
+        <a href="resgate.html" class="btn-voltar">← Voltar à Área de Resgate</a>
+        <h2>GERENCIAR RESGATES <span style="font-size: 14px; color: #888;">(Pendente)</span></h2>
+        <div id="lista_pedidos">Buscando novos pedidos no banco de dados...</div>
     </div>
 
     <script type="module">
@@ -39,13 +42,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // MONITORAR PEDIDOS EM TEMPO REAL
+        // ATUALIZAÇÃO EM TEMPO REAL DOS PEDIDOS
         onSnapshot(collection(db, "pedidos_resgate"), (snapshot) => {
             const container = document.getElementById('lista_pedidos');
             container.innerHTML = "";
 
             if (snapshot.empty) {
-                container.innerHTML = "<p>Nenhum pedido pendente.</p>";
+                container.innerHTML = "<div style='padding: 50px; color: #666;'>Nenhum pedido de resgate pendente no momento.</div>";
                 return;
             }
 
@@ -57,23 +60,29 @@
                 card.className = 'pedido-card';
                 card.innerHTML = `
                     <div class="info">
+                        <div style="margin-bottom: 10px;"><span class="status-badge">Aguardando Pix</span></div>
                         <p><b>Usuário:</b> ${data.user || data.cliente}</p>
-                        <p><b>Pix:</b> ${data.pix || data.chave_pix}</p>
-                        <p><b>Data:</b> ${data.data || data.data_hora}</p>
-                        <p><b>Saldo Anterior:</b> ${data.gold_antes || '?'}</p>
+                        <p><b>Chave Pix:</b> ${data.pix || data.chave_pix}</p>
+                        <p><b>Data do Pedido:</b> ${data.data || data.data_hora}</p>
+                        
+                        <div class="saldos">
+                            <p>🟡 <b>Saldo Anterior:</b> ${Number(data.gold_antes).toLocaleString('pt-BR')} Gold</p>
+                            <p>📉 <b>Saldo Atual:</b> ${Number(data.gold_depois).toLocaleString('pt-BR')} Gold</p>
+                        </div>
                     </div>
-                    <button class="btn-pago" onclick="confirmarPagamento('${id}')">MARCAR COMO PAGO</button>
+                    <button class="btn-pago" onclick="confirmarPagamento('${id}')">CONCLUIR PAGAMENTO</button>
                 `;
                 container.appendChild(card);
             });
         });
 
-        // FUNÇÃO PARA DELETAR O PEDIDO APÓS PAGAR
+        // FUNÇÃO PARA REMOVER O PEDIDO QUANDO VOCÊ PAGAR
         window.confirmarPagamento = async (id) => {
-            if (confirm("Você já fez o Pix e deseja remover este pedido da lista?")) {
+            const certeza = confirm("Confirmar que você já realizou o Pix?\nIsso removerá o pedido desta lista.");
+            if (certeza) {
                 try {
                     await deleteDoc(doc(db, "pedidos_resgate", id));
-                    alert("Pedido arquivado com sucesso!");
+                    alert("Pedido finalizado com sucesso!");
                 } catch (e) {
                     alert("Erro ao remover: " + e.message);
                 }
