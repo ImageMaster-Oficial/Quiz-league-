@@ -8,31 +8,31 @@
         :root { 
             --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
             --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 75px; --correct: #28a745; --wrong: #dc3545;
+            --ad-space: 85px; /* ESPAÇO RESERVADO PARA O ANÚNCIO */
+            --correct: #28a745; --wrong: #dc3545;
         }
         html, body { 
             font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #051421 0%, #010a13 100%);
             color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior-y: contain;
         }
-        .app-container { flex: 1; display: flex; flex-direction: column; padding: 10px 0; gap: 8px; width: 94%; max-width: 400px; box-sizing: border-box; }
         
-        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px; flex-shrink: 0; width: 100%; box-sizing: border-box; }
+        /* CONTAINER SUBIDO PARA DAR ESPAÇO AO RODAPÉ */
+        .app-container { 
+            flex: 1; display: flex; flex-direction: column; 
+            padding: 5px 0; gap: 8px; width: 94%; max-width: 400px; 
+            box-sizing: border-box; 
+            margin-bottom: var(--ad-space); /* SOBE O CONTEÚDO */
+        }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; flex-shrink: 0; width: 100%; box-sizing: border-box; }
         .title-legends h1 {
-            font-size: 1.8rem;
-            margin: 0; color: var(--gold); text-transform: uppercase;
+            font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase;
             background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         
-        .coin-badge { 
-            border: 2px solid var(--gold); 
-            padding: 8px 15px;
-            background: rgba(1, 10, 19, 0.9); 
-            color: var(--gold); 
-            font-weight: 900; 
-            font-size: 1.1rem;
-        }
+        .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; font-size: 1rem; }
         
         .hex-frame {
             background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; flex: 1;
@@ -54,28 +54,35 @@
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; color: white !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; color: white !important; }
         
-        .video-wrapper { text-align: center; margin-top: auto; padding-top: 10px; width: 100%; z-index: 2; }
+        .video-wrapper { text-align: center; margin-top: auto; padding-top: 5px; width: 100%; z-index: 2; }
         .limit-label { font-size: 0.65rem; color: var(--gold); display: block; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
         .video-btn { 
             background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
+            color: #f0e6d2; padding: 10px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
         }
 
         .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
         .resgate-opt {
             flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold);
-            padding: 12px 2px;
-            font-size: 0.85rem;
-            font-weight: 900; cursor: pointer; text-align: center;
-            transition: 0.3s;
+            padding: 10px 2px; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-align: center;
         }
-        .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); box-shadow: 0 0 8px var(--gold); }
+        .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); }
 
         .progress-bg { background: #000; height: 10px; border: 1px solid var(--gold-dark); margin-top: 4px; }
         .progress-fill { background: var(--gold); height: 100%; width: 0%; transition: 0.7s; }
         
         input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 6px 0; box-sizing: border-box; font-size: 0.9rem; }
-        #avisoStatusQuiz { text-align: center; font-size: 0.8rem; color: var(--gold); font-weight: bold; margin-top: 8px; text-transform: uppercase; }
+        #avisoStatusQuiz { text-align: center; font-size: 0.8rem; color: var(--gold); font-weight: bold; margin-top: 5px; text-transform: uppercase; }
+
+        /* ESPAÇO FIXO DO ANÚNCIO NO RODAPÉ */
+        .footer-ad-space {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            height: var(--ad-space); background: #000;
+            border-top: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold); font-size: 0.7rem; font-weight: bold;
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
@@ -88,21 +95,21 @@
         
         <div class="hex-frame">
             <div class="quiz-wrapper" id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0;">Sincronizando Nexus...</p>
+                <p id="perguntaTexto" style="text-align: center; font-size: 0.95rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Carregando Questão...</p>
                 <div id="opcoes"></div>
                 <p id="avisoStatusQuiz"></p>
             </div>
 
             <div class="video-wrapper">
-                <span class="limit-label">Limite Diário: <span id="limitDiario">0/35</span> Vídeos</span>
-                <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
+                <span class="limit-label">Limite: <span id="limitDiario">0/35</span> Vídeos</span>
+                <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (+300)</button>
             </div>
         </div>
 
         <div class="hex-frame" style="flex: 0;">
             <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
             <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 6px 0; font-weight: bold;">
-                <span id="txtMeta">Meta: 15.8k Gold</span>
+                <span id="txtMeta">Meta: 15.8k</span>
                 <span id="txtPorcentagem">0%</span>
             </div>
             
@@ -112,9 +119,13 @@
                 <div class="resgate-opt" onclick="setResgate(this, 150000)">R$ 5,00</div>
             </div>
 
-            <input type="text" id="chavePix" placeholder="CHAVE PIX PARA RECEBER">
-            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%; padding: 15px;">SOLICITAR RESGATE PIX</button>
+            <input type="text" id="chavePix" placeholder="CHAVE PIX">
+            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%; padding: 15px;">RESGATAR AGORA</button>
         </div>
+    </div>
+
+    <div class="footer-ad-space">
+        ESPAÇO PARA BANNER DE ANÚNCIO
     </div>
 
     <script type="module">
@@ -133,49 +144,30 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const REQUISITO_ACERTOS = 10;
-        const REQUISITO_VIDEOS = 3;
-        const LIMITE_DIARIO = 35;
-
         let metaAtual = 15800;
         let usuarioLogado = localStorage.getItem("usuarioLogado");
-        if (!usuarioLogado) window.location.href = "index.html";
-
         const userRef = doc(db, "usuarios", usuarioLogado);
-        let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje;
-        let jogoInicializado = false;
+        let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
 
-        // PERGUNTAS COM 4 OPÇÕES (RESTAURADO)
         const perguntasBase = [
             { q: "Quem é o cego de Ionia?", a: ["Jax", "Lee Sin", "Yi", "Yone"], correct: "Lee Sin" },
             { q: "Região de Garen e Lux?", a: ["Noxus", "Ionia", "Demacia", "Piltover"], correct: "Demacia" },
             { q: "Qual a irmã da Jinx?", a: ["Vi", "Lux", "Caitlyn", "Diana"], correct: "Vi" },
-            { q: "Qual campeão usa um poste?", a: ["Darius", "Jax", "Garen", "Sion"], correct: "Jax" },
-            { q: "Quem criou o Blitzcrank?", a: ["Viktor", "Jayce", "Ekko", "Singed"], correct: "Viktor" },
-            { q: "Qual o nome do urso da Annie?", a: ["Daisy", "Tibbers", "Willump", "Skarner"], correct: "Tibbers" }
+            { q: "Qual campeão usa um poste?", a: ["Darius", "Jax", "Garen", "Sion"], correct: "Jax" }
         ];
 
-        // LÓGICA DE ESCUTA COM RESET DIÁRIO (MANTIDA PARA FUNCIONAR AUTOMÁTICO)
         onSnapshot(userRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 const hoje = new Date().toLocaleDateString('pt-BR');
-
                 if (data.ultimaDataAcesso !== hoje) {
-                    await updateDoc(userRef, {
-                        totalVideosHoje: 0,
-                        videosAssistidos: 0,
-                        acertos: 0,
-                        ultimaDataAcesso: hoje
-                    });
+                    await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje });
                     return;
                 }
-
                 goldDB = data.saldo || 0;
                 acertosNoCiclo = data.acertos || 0;
                 videosAssistidos = data.videosAssistidos || 0;
                 totalVideosHoje = data.totalVideosHoje || 0;
-                
                 atualizarInterface();
                 if (!jogoInicializado) { jogoInicializado = true; carregarQuestao(); }
             }
@@ -183,23 +175,20 @@
 
         function atualizarInterface() {
             document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/${LIMITE_DIARIO}`;
+            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
             let progresso = Math.min((goldDB / metaAtual) * 100, 100);
             document.getElementById('progressBar').style.width = progresso + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
-            document.getElementById('txtMeta').innerText = `Meta: ${(metaAtual/1000).toFixed(1)}k Gold`;
             
             const btnVideo = document.getElementById('btnVideo');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            if (totalVideosHoje >= LIMITE_DIARIO) {
+            if (totalVideosHoje >= 35) {
                 btnVideo.disabled = true; aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
-            } else if (acertosNoCiclo < REQUISITO_ACERTOS) {
-                btnVideo.disabled = true;
-                aviso.innerHTML = `ACERTE <span style="color:#28a745">${REQUISITO_ACERTOS - acertosNoCiclo}</span> QUESTÕES`;
+            } else if (acertosNoCiclo < 10) {
+                btnVideo.disabled = true; aviso.innerHTML = `ACERTE <span style="color:#28a745">${10 - acertosNoCiclo}</span> QUESTÕES`;
             } else {
-                btnVideo.disabled = false;
-                aviso.innerHTML = `ASSISTA <span style="color:#28a745">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS`;
+                btnVideo.disabled = false; aviso.innerHTML = `ASSISTA <span style="color:#28a745">${3 - videosAssistidos}</span> VÍDEOS`;
             }
         }
 
@@ -210,62 +199,27 @@
             const intervalo = setInterval(() => {
                 btn.innerText = `ASSISTINDO... ${tempo}s`;
                 tempo--;
-                if (tempo < 0) {
-                    clearInterval(intervalo);
-                    finalizarVideo();
-                }
+                if (tempo < 0) { clearInterval(intervalo); finalizarVideo(); }
             }, 1000);
         };
 
         async function finalizarVideo() {
-            const btn = document.getElementById('btnVideo');
-            let novosVideosAssistidos = videosAssistidos + 1;
-            let dadosUpdate = {
-                saldo: increment(300),
-                videosAssistidos: increment(1),
-                totalVideosHoje: increment(1)
-            };
-            if (novosVideosAssistidos >= REQUISITO_VIDEOS) {
-                dadosUpdate.acertos = 0;
-                dadosUpdate.videosAssistidos = 0;
-            }
-            await updateDoc(userRef, dadosUpdate);
-            btn.innerText = "📺 ASSISTIR ANÚNCIO (300 GOLD)";
+            let novosVideos = videosAssistidos + 1;
+            let dados = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+            if (novosVideos >= 3) { dados.acertos = 0; dados.videosAssistidos = 0; }
+            await updateDoc(userRef, dados);
+            document.getElementById('btnVideo').innerText = "📺 ASSISTIR ANÚNCIO (+300)";
             carregarQuestao();
         }
 
         document.getElementById('btnResgate').onclick = async () => {
             const chave = document.getElementById('chavePix').value;
-            const btn = document.getElementById('btnResgate');
-
-            if (goldDB < metaAtual) { alert("Saldo insuficiente!"); return; }
-            if (chave.length < 5) { alert("Chave PIX inválida!"); return; }
-
-            btn.disabled = true;
-            btn.innerText = "PROCESSANDO...";
-
-            try {
-                await addDoc(collection(db, "resgates"), {
-                    usuarioId: usuarioLogado,
-                    chavePix: chave,
-                    valorGold: metaAtual,
-                    valorReais: metaAtual === 15800 ? "0,50" : (metaAtual === 31500 ? "1,00" : "5,00"),
-                    goldAnterior: goldDB,
-                    goldPosResgate: goldDB - metaAtual,
-                    status: "Pendente",
-                    data: new Date().toLocaleString('pt-BR'),
-                    timestamp: Date.now()
-                });
-
-                await updateDoc(userRef, { saldo: increment(-metaAtual) });
-                alert("Pedido de resgate enviado com sucesso!");
-                document.getElementById('chavePix').value = "";
-            } catch (e) {
-                alert("Erro ao solicitar resgate.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "SOLICITAR RESGATE PIX";
-            }
+            if (goldDB < metaAtual || chave.length < 5) { alert("Saldo insuficiente ou chave inválida!"); return; }
+            await addDoc(collection(db, "resgates"), {
+                usuarioId: usuarioLogado, chavePix: chave, valorGold: metaAtual, status: "Pendente", data: new Date().toLocaleString('pt-BR')
+            });
+            await updateDoc(userRef, { saldo: increment(-metaAtual) });
+            alert("Solicitado!");
         };
 
         window.setResgate = (el, valor) => {
@@ -277,14 +231,14 @@
 
         function carregarQuestao() {
             const container = document.getElementById('opcoes');
-            const textoQuestao = document.getElementById('perguntaTexto');
-            if (acertosNoCiclo >= REQUISITO_ACERTOS) {
-                textoQuestao.innerText = "Meta de questões atingida!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista aos vídeos abaixo para liberar mais questões.</p>`;
+            const texto = document.getElementById('perguntaTexto');
+            if (acertosNoCiclo >= 10) {
+                texto.innerText = "Meta de questões atingida!";
+                container.innerHTML = "<p style='text-align:center;'>Assista aos vídeos para liberar mais.</p>";
                 return;
             }
             const q = perguntasBase[Math.floor(Math.random() * perguntasBase.length)];
-            textoQuestao.innerText = q.q;
+            texto.innerText = q.q;
             container.innerHTML = "";
             q.a.forEach(opt => {
                 const btn = document.createElement('button');
