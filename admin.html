@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Quiz Legends</title>
+    <title>Admin - Quiz Legends v2</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#010a13">
@@ -43,12 +43,23 @@
     <div id="painel_conteudo">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="margin:0;">PEDIDOS PIX</h2>
-            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px">Sair</button>
+            <button onclick="localStorage.clear(); location.reload();" style="background:#444; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px">Limpar & Sair</button>
         </div>
-        <div id="lista_pedidos">Aguardando novos resgates...</div>
+        <div id="lista_pedidos">Sincronizando banco de dados...</div>
     </div>
 
     <script type="module">
+        // FORÇAR ATUALIZAÇÃO DO SERVICE WORKER ANTIGO
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for(let registration of registrations) { registration.unregister(); }
+            });
+            navigator.serviceWorker.register('sw.js?v=2').then(reg => {
+                console.log("Novo Service Worker v2 registrado!");
+                reg.update();
+            });
+        }
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
@@ -68,7 +79,6 @@
         const messaging = getMessaging(app);
         const audio = document.getElementById("notifSound");
 
-        // --- FUNÇÃO PARA ATIVAR PUSH OFICIAL ---
         async function registrarPush() {
             try {
                 const permission = await Notification.requestPermission();
@@ -76,20 +86,10 @@
                     const token = await getToken(messaging, { 
                         vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" 
                     });
-                    if (token) console.log("Push registrado!");
+                    if (token) console.log("Token PWA ativo!");
                 }
             } catch (err) {
-                console.log("Erro ao registrar Push:", err);
-            }
-        }
-
-        function enviarNotificacaoLocal() {
-            if (Notification.permission === "granted") {
-                const n = new Notification("💰 NOVO RESGATE!", {
-                    body: "Um usuário solicitou um novo PIX agora.",
-                    icon: "icone-admin.png"
-                });
-                n.onclick = () => { window.focus(); n.close(); };
+                console.log("Erro no Push:", err);
             }
         }
 
@@ -102,7 +102,9 @@
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added" && !snapshot.metadata.fromCache) {
                         audio.play().catch(() => {});
-                        enviarNotificacaoLocal();
+                        if (Notification.permission === "granted") {
+                            new Notification("💰 NOVO RESGATE!", { body: "Um usuário solicitou PIX", icon: "icone-admin.png" });
+                        }
                     }
                 });
 
@@ -134,6 +136,9 @@
                     `;
                     container.appendChild(card);
                 });
+            }, (error) => {
+                console.error("Erro Firestore:", error);
+                container.innerHTML = "<p style='color:red'>Erro de sincronização. Recarregue a página.</p>";
             });
         }
 
