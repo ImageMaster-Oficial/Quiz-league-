@@ -75,7 +75,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -88,33 +87,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const messaging = getMessaging(app);
         const audio = document.getElementById("notifSound");
 
-        async function registrarPush() {
-            try {
-                const permission = await Notification.requestPermission();
-                if (permission === "granted") {
-                    await getToken(messaging, { vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" });
-                }
-            } catch (e) {}
-        }
-
-        // --- FUNÇÃO CORRIGIDA PARA REMOVER O .0k ---
+        // FUNÇÃO DE FORMATAÇÃO AJUSTADA
         function limparGold(valor) {
-            if (!valor) return "0";
-            let str = String(valor).toLowerCase();
-            // Remove o ".0k" e substitui por "k" ou formata
-            str = str.replace(".0k", "k"); 
-            // Se você preferir que mostre "150.000" em vez de "150k", use esta linha abaixo:
-            // str = str.replace(".0k", "000").replace("k", "000"); 
-            return str;
-        }
-
-        function formatarData(timestamp) {
-            if(!timestamp) return "Data desconhecida";
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleString('pt-BR');
+            if (valor === undefined || valor === null) return "0";
+            let num = parseFloat(String(valor).replace('k', '000'));
+            return num.toLocaleString('pt-BR');
         }
 
         function iniciarPainel() {
@@ -136,17 +115,17 @@
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
                     
-                    // Converte para número apenas para comparar fraude
-                    const n1 = parseFloat(String(data.goldAnterior).replace('k', '000'));
-                    const n2 = parseFloat(String(data.valorGold).replace('k', '000'));
-                    const suspeito = n1 < n2;
+                    // Lógica de fraude: Se o saldo anterior for menor que o custo do saque
+                    const nAnterior = parseFloat(data.goldAnterior) || 0;
+                    const nCusto = parseFloat(data.valorGold) || 0;
+                    const suspeito = nAnterior < nCusto;
                     
                     const card = document.createElement('div');
                     card.className = `pedido-card ${suspeito ? 'blink-alerta' : ''}`;
                     card.innerHTML = `
-                        <span class="timestamp">📅 Solicitado em: ${formatarData(data.timestamp)}</span>
+                        <span class="timestamp">📅 Solicitado em: ${data.data || 'Data indisponível'}</span>
                         <div class="info">
-                            <b>Usuário:</b> <span style="color:var(--ouro)">${data.usuarioId}</span>
+                            <b>Usuário ID:</b> <span style="color:var(--ouro)">${data.usuarioId}</span>
                             
                             <div class="pix-container" onclick="navigator.clipboard.writeText('${data.chavePix}'); alert('PIX Copiado!')">
                                 <span class="copy-label">CLIQUE PARA COPIAR PIX</span>
@@ -174,7 +153,6 @@
             if (document.getElementById('admin_pass').value === "Belial10") {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
-                registrarPush();
                 iniciarPainel();
             } else {
                 document.getElementById('erro_msg').innerText = "Senha incorreta!";
@@ -182,8 +160,10 @@
         };
 
         window.confirmarPagamento = async (id) => {
-            if (confirm("Confirmar pagamento?")) {
-                await deleteDoc(doc(db, "resgates", id));
+            if (confirm("Confirmar pagamento? O pedido será removido da lista.")) {
+                try {
+                    await deleteDoc(doc(db, "resgates", id));
+                } catch(e) { alert("Erro ao deletar pedido."); }
             }
         };
     </script>
