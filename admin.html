@@ -3,39 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Quiz Legends vFinal</title>
+    <title>Admin - Quiz Legends</title>
     
-    <script>
-        // SCRIPT DE LIMPEZA TOTAL - Roda antes de carregar o Firebase
-        async function nukeAll() {
-            // 1. Deleta Service Workers
-            if ('serviceWorker' in navigator) {
-                const regs = await navigator.serviceWorker.getRegistrations();
-                for(let reg of regs) { await reg.unregister(); }
-            }
-            // 2. Limpa Cache e Storages
-            const cachesKeys = await caches.keys();
-            for(let key of cachesKeys) { await caches.delete(key); }
-            localStorage.clear();
-            sessionStorage.clear();
-            console.log("Navegador limpo. Tentando sincronizar...");
-        }
-        nukeAll();
-    </script>
-
     <link rel="manifest" href="manifest.json">
     <style>
-        body { background: #010a13; color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; }
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #010a13; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-box { border: 2px solid #c89b3c; padding: 40px; background: #091428; border-radius: 10px; text-align: center; width: 300px; }
-        #painel_conteudo { display: none; max-width: 800px; margin: 0 auto; }
-        h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        input { padding: 14px; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; width: 100%; box-sizing: border-box; margin-bottom: 15px; font-size: 16px; outline: none; }
-        button.btn-entrar { background: #c89b3c; color: black; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .pix-box { background: #000; padding: 12px; border-radius: 4px; color: #00ffcc; font-family: monospace; font-size: 1.1em; margin: 10px 0; border: 1px dashed #444; word-break: break-all; }
-        .saldos-container { margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 5px; border-left: 4px solid #c89b3c; font-size: 14px; }
-        .btn-pago { background: #28a745; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; font-size: 16px; }
+        .lock-box { border: 2px solid #c89b3c; padding: 30px; background: #091428; border-radius: 10px; text-align: center; }
+        #painel_conteudo { display: none; max-width: 600px; margin: 0 auto; }
+        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #c89b3c; }
+        button { background: #c89b3c; color: black; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
+        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .pix-box { background: #000; padding: 10px; color: #00ffcc; font-family: monospace; margin: 10px 0; border: 1px dashed #444; }
+        .btn-pago { background: #28a745; color: white; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -44,27 +24,22 @@
 
     <div id="lock-screen">
         <div class="lock-box">
-            <h2>ADMIN</h2>
+            <h2 style="color:#c89b3c">ADMIN</h2>
             <input type="password" id="admin_pass" placeholder="Senha Mestra">
-            <button class="btn-entrar" id="btn_acessar">LIBERAR PAINEL</button>
-            <p id="erro_msg" style="color: #ff4444; font-size: 13px; margin-top: 15px;"></p>
+            <button id="btn_acessar">ENTRAR NO PAINEL</button>
         </div>
     </div>
 
     <div id="painel_conteudo">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin:0;">PEDIDOS PIX</h2>
-            <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px">Sair</button>
-        </div>
-        <div id="lista_pedidos">Conectando ao banco...</div>
+        <h2>PEDIDOS DE RESGATE</h2>
+        <div id="lista_pedidos">Conectando...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
-        const SENHA_MESTRA = "Belial10"; 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
             authDomain: "quizlegends-f58fc.firebaseapp.com",
@@ -79,74 +54,59 @@
         const messaging = getMessaging(app);
         const audio = document.getElementById("notifSound");
 
-        async function registrarPush() {
+        async function ativarPush() {
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === "granted") {
+                    // COLE SUA CHAVE VAPID ABAIXO
                     await getToken(messaging, { vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" });
                 }
-            } catch (e) {}
+            } catch (e) { console.log("Push desativado"); }
         }
 
-        function iniciarPainel() {
+        function carregarDados() {
             const q = query(collection(db, "resgates"), orderBy("timestamp", "desc"));
-            
-            // Força o Firebase a re-conectar à rede
-            disableNetwork(db).then(() => enableNetwork(db));
-
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
                 
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === "added" && !snapshot.metadata.fromCache) {
-                        audio.play().catch(() => {});
-                    }
-                });
+                // Som de alerta
+                if (!snapshot.metadata.fromCache && snapshot.docChanges().some(c => c.type === "added")) {
+                    audio.play().catch(() => {});
+                }
 
                 container.innerHTML = "";
                 if (snapshot.empty) {
-                    container.innerHTML = "<p style='color:#888; text-align:center;'>Nenhum pedido.</p>";
+                    container.innerHTML = "<p>Nenhum pedido pendente.</p>";
                     return;
                 }
 
-                snapshot.forEach((pedido) => {
-                    const data = pedido.data();
+                snapshot.forEach((p) => {
+                    const d = p.data();
                     const card = document.createElement('div');
                     card.className = 'pedido-card';
                     card.innerHTML = `
-                        <div class="info">
-                            <p><b>Usuário:</b> ${data.usuarioId}</p>
-                            <div class="pix-box">${data.chavePix}</div>
-                            <p><b>Valor:</b> <span style="color:#28a745; font-weight:bold; font-size:1.3em;">R$ ${data.valorReais}</span></p>
-                            <div class="saldos-container">
-                                <b>Relatório:</b><br>
-                                Anterior: ${data.goldAnterior || 0}<br>
-                                Atual: ${data.goldPosResgate || 0}
-                            </div>
-                        </div>
-                        <button class="btn-pago" onclick="confirmarPagamento('${pedido.id}')">PAGO</button>
+                        <b>ID:</b> ${d.usuarioId}<br>
+                        <div class="pix-box">${d.chavePix}</div>
+                        <b>Valor: R$ ${d.valorReais}</b><br>
+                        <small>Anterior: ${d.goldAnterior} | Atual: ${d.goldPosResgate}</small><br>
+                        <button class="btn-pago" onclick="marcarPago('${p.id}')">MARCAR COMO PAGO</button>
                     `;
                     container.appendChild(card);
                 });
-            }, (error) => {
-                console.error(error);
-                document.getElementById('lista_pedidos').innerHTML = "Erro de conexão. Verifique se há extensões bloqueando o site.";
             });
         }
 
         document.getElementById('btn_acessar').onclick = () => {
-            if (document.getElementById('admin_pass').value === SENHA_MESTRA) {
+            if (document.getElementById('admin_pass').value === "Belial10") {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
-                registrarPush();
-                iniciarPainel();
-            } else {
-                document.getElementById('erro_msg').innerText = "Senha incorreta!";
+                ativarPush();
+                carregarDados();
             }
         };
 
-        window.confirmarPagamento = async (id) => {
-            if (confirm("Remover pedido?")) await deleteDoc(doc(db, "resgates", id));
+        window.marcarPago = async (id) => {
+            if (confirm("Confirmar pagamento?")) await deleteDoc(doc(db, "resgates", id));
         };
     </script>
 </body>
