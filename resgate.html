@@ -8,19 +8,66 @@
         :root { 
             --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
             --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 70px; /* Ajustado para 70px conforme solicitado */
+            --ad-space: 70px; 
             --correct: #28a745; --wrong: #dc3545;
         }
+        
         html, body { 
-            font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #051421 0%, #010a13 100%);
-            color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
-            height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior-y: contain;
+            font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle, #051421 0%, #010a13 100%);
+            color: var(--text); 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            min-height: 100vh; 
+            width: 100vw; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            /* Importante para o refresh personalizado: */
+            overscroll-behavior-y: contain;
+        }
+
+        /* Estilo do indicador de Recarregar */
+        #pull-to-refresh {
+            position: fixed;
+            top: -60px; /* Escondido acima */
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: transform 0.2s ease;
+        }
+
+        .refresh-badge {
+            border: 2px solid var(--gold);
+            padding: 8px 20px;
+            background: rgba(9, 20, 40, 0.95);
+            color: var(--gold);
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(200, 155, 60, 0.3);
+            clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
         }
         
         .app-container { 
-            flex: 1; display: flex; flex-direction: column; 
-            padding: 10px 0; gap: 10px; width: 94%; max-width: 400px; 
-            box-sizing: border-box; margin-bottom: var(--ad-space); justify-content: center; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 15px 0; 
+            gap: 10px; 
+            width: 94%; 
+            max-width: 400px; 
+            box-sizing: border-box; 
+            margin-bottom: var(--ad-space); 
+            justify-content: center;
+            transition: transform 0.2s ease; /* Para acompanhar o puxão */
         }
         
         .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; flex-shrink: 0; }
@@ -71,23 +118,19 @@
             color: var(--gold); font-size: 0.8rem; font-weight: bold; z-index: 1000;
         }
 
-        /* Estilo do link dentro do quadro ajustado para 70px */
         .link-politica-quadro {
-            display: block; 
-            text-align: center; 
-            color: var(--gold); 
-            font-size: 9px; 
-            text-decoration: none; 
-            margin-top: 10px; 
-            opacity: 0.5; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
+            display: block; text-align: center; color: var(--gold); font-size: 9px; 
+            text-decoration: none; margin-top: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div id="pull-to-refresh">
+        <div class="refresh-badge">Solte para Recarregar</div>
+    </div>
+
+    <div class="app-container" id="main-content">
         <div class="header-section">
             <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
             <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
@@ -120,7 +163,6 @@
 
             <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
             <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
-            
             <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
         </div>
     </div>
@@ -128,9 +170,48 @@
     <div class="footer-ad-space">ESPAÇO PARA ANÚNCIO</div>
 
     <script type="module">
+        // Lógica do Pull-to-Refresh
+        let startY = 0;
+        const refreshIndicator = document.getElementById('pull-to-refresh');
+        const mainContent = document.getElementById('main-content');
+        const threshold = 70; // Quanto precisa puxar para ativar (em pixels)
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) startY = e.touches[0].pageY;
+        }, {passive: true});
+
+        window.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].pageY;
+            const pullDistance = currentY - startY;
+
+            if (window.scrollY === 0 && pullDistance > 0) {
+                // Limita o quanto pode puxar visualmente
+                const move = Math.min(pullDistance * 0.5, threshold + 20);
+                refreshIndicator.style.transform = `translateY(${move}px)`;
+                mainContent.style.transform = `translateY(${move}px)`;
+                
+                // Muda a opacidade conforme puxa
+                refreshIndicator.style.opacity = move / threshold;
+            }
+        }, {passive: true});
+
+        window.addEventListener('touchend', () => {
+            const currentTransform = new WebKitCSSMatrix(window.getComputedStyle(refreshIndicator).transform).m42;
+            
+            if (currentTransform >= threshold) {
+                // Ativa o recarregamento
+                document.querySelector('.refresh-badge').innerText = "Recarregando...";
+                location.reload();
+            } else {
+                // Volta ao normal se não puxou o suficiente
+                refreshIndicator.style.transform = 'translateY(0)';
+                mainContent.style.transform = 'translateY(0)';
+            }
+        });
+
+        // Início do Script Firebase original
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        
         import { bancoPerguntas } from './pergunta.js';
 
         const firebaseConfig = {
@@ -156,17 +237,14 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 const hoje = new Date().toLocaleDateString('pt-BR');
-
                 if (data.ultimaDataAcesso !== hoje) {
                     await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje });
                     return;
                 }
-
                 goldDB = data.saldo || 0;
                 acertosNoCiclo = data.acertos || 0;
                 videosAssistidos = data.videosAssistidos || 0;
                 totalVideosHoje = data.totalVideosHoje || 0;
-
                 atualizarInterface();
                 if (!jogoInicializado) { jogoInicializado = true; carregarQuestao(); }
             }
@@ -175,15 +253,12 @@
         function atualizarInterface() {
             document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
             document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
-            
             let progresso = Math.min((goldDB / metaAtual) * 100, 100);
             document.getElementById('progressBar').style.width = progresso + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
             document.getElementById('txtMeta').innerText = `Meta: ${(metaAtual/1000).toFixed(1)}k`;
-
             const btnVideo = document.getElementById('btnVideo');
             const aviso = document.getElementById('avisoStatusQuiz');
-
             if (totalVideosHoje >= 35) {
                 btnVideo.disabled = true;
                 aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
@@ -212,17 +287,8 @@
 
         async function finalizarVideo() {
             let novosVideos = videosAssistidos + 1;
-            let dadosUpdate = {
-                saldo: increment(300),
-                videosAssistidos: increment(1),
-                totalVideosHoje: increment(1)
-            };
-
-            if (novosVideos >= 3) {
-                dadosUpdate.acertos = 0;
-                dadosUpdate.videosAssistidos = 0;
-            }
-
+            let dadosUpdate = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+            if (novosVideos >= 3) { dadosUpdate.acertos = 0; dadosUpdate.videosAssistidos = 0; }
             await updateDoc(userRef, dadosUpdate);
             document.getElementById('btnVideo').innerText = "📺 ASSISTIR ANÚNCIO (+300)";
             carregarQuestao();
@@ -238,77 +304,46 @@
 
         document.getElementById('btnResgate').onclick = async () => {
             const chave = document.getElementById('chavePix').value.trim();
-            if (goldDB < metaAtual) { 
-                alert("Saldo insuficiente para esta meta!"); 
-                return; 
-            }
-            if (chave.length < 5) { 
-                alert("Insira uma chave PIX válida!"); 
-                return; 
-            }
-
-            const saldoAnterior = goldDB;
-            const saldoResultante = goldDB - metaAtual;
-
+            if (goldDB < metaAtual) { alert("Saldo insuficiente!"); return; }
+            if (chave.length < 5) { alert("Chave PIX inválida!"); return; }
             try {
                 await addDoc(collection(db, "resgates"), {
-                    usuarioId: usuarioLogado,
-                    chavePix: chave,
-                    valorGold: metaAtual,
-                    valorReais: "R$ " + valorReaisMeta,
-                    goldAnterior: saldoAnterior,
-                    goldPosResgate: saldoResultante,
-                    status: "Pendente",
-                    data: new Date().toLocaleString('pt-BR'),
-                    timestamp: Date.now()
+                    usuarioId: usuarioLogado, chavePix: chave, valorGold: metaAtual,
+                    valorReais: "R$ " + valorReaisMeta, status: "Pendente",
+                    data: new Date().toLocaleString('pt-BR'), timestamp: Date.now()
                 });
-
                 await updateDoc(userRef, { saldo: increment(-metaAtual) });
-                alert("Solicitação de resgate enviada com sucesso!");
+                alert("Resgate solicitado!");
                 document.getElementById('chavePix').value = "";
-            } catch (e) {
-                alert("Erro ao processar resgate. Tente novamente.");
-            }
+            } catch (e) { alert("Erro no resgate."); }
         };
 
         function carregarQuestao() {
             const container = document.getElementById('opcoes');
             const texto = document.getElementById('perguntaTexto');
-
             if (acertosNoCiclo >= 10) {
-                texto.innerText = "Meta de acertos atingida!";
-                container.innerHTML = "<p style='text-align:center; color:var(--gold);'>Assista aos anúncios abaixo para liberar novas questões.</p>";
+                texto.innerText = "Meta atingida!";
+                container.innerHTML = "<p style='text-align:center; color:var(--gold);'>Assista aos anúncios abaixo.</p>";
                 return;
             }
-
             const q = bancoPerguntas[Math.floor(Math.random() * bancoPerguntas.length)];
-            
-            let opcoesEmbaralhadas = q.opcoes.map((opt, index) => {
-                return { texto: opt, correta: index === q.correta };
-            });
-
+            let opcoesEmbaralhadas = q.opcoes.map((opt, index) => { return { texto: opt, correta: index === q.correta }; });
             opcoesEmbaralhadas.sort(() => Math.random() - 0.5);
-
             texto.innerText = q.pergunta;
             container.innerHTML = "";
-
             opcoesEmbaralhadas.forEach((opcaoObj) => {
                 const btn = document.createElement('button');
                 btn.className = "option-btn";
                 btn.innerText = opcaoObj.texto;
-                
                 btn.onclick = async () => {
                     const btns = container.querySelectorAll('button');
                     btns.forEach(b => b.disabled = true);
-
                     if (opcaoObj.correta) {
                         btn.classList.add('btn-correct');
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) });
                     } else {
                         btn.classList.add('btn-wrong');
-                        opcoesEmbaralhadas.forEach((obj, i) => {
-                            if(obj.correta) btns[i].classList.add('btn-correct');
-                        });
+                        opcoesEmbaralhadas.forEach((obj, i) => { if(obj.correta) btns[i].classList.add('btn-correct'); });
                     }
                     setTimeout(carregarQuestao, 1200);
                 };
