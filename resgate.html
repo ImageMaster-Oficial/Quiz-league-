@@ -36,7 +36,7 @@
         
         .hex-frame {
             background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; flex: 1;
-            display: flex; flex-direction: column; justify-content: flex-start; /* Alinha itens no topo */
+            display: flex; flex-direction: column; justify-content: flex-start;
             box-sizing: border-box;
             clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
@@ -45,7 +45,6 @@
             pointer-events: none; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
 
-        /* Container interno para empurrar o botão para baixo */
         .quiz-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
 
         .option-btn { 
@@ -61,7 +60,6 @@
             background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
             color: #f0e6d2; padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
         }
-        .video-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
         .resgate-opt {
@@ -192,12 +190,11 @@
             }
         }
 
-        // LÓGICA DE SIMULAÇÃO DO VÍDEO
+        // LÓGICA DO VÍDEO (Simulação 3s)
         document.getElementById('btnVideo').onclick = async () => {
             const btn = document.getElementById('btnVideo');
             btn.disabled = true;
             let tempo = 3;
-            
             const intervalo = setInterval(() => {
                 btn.innerText = `ASSISTINDO... ${tempo}s`;
                 tempo--;
@@ -216,17 +213,55 @@
                 videosAssistidos: increment(1),
                 totalVideosHoje: increment(1)
             };
-
-            // Se completou os 3 vídeos, reseta os acertos e os vídeos do ciclo
             if (novosVideosAssistidos >= REQUISITO_VIDEOS) {
                 dadosUpdate.acertos = 0;
                 dadosUpdate.videosAssistidos = 0;
             }
-
             await updateDoc(userRef, dadosUpdate);
             btn.innerText = "📺 ASSISTIR ANÚNCIO (300 GOLD)";
-            carregarQuestao(); // Recarrega para caso o ciclo tenha resetado
+            carregarQuestao();
         }
+
+        // LÓGICA DE RESGATE PIX
+        document.getElementById('btnResgate').onclick = async () => {
+            const chave = document.getElementById('chavePix').value;
+            const btn = document.getElementById('btnResgate');
+
+            if (goldDB < metaAtual) {
+                alert("Saldo insuficiente para esta meta!");
+                return;
+            }
+            if (chave.length < 5) {
+                alert("Introduza uma chave PIX válida!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "PROCESSANDO...";
+
+            try {
+                // Envia para a coleção 'resgates' que o seu admin.html lê
+                await addDoc(collection(db, "resgates"), {
+                    usuarioId: usuarioLogado,
+                    chavePix: chave,
+                    valorGold: metaAtual,
+                    valorReais: metaAtual === 15800 ? "0,50" : (metaAtual === 31500 ? "1,00" : "5,00"),
+                    status: "Pendente",
+                    data: new Date().toLocaleString('pt-BR')
+                });
+
+                // Deduz o saldo do utilizador
+                await updateDoc(userRef, { saldo: increment(-metaAtual) });
+                
+                alert("Pedido de resgate enviado com sucesso!");
+                document.getElementById('chavePix').value = "";
+            } catch (e) {
+                alert("Erro ao solicitar resgate. Tente novamente.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "SOLICITAR RESGATE PIX";
+            }
+        };
 
         window.setResgate = (el, valor) => {
             metaAtual = valor;
