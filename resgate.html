@@ -134,10 +134,7 @@
 
         function openModal(title, text, type = 'alert', onConfirm = null) {
             mTitle.innerText = title; mText.innerText = text; mFooter.innerHTML = '';
-            
-            // Forçamos o título a ser sempre dourado no modal
             mTitle.style.color = "var(--gold)";
-
             if (type === 'confirm') {
                 const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR E ENVIAR';
                 bC.onclick = () => { onConfirm(); };
@@ -206,12 +203,27 @@
 
         async function enviarResgateFirebase() {
             const chave = document.getElementById('chavePix').value.trim();
+            const saldoAntes = goldDB;
+            const saldoDepois = goldDB - metaAtual;
+
             try {
-                await addDoc(collection(db, "resgates"), { usuarioId: usuarioLogado, chavePix: chave, valorGold: metaAtual, valorReais: "R$ " + valorReaisMeta, status: "Pendente", data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() });
-                await updateDoc(userRef, { saldo: increment(-metaAtual) });
+                // REGISTRO NO PAINEL COM SALDO INICIAL E FINAL
+                await addDoc(collection(db, "resgates"), { 
+                    usuarioId: usuarioLogado, 
+                    chavePix: chave, 
+                    valorGold: metaAtual, 
+                    valorReais: "R$ " + valorReaisMeta,
+                    saldoAnterior: saldoAntes,
+                    saldoFinal: saldoDepois,
+                    status: "Pendente", 
+                    data: new Date().toLocaleString('pt-BR'), 
+                    timestamp: Date.now() 
+                });
+                
+                // ATUALIZA O SALDO DO USUÁRIO
+                await updateDoc(userRef, { saldo: saldoDepois });
                 
                 openModal("SOLICITAÇÃO FEITA COM SUCESSO", "O envio do Pix pode demorar até 2 horas, devido à alta demanda de solicitações!");
-                
                 document.getElementById('chavePix').value = "";
             } catch (e) { openModal("ERRO", "Falha ao processar."); }
         }
@@ -230,10 +242,7 @@
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-            if (acertosNoCiclo >= 10) { 
-                t.innerText = ""; c.innerHTML = ""; 
-                return; 
-            }
+            if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
             let opts = q.opcoes.map((o, i) => { return { texto: o, correta: i === q.correta }; }).sort(() => Math.random() - 0.5);
             t.innerText = q.pergunta; c.innerHTML = "";
@@ -249,7 +258,6 @@
             });
         }
         
-        // Pull to refresh
         let sY = 0; window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
         window.addEventListener('touchmove', (e) => {
             const p = e.touches[0].pageY - sY;
