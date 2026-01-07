@@ -7,15 +7,15 @@
     <style>
         :root {
             --ouro: #c89b3c;
-            --ouro-claro: #f0e6d2;
-            --fundo-escuro: #010a13;
-            --azul-hextech: #0ac8b9;
+            --ouro-brilhante: #f0e6d2;
+            --fundo-profundo: #010a13;
+            --borda-input: rgba(200, 155, 60, 0.4);
         }
 
         body { 
             background: radial-gradient(circle at center, #091428 0%, #010a13 100%);
             color: white; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -24,172 +24,183 @@
             overflow: hidden;
         }
 
-        /* Partículas de Fundo Sutis */
+        /* Fundo com textura de poeira estelar */
         body::before {
             content: "";
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3;
+            opacity: 0.2;
             pointer-events: none;
         }
 
         .login-box { 
             position: relative;
-            border: 1px solid var(--ouro); 
+            border: 2px solid var(--ouro); 
             padding: 40px; 
-            background: rgba(9, 20, 40, 0.95); 
-            border-radius: 4px; 
+            background: linear-gradient(135deg, rgba(9, 20, 40, 0.98) 0%, rgba(1, 10, 19, 1) 100%); 
+            border-radius: 2px; 
             width: 350px; 
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(200, 155, 60, 0.1);
-            backdrop-filter: blur(10px);
-            z-index: 1;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(200, 155, 60, 0.05);
+            text-align: center;
         }
 
-        /* Detalhe de canto estilo moldura antiga */
-        .login-box::after {
+        /* Moldura de canto estilizada */
+        .login-box::before {
             content: "";
             position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border: 1px solid rgba(200, 155, 60, 0.3);
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border: 1px solid rgba(240, 230, 210, 0.1);
             pointer-events: none;
-            border-radius: 6px;
         }
 
-        .logo-area {
-            margin-bottom: 20px;
+        /* LOGO L ESTILIZADO */
+        .logo-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
         }
 
-        .logo-circle {
-            width: 70px;
-            height: 70px;
+        .logo-diamond {
+            width: 100%;
+            height: 100%;
+            background: #010a13;
             border: 2px solid var(--ouro);
-            border-radius: 50%;
-            margin: 0 auto 15px;
+            transform: rotate(45deg);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #010a13;
-            box-shadow: 0 0 15px var(--ouro);
+            box-shadow: 0 0 20px rgba(200, 155, 60, 0.3);
+        }
+
+        .logo-text {
+            transform: rotate(-45deg);
+            font-family: 'Georgia', serif;
+            font-size: 45px;
+            font-weight: bold;
+            color: var(--ouro);
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.8), 0 0 10px var(--ouro);
+            user-select: none;
         }
 
         h2 { 
-            color: var(--ouro-claro); 
+            color: var(--ouro-brilhante); 
             text-transform: uppercase; 
-            letter-spacing: 4px; 
-            margin-bottom: 30px; 
-            font-size: 24px;
-            font-weight: 300;
+            letter-spacing: 5px; 
+            margin-bottom: 35px; 
+            font-size: 22px;
+            font-weight: 400;
         }
 
+        /* INPUTS COM BORDAS DOURADAS */
         .input-group {
-            position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            text-align: left;
         }
 
         input { 
             width: 100%; 
             padding: 14px 15px; 
-            border-radius: 2px; 
-            border: 1px solid #3c3c41; 
-            background: #1e2328; 
+            border: 1px solid var(--borda-input); 
+            background: rgba(30, 35, 40, 0.7); 
             color: #f0e6d2; 
             box-sizing: border-box; 
             font-size: 14px; 
-            transition: 0.3s;
+            transition: all 0.3s ease;
             outline: none;
+            letter-spacing: 0.5px;
+        }
+
+        input::placeholder {
+            color: rgba(240, 230, 210, 0.3);
+            text-transform: uppercase;
+            font-size: 11px;
         }
 
         input:focus { 
             border-color: var(--ouro); 
-            background: #2a2e33;
-            box-shadow: inset 0 0 10px rgba(200, 155, 60, 0.1);
+            background: #1e2328;
+            box-shadow: 0 0 12px rgba(200, 155, 60, 0.2);
+            transform: translateY(-1px);
         }
 
+        /* BOTÃO PREMIUM */
         button { 
-            background: var(--ouro); 
+            background: linear-gradient(to bottom, #c89b3c 0%, #a07a2d 100%); 
             color: #010a13; 
-            padding: 15px; 
+            padding: 16px; 
             width: 100%; 
             border: 1px solid var(--ouro); 
             font-weight: bold; 
             cursor: pointer; 
-            border-radius: 2px; 
-            margin-top: 10px; 
+            margin-top: 15px; 
             font-size: 13px; 
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: 0.4s;
-            position: relative;
-            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         button:hover { 
-            background: #d4af37;
-            box-shadow: 0 0 20px rgba(200, 155, 60, 0.4);
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background: #444;
-            border-color: #555;
-            cursor: not-allowed;
-            transform: none;
+            filter: brightness(1.2);
+            box-shadow: 0 0 25px rgba(200, 155, 60, 0.5);
         }
 
         .footer-links { 
-            margin-top: 30px; 
-            font-size: 12px; 
-            color: #a09b8c; 
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            margin-top: 35px; 
+            font-size: 11px; 
+            color: #7e7e7e; 
+            letter-spacing: 1px;
         }
 
         .footer-links a { 
             color: var(--ouro); 
             text-decoration: none; 
             font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
             transition: 0.3s;
         }
 
-        .footer-links a:hover { color: #fff; }
+        .footer-links a:hover { color: #fff; text-shadow: 0 0 8px var(--ouro); }
 
         #msg { 
-            margin-top: 15px; 
-            font-size: 13px; 
+            margin-top: 20px; 
+            font-size: 12px; 
             color: #ff4e50; 
-            font-weight: bold;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            min-height: 15px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
     <div class="login-box">
-        <div class="logo-area">
-            <div class="logo-circle">
-                <span style="color:var(--ouro); font-size: 30px; font-weight: bold;">L</span>
+        <div class="logo-container">
+            <div class="logo-diamond">
+                <span class="logo-text">L</span>
             </div>
         </div>
         
-        <h2>LOGIN</h2>
+        <h2>Autenticação</h2>
         
         <div class="input-group">
-            <input type="text" id="user" placeholder="NOME DE USUÁRIO" autocomplete="off">
+            <input type="text" id="user" placeholder="Nome de Invencível" autocomplete="off">
         </div>
         
         <div class="input-group">
-            <input type="password" id="pass" placeholder="SENHA">
+            <input type="password" id="pass" placeholder="Senha Mestra">
         </div>
         
-        <button id="btnLogin">Acessar Conta</button>
+        <button id="btnLogin">ENTRAR NO REINO</button>
         
         <div id="msg"></div>
 
         <div class="footer-links">
-            AINDA NÃO POSSUI UMA CONTA?<br><br>
-            <a href="cadastro.html">CRIE UMA AGORA</a>
+            NOVO POR AQUI?<br>
+            <a href="cadastro.html">CRIAR UMA CONTA LENDÁRIA</a>
         </div>
     </div>
 
@@ -197,7 +208,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Configuração permanece a mesma
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
             authDomain: "quizlegends-f58fc.firebaseapp.com",
@@ -217,12 +227,12 @@
             const btn = document.getElementById('btnLogin');
 
             if (!usuarioInput || !senhaInput) {
-                msg.innerText = "Campos obrigatórios vazios!";
+                msg.innerText = "Campos obrigatórios!";
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "Autenticando...";
+            btn.innerText = "VERIFICANDO...";
 
             try {
                 const docRef = doc(db, "usuarios", usuarioInput);
@@ -232,14 +242,12 @@
                     localStorage.setItem("usuarioLogado", usuarioInput);
                     window.location.href = "resgate.html";
                 } else {
-                    msg.innerText = "Credenciais inválidas.";
-                    btn.disabled = false;
-                    btn.innerText = "Acessar Conta";
+                    msg.innerText = "Acesso negado: Credenciais inválidas.";
+                    btn.disabled = false; btn.innerText = "ENTRAR NO REINO";
                 }
             } catch (e) {
-                msg.innerText = "Servidor indisponível no momento.";
-                btn.disabled = false;
-                btn.innerText = "Acessar Conta";
+                msg.innerText = "Erro na conexão com o servidor.";
+                btn.disabled = false; btn.innerText = "ENTRAR NO REINO";
             }
         };
     </script>
