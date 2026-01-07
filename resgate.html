@@ -48,8 +48,8 @@
         .quiz-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
 
         .option-btn { 
-            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 10px; 
-            margin: 4px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
+            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 8px; 
+            margin: 3px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem;
         }
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; color: white !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; color: white !important; }
@@ -88,7 +88,7 @@
         
         <div class="hex-frame">
             <div class="quiz-wrapper" id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0;">Sincronizando Nexus...</p>
+                <p id="perguntaTexto" style="text-align: center; font-size: 0.95rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0;">Sincronizando Nexus...</p>
                 <div id="opcoes"></div>
                 <p id="avisoStatusQuiz"></p>
             </div>
@@ -116,8 +116,6 @@
             <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%; padding: 15px;">SOLICITAR RESGATE PIX</button>
         </div>
     </div>
-
-    <div class="ad-banner-footer" style="height: 75px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border-top: 2px solid var(--gold);">ANÚNCIO</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -147,13 +145,22 @@
         let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje;
         let jogoInicializado = false;
 
-        // --- LÓGICA DE ESCUTA EM TEMPO REAL COM RESET DIÁRIO ---
+        // --- LISTA DE PERGUNTAS COM 5 OPÇÕES CADA ---
+        const perguntasBase = [
+            { q: "Quem é o cego de Ionia?", a: ["Jax", "Lee Sin", "Yi", "Yone", "Kayn"], correct: "Lee Sin" },
+            { q: "Região de Garen e Lux?", a: ["Noxus", "Ionia", "Demacia", "Piltover", "Shurima"], correct: "Demacia" },
+            { q: "Qual a irmã da Vi?", a: ["Caitlyn", "Lux", "Jinx", "Diana", "Leona"], correct: "Jinx" },
+            { q: "Qual campeão usa um poste?", a: ["Darius", "Jax", "Garen", "Sion", "Tryndamere"], correct: "Jax" },
+            { q: "Quem criou o Blitzcrank?", a: ["Viktor", "Jayce", "Ekko", "Singed", "Heimerdinger"], correct: "Viktor" },
+            { q: "Qual o nome do urso da Annie?", a: ["Daisy", "Tibbers", "Willump", "Skarner", "Ivern"], correct: "Tibbers" }
+        ];
+
+        // --- LÓGICA DE RESET DIÁRIO E ESCUTA ---
         onSnapshot(userRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 const hoje = new Date().toLocaleDateString('pt-BR');
 
-                // Se o dia mudou, reseta tudo e salva a nova data
                 if (data.ultimaDataAcesso !== hoje) {
                     await updateDoc(userRef, {
                         totalVideosHoje: 0,
@@ -161,7 +168,7 @@
                         acertos: 0,
                         ultimaDataAcesso: hoje
                     });
-                    return; // Interrompe para aguardar o próximo ciclo com dados zerados
+                    return;
                 }
 
                 goldDB = data.saldo || 0;
@@ -236,7 +243,7 @@
                 return;
             }
             if (chave.length < 5) {
-                alert("Introduza uma chave PIX válida!");
+                alert("Chave PIX inválida!");
                 return;
             }
 
@@ -244,26 +251,23 @@
             btn.innerText = "PROCESSANDO...";
 
             try {
-                const saldoAnterior = goldDB;
-                const saldoDepois = goldDB - metaAtual;
-
                 await addDoc(collection(db, "resgates"), {
                     usuarioId: usuarioLogado,
                     chavePix: chave,
                     valorGold: metaAtual,
                     valorReais: metaAtual === 15800 ? "0,50" : (metaAtual === 31500 ? "1,00" : "5,00"),
-                    goldAnterior: saldoAnterior,
-                    goldPosResgate: saldoDepois,
+                    goldAnterior: goldDB,
+                    goldPosResgate: goldDB - metaAtual,
                     status: "Pendente",
                     data: new Date().toLocaleString('pt-BR'),
                     timestamp: Date.now()
                 });
 
                 await updateDoc(userRef, { saldo: increment(-metaAtual) });
-                alert("Pedido de resgate enviado com sucesso!");
+                alert("Pedido de resgate enviado!");
                 document.getElementById('chavePix').value = "";
             } catch (e) {
-                alert("Erro ao solicitar resgate.");
+                alert("Erro ao solicitar.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "SOLICITAR RESGATE PIX";
@@ -277,35 +281,33 @@
             atualizarInterface();
         }
 
-        const perguntasBase = [
-            { q: "Quem é o cego de Ionia?", a: ["Jax", "Lee Sin", "Yi", "Yone"], correct: "Lee Sin" },
-            { q: "Região de Garen e Lux?", a: ["Noxus", "Ionia", "Demacia", "Piltover"], correct: "Demacia" },
-            { q: "Qual a irmã da Jinx?", a: ["Vi", "Lux", "Caitlyn", "Diana"], correct: "Vi" },
-            { q: "Qual campeão usa um poste?", a: ["Darius", "Jax", "Garen", "Sion"], correct: "Jax" },
-            { q: "Quem criou o Blitzcrank?", a: ["Viktor", "Jayce", "Ekko", "Singed"], correct: "Viktor" },
-            { q: "Qual o nome do urso da Annie?", a: ["Daisy", "Tibbers", "Willump", "Skarner"], correct: "Tibbers" }
-        ];
-
         function carregarQuestao() {
             const container = document.getElementById('opcoes');
             const textoQuestao = document.getElementById('perguntaTexto');
             if (acertosNoCiclo >= REQUISITO_ACERTOS) {
                 textoQuestao.innerText = "Meta de questões atingida!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista aos vídeos abaixo para liberar mais questões.</p>`;
+                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista aos vídeos para liberar mais.</p>`;
                 return;
             }
             const q = perguntasBase[Math.floor(Math.random() * perguntasBase.length)];
             textoQuestao.innerText = q.q;
             container.innerHTML = "";
+            
+            // Aqui ele cria os botões baseados na quantidade de itens em 'q.a'
             q.a.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "option-btn";
                 btn.innerText = opt;
                 btn.onclick = async () => {
+                    const todosBtn = container.querySelectorAll('button');
+                    todosBtn.forEach(b => b.disabled = true); // Evita cliques múltiplos
+
                     if (opt === q.correct) {
                         btn.classList.add('btn-correct');
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) });
-                    } else { btn.classList.add('btn-wrong'); }
+                    } else { 
+                        btn.classList.add('btn-wrong'); 
+                    }
                     setTimeout(carregarQuestao, 800);
                 };
                 container.appendChild(btn);
