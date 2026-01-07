@@ -7,14 +7,12 @@
     <style>
         body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; margin: 0; }
         
-        /* Tela de Bloqueio */
         #lock-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #010a13; display: flex; align-items: center; justify-content: center; z-index: 10000; 
         }
         .lock-box { border: 2px solid #c89b3c; padding: 40px; background: #091428; border-radius: 10px; text-align: center; width: 300px; }
         
-        /* Painel escondido */
         #painel_conteudo { display: none; max-width: 800px; margin: 0 auto; }
         
         h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; text-transform: uppercase; }
@@ -50,7 +48,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // SUA SENHA AQUI
         const SENHA_MESTRA = "Belial10"; 
 
         const firebaseConfig = {
@@ -65,9 +62,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // FUNÇÃO QUE REALMENTE BUSCA OS DADOS
         function iniciarPainel() {
-            onSnapshot(collection(db, "pedidos_resgate"), (snapshot) => {
+            // MUDANÇA AQUI: Alterado de 'pedidos_resgate' para 'resgates'
+            onSnapshot(collection(db, "resgates"), (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
                 container.innerHTML = "";
                 
@@ -81,38 +78,40 @@
                     const id = pedido.id;
                     const card = document.createElement('div');
                     card.className = 'pedido-card';
+                    
+                    // MUDANÇA AQUI: Ajustado nomes dos campos para baterem com o jogo
                     card.innerHTML = `
                         <div class="info">
-                            <p><b>Usuário:</b> ${data.user}</p>
-                            <p><b>Pix:</b> ${data.pix}</p>
+                            <p><b>Usuário ID:</b> ${data.usuarioId}</p>
+                            <p><b>Pix:</b> ${data.chavePix}</p>
                             <div class="saldos">
-                                <b>Gold Antes:</b> ${Number(data.gold_antes).toLocaleString('pt-BR')} <br>
-                                <b>Gold Atual:</b> ${Number(data.gold_depois).toLocaleString('pt-BR')}
+                                <b>Valor em R$:</b> R$ ${data.valorReais} <br>
+                                <b>Custo Gold:</b> ${Number(data.valorGold).toLocaleString('pt-BR')} <br>
+                                <b>Data:</b> ${data.data}
                             </div>
                         </div>
-                        <button class="btn-pago" onclick="confirmarPagamento('${id}')">PAGO</button>
+                        <button class="btn-pago" onclick="confirmarPagamento('${id}')">MARCAR PAGO</button>
                     `;
                     container.appendChild(card);
                 });
             });
         }
 
-        // VERIFICAÇÃO DA SENHA
         document.getElementById('btn_acessar').onclick = () => {
             const senha = document.getElementById('admin_pass').value;
             if (senha === SENHA_MESTRA) {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
-                iniciarPainel(); // SÓ CHAMA O FIREBASE AQUI
+                iniciarPainel();
             } else {
                 document.getElementById('erro_msg').innerText = "Senha incorreta!";
             }
         };
 
-        // FUNÇÃO DELETAR
         window.confirmarPagamento = async (id) => {
-            if (confirm("Deseja marcar como pago?")) {
-                await deleteDoc(doc(db, "pedidos_resgate", id));
+            if (confirm("Deseja marcar como pago? Isso removerá o pedido da lista.")) {
+                // MUDANÇA AQUI: Alterado de 'pedidos_resgate' para 'resgates'
+                await deleteDoc(doc(db, "resgates", id));
             }
         };
     </script>
