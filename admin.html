@@ -97,12 +97,16 @@
                 if (permission === "granted") {
                     await getToken(messaging, { vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" });
                 }
-            } catch (e) { console.warn("Push desativado ou erro de permissão."); }
+            } catch (e) { console.warn("Push bloqueado."); }
         }
 
-        // Função para formatar Gold removendo decimais e adicionando pontos
+        // --- NOVA FUNÇÃO DE LIMPEZA AGRESSIVA DE GOLD ---
         function formatarGold(valor) {
-            return Number(valor).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+            if (!valor) return "0";
+            // Converte para string e remove ".0k", ".0", "k" e qualquer coisa que não seja número
+            let limpo = String(valor).toLowerCase().replace(/\.0k/g, '000').replace(/k/g, '000').replace(/[^0-9]/g, '');
+            // Formata com os pontos de milhar brasileiros
+            return Number(limpo).toLocaleString('pt-BR');
         }
 
         function formatarData(timestamp) {
@@ -129,7 +133,11 @@
 
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
-                    const suspeito = Number(data.goldAnterior) < Number(data.valorGold);
+                    
+                    // Lógica para detecção de fraude baseada em números limpos
+                    const goldAntNum = Number(String(data.goldAnterior).replace(/[^0-9]/g, ''));
+                    const valorGNum = Number(String(data.valorGold).replace(/[^0-9]/g, ''));
+                    const suspeito = goldAntNum < valorGNum;
                     
                     const card = document.createElement('div');
                     card.className = `pedido-card ${suspeito ? 'blink-alerta' : ''}`;
@@ -157,9 +165,6 @@
                     `;
                     container.appendChild(card);
                 });
-            }, (error) => {
-                console.error("Erro de conexão:", error);
-                document.getElementById('lista_pedidos').innerHTML = "<p style='color:red; text-align:center;'>Erro ao conectar com o banco. Recarregue a página.</p>";
             });
         }
 
@@ -175,7 +180,7 @@
         };
 
         window.confirmarPagamento = async (id) => {
-            if (confirm("Confirmar pagamento? O pedido será removido permanentemente.")) {
+            if (confirm("Confirmar pagamento?")) {
                 await deleteDoc(doc(db, "resgates", id));
             }
         };
