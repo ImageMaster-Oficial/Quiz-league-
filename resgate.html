@@ -35,55 +35,33 @@
         }
         @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        .modal-title { color: var(--gold); font-weight: 900; text-transform: uppercase; margin-bottom: 12px; font-size: 1.1rem; }
-        .modal-text { font-size: 0.9rem; line-height: 1.4; color: var(--gold-bright); margin-bottom: 20px; }
-        .modal-footer { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        
         .modal-btn-confirm { 
             background: linear-gradient(to bottom, var(--gold), var(--gold-dark)); border: 1px solid var(--gold-bright);
             color: #000; padding: 12px 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; width: 100%;
             clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
         }
-        .modal-btn-close { 
-            background: transparent; border: none; color: var(--gold); text-decoration: underline; 
-            font-size: 0.75rem; cursor: pointer; text-transform: uppercase; opacity: 0.7;
-        }
+        .modal-btn-close { background: transparent; border: none; color: var(--gold); text-decoration: underline; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; opacity: 0.7; }
 
         /* --- DESIGN GERAL --- */
-        #pull-to-refresh {
-            position: fixed; top: -60px; left: 0; width: 100%; height: 60px;
-            display: flex; align-items: center; justify-content: center; z-index: 2000;
-            transition: transform 0.2s ease;
-        }
-        .refresh-badge {
-            border: 2px solid var(--gold); padding: 8px 20px; background: rgba(9, 20, 40, 0.95);
-            color: var(--gold); font-weight: 900; font-size: 0.8rem; text-transform: uppercase;
-            clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
-        }
+        #pull-to-refresh { position: fixed; top: -60px; left: 0; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; z-index: 2000; transition: transform 0.2s ease; }
+        .refresh-badge { border: 2px solid var(--gold); padding: 8px 20px; background: rgba(9, 20, 40, 0.95); color: var(--gold); font-weight: 900; font-size: 0.8rem; text-transform: uppercase; clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%); }
         .app-container { flex: 1; display: flex; flex-direction: column; padding: 15px 0; gap: 10px; width: 94%; max-width: 400px; box-sizing: border-box; margin-bottom: var(--ad-space); justify-content: center; transition: transform 0.2s ease; }
         .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .title-legends h1 { font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase; background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; }
         .hex-frame { background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; display: flex; flex-direction: column; box-sizing: border-box; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%); margin-bottom: 5px; }
-        
         .option-btn { background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 12px; margin: 5px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; }
         
-        /* Estilo Dinâmico do Botão de Vídeo */
+        /* Botão de Vídeo Dinâmico */
         .video-btn { 
-            background: #1e2328; /* Cor desativada padrão */
-            border: 1px solid #333; 
-            color: #666; 
-            padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: not-allowed; font-size: 0.75rem; margin-top: 8px;
-            transition: 0.3s;
+            background: #1e2328; border: 1px solid #333; color: #666; 
+            padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: not-allowed; font-size: 0.75rem; margin-top: 8px; transition: 0.3s;
         }
         .video-btn.active {
-            background: linear-gradient(to bottom, #c8a355, #785a28); 
-            border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; 
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(200, 155, 60, 0.4);
+            background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
+            color: #f0e6d2; cursor: pointer; box-shadow: 0 0 10px rgba(200, 155, 60, 0.4);
         }
 
         .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
@@ -118,7 +96,7 @@
             <div id="quizContent">
                 <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Carregando...</p>
                 <div id="opcoes"></div>
-                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; min-height: 20px;"></p>
+                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
             </div>
             <div style="text-align: center;">
                 <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário: <span id="limitDiario">0/35</span></span>
@@ -161,8 +139,7 @@
                 mFooter.appendChild(bC); mFooter.appendChild(bX);
             } else {
                 const bO = document.createElement('button'); bO.className = 'modal-btn-confirm'; bO.innerText = 'ENTENDI';
-                bO.onclick = () => { modal.style.display = 'none'; };
-                mFooter.appendChild(bO);
+                bO.onclick = () => { modal.style.display = 'none'; }; mFooter.appendChild(bO);
             }
             modal.style.display = 'flex';
         }
@@ -199,20 +176,16 @@
             
             const btnV = document.getElementById('btnVideo'), aviso = document.getElementById('avisoStatusQuiz');
             
-            // LÓGICA DO PENTE FINO:
             if (totalVideosHoje >= 35) {
                 btnV.disabled = true; btnV.classList.remove('active');
                 aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
             } else if (acertosNoCiclo < 10) {
-                // Bloqueado até acertar 10
-                btnV.disabled = true; 
-                btnV.classList.remove('active');
+                btnV.disabled = true; btnV.classList.remove('active');
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEO`;
             } else {
-                // ACESO: Meta de 10 acertos atingida
-                btnV.disabled = false; 
-                btnV.classList.add('active');
-                aviso.innerHTML = `ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> VÍDEOS PARA VOLTAR AO QUIZ`;
+                // META ATINGIDA - MOSTRANDO APENAS O TEXTO DOURADO COM CONTADOR VERDE
+                btnV.disabled = false; btnV.classList.add('active');
+                aviso.innerHTML = `<span style="color:var(--gold)">META ATINGIDA!</span><br>ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> VÍDEOS PARA LIBERAR O QUIZ`;
             }
         }
 
@@ -250,9 +223,8 @@
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
             if (acertosNoCiclo >= 10) { 
-                // AVISO DOURADO DE META ATINGIDA
-                t.innerHTML = `<span style="color:var(--gold)">META ATINGIDA!</span><br><span style="font-size:0.8rem; color:var(--gold-bright)">Assista 3 anúncios para liberar o quiz.</span>`;
-                c.innerHTML = ""; 
+                t.innerText = ""; // Limpa o título da pergunta
+                c.innerHTML = ""; // Limpa as opções
                 return; 
             }
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
@@ -270,7 +242,6 @@
             });
         }
         
-        // Pull to refresh simplificado
         let sY = 0; window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
         window.addEventListener('touchmove', (e) => {
             const p = e.touches[0].pageY - sY;
@@ -286,4 +257,4 @@
         });
     </script>
 </body>
-                                                                                            </html>
+</html>
