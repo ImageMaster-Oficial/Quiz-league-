@@ -167,7 +167,6 @@
             document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
             document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
             
-            // Atualiza barra de progresso baseada na meta selecionada
             let progresso = Math.min((goldDB / metaAtual) * 100, 100);
             document.getElementById('progressBar').style.width = progresso + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
@@ -176,7 +175,6 @@
             const btnVideo = document.getElementById('btnVideo');
             const aviso = document.getElementById('avisoStatusQuiz');
 
-            // Lógica do Ciclo 10 acertos -> 3 vídeos
             if (totalVideosHoje >= 35) {
                 btnVideo.disabled = true;
                 aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
@@ -211,7 +209,6 @@
                 totalVideosHoje: increment(1)
             };
 
-            // Se completou 3 vídeos, reseta acertos e contador de vídeos do ciclo
             if (novosVideos >= 3) {
                 dadosUpdate.acertos = 0;
                 dadosUpdate.videosAssistidos = 0;
@@ -230,24 +227,40 @@
             atualizarInterface();
         }
 
+        // --- FUNÇÃO DE RESGATE ATUALIZADA PARA O SEU PAINEL ADMIN ---
         document.getElementById('btnResgate').onclick = async () => {
             const chave = document.getElementById('chavePix').value;
-            if (goldDB < metaAtual) { alert("Saldo insuficiente para esta meta!"); return; }
-            if (chave.length < 5) { alert("Chave PIX inválida!"); return; }
+            if (goldDB < metaAtual) { 
+                alert("Saldo insuficiente para esta meta!"); 
+                return; 
+            }
+            if (chave.length < 5) { 
+                alert("Chave PIX inválida!"); 
+                return; 
+            }
+
+            // Captura os valores antes de subtrair
+            const saldoAnterior = goldDB;
+            const saldoResultante = goldDB - metaAtual;
 
             try {
                 await addDoc(collection(db, "resgates"), {
                     usuarioId: usuarioLogado,
                     chavePix: chave,
                     valorGold: metaAtual,
-                    valorReais: valorReaisMeta,
+                    valorReais: "R$ " + valorReaisMeta,
+                    
+                    // Campos para evitar o NaN no seu painel
+                    goldAnterior: saldoAnterior,
+                    goldPosResgate: saldoResultante,
+                    
                     status: "Pendente",
                     data: new Date().toLocaleString('pt-BR'),
                     timestamp: Date.now()
                 });
 
                 await updateDoc(userRef, { saldo: increment(-metaAtual) });
-                alert("Solicitação de R$ " + valorReaisMeta + " enviada!");
+                alert("Solicitação de R$ " + valorReaisMeta + " enviada com sucesso!");
                 document.getElementById('chavePix').value = "";
             } catch (e) {
                 alert("Erro ao processar resgate.");
@@ -274,7 +287,7 @@
                 btn.innerText = opt;
                 btn.onclick = async () => {
                     const btns = container.querySelectorAll('button');
-                    btns.forEach(b => b.disabled = true); // Evita cliques duplos
+                    btns.forEach(b => b.disabled = true);
 
                     if (opt === q.correct) {
                         btn.classList.add('btn-correct');
