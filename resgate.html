@@ -8,36 +8,36 @@
         :root { 
             --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
             --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 75px; --correct: #28a745; --wrong: #dc3545;
+            --ad-height: 75px; --correct: #28a745; --wrong: #dc3545;
         }
         html, body { 
             font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle, #051421 0%, #010a13 100%);
             color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden; overscroll-behavior-y: contain;
         }
-        .app-container { flex: 1; display: flex; flex-direction: column; padding: 10px 0; gap: 8px; width: 94%; max-width: 400px; box-sizing: border-box; }
         
-        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px; flex-shrink: 0; width: 100%; box-sizing: border-box; }
+        /* Container principal com espaço reservado para o banner fixo */
+        .app-container { 
+            flex: 1; display: flex; flex-direction: column; 
+            padding: 5px 0; gap: 5px; width: 94%; max-width: 400px; 
+            box-sizing: border-box; margin-bottom: var(--ad-height);
+        }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; flex-shrink: 0; }
         .title-legends h1 {
-            font-size: 1.8rem;
-            margin: 0; color: var(--gold); text-transform: uppercase;
+            font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase;
             background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         
         .coin-badge { 
-            border: 2px solid var(--gold); 
-            padding: 8px 15px;
-            background: rgba(1, 10, 19, 0.9); 
-            color: var(--gold); 
-            font-weight: 900; 
-            font-size: 1.1rem;
+            border: 2px solid var(--gold); padding: 5px 12px; background: rgba(1, 10, 19, 0.9); 
+            color: var(--gold); font-weight: 900; font-size: 1rem;
         }
         
         .hex-frame {
-            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; flex: 1;
-            display: flex; flex-direction: column; justify-content: flex-start; /* Alinha itens no topo */
-            box-sizing: border-box;
+            background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 10px; 
+            display: flex; flex-direction: column; box-sizing: border-box;
             clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
         .hex-frame::after {
@@ -45,38 +45,43 @@
             pointer-events: none; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%);
         }
 
-        /* Container interno para empurrar o botão para baixo */
-        .quiz-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 5px; }
+        .quiz-wrapper { display: flex; flex-direction: column; justify-content: flex-start; }
 
         .option-btn { 
-            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 10px; 
-            margin: 4px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
+            background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 8px; 
+            margin: 3px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem;
         }
-        .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; color: white !important; }
-        .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; color: white !important; }
+        .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; }
+        .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; }
         
-        .video-wrapper { text-align: center; margin-top: auto; padding-top: 10px; width: 100%; z-index: 2; }
-        .limit-label { font-size: 0.65rem; color: var(--gold); display: block; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        /* Botão de vídeo mais compacto e "para cima" */
+        .video-wrapper { text-align: center; margin-top: 5px; width: 100%; z-index: 2; }
+        .limit-label { font-size: 0.6rem; color: var(--gold); display: block; margin-bottom: 2px; text-transform: uppercase; }
         .video-btn { 
             background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
+            color: #f0e6d2; padding: 10px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
         }
 
-        .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
+        .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 5px; }
         .resgate-opt {
             flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold);
-            padding: 12px 2px;
-            font-size: 0.85rem;
-            font-weight: 900; cursor: pointer; text-align: center;
-            transition: 0.3s;
+            padding: 10px 2px; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-align: center;
         }
-        .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); box-shadow: 0 0 8px var(--gold); }
+        .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); }
 
-        .progress-bg { background: #000; height: 10px; border: 1px solid var(--gold-dark); margin-top: 4px; }
+        .progress-bg { background: #000; height: 8px; border: 1px solid var(--gold-dark); margin-top: 2px; }
         .progress-fill { background: var(--gold); height: 100%; width: 0%; transition: 0.7s; }
         
-        input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 6px 0; box-sizing: border-box; font-size: 0.9rem; }
-        #avisoStatusQuiz { text-align: center; font-size: 0.8rem; color: var(--gold); font-weight: bold; margin-top: 8px; text-transform: uppercase; }
+        input { width: 100%; padding: 10px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 5px 0; box-sizing: border-box; font-size: 0.85rem; }
+        
+        #avisoStatusQuiz { text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin: 5px 0; text-transform: uppercase; }
+
+        /* Banner Fixo no Rodapé */
+        .ad-banner-footer { 
+            position: fixed; bottom: 0; width: 100%; height: var(--ad-height); 
+            background: #000; color: var(--gold); display: flex; align-items: center; 
+            justify-content: center; font-size: 0.8rem; border-top: 2px solid var(--gold); z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -87,22 +92,22 @@
             <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
         </div>
         
-        <div class="hex-frame">
+        <div class="hex-frame" style="flex: 1.2;">
             <div class="quiz-wrapper" id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 10px 0;">Sincronizando Nexus...</p>
+                <p id="perguntaTexto" style="text-align: center; font-size: 0.95rem; color: var(--gold-bright); font-weight: bold; margin: 0 0 5px 0;">Sincronizando Nexus...</p>
                 <div id="opcoes"></div>
                 <p id="avisoStatusQuiz"></p>
             </div>
 
             <div class="video-wrapper">
-                <span class="limit-label">Limite Diário: <span id="limitDiario">0/35</span> Vídeos</span>
+                <span class="limit-label">Limite Diário: <span id="limitDiario">0/35</span></span>
                 <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (300 GOLD)</button>
             </div>
         </div>
 
         <div class="hex-frame" style="flex: 0;">
             <div class="progress-bg"><div id="progressBar" class="progress-fill"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 6px 0; font-weight: bold;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--gold); margin: 4px 0; font-weight: bold;">
                 <span id="txtMeta">Meta: 15.8k Gold</span>
                 <span id="txtPorcentagem">0%</span>
             </div>
@@ -114,15 +119,16 @@
             </div>
 
             <input type="text" id="chavePix" placeholder="CHAVE PIX PARA RECEBER">
-            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%; padding: 15px;">SOLICITAR RESGATE PIX</button>
+            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); width:100%; padding: 12px;">SOLICITAR RESGATE PIX</button>
         </div>
     </div>
 
-    <div class="ad-banner-footer" style="height: 75px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border-top: 2px solid var(--gold);">ANÚNCIO</div>
+    <div class="ad-banner-footer">ESPAÇO PARA BANNER DE ANÚNCIO</div>
 
     <script type="module">
+        // [O script do Firebase permanece o mesmo, apenas a lógica de UI abaixo foi atualizada levemente]
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -137,15 +143,13 @@
         const db = getFirestore(app);
 
         const REQUISITO_ACERTOS = 10;
-        const REQUISITO_VIDEOS = 3;
         const LIMITE_DIARIO = 35;
-
         let metaAtual = 15800;
         let usuarioLogado = localStorage.getItem("usuarioLogado");
         if (!usuarioLogado) window.location.href = "index.html";
 
         const userRef = doc(db, "usuarios", usuarioLogado);
-        let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje;
+        let goldDB, acertosNoCiclo, totalVideosHoje;
         let jogoInicializado = false;
 
         const perguntasBase = [
@@ -162,7 +166,6 @@
                 const data = docSnap.data();
                 goldDB = data.saldo || 0;
                 acertosNoCiclo = data.acertos || 0;
-                videosAssistidos = data.videosAssistidos || 0;
                 totalVideosHoje = data.totalVideosHoje || 0;
                 atualizarInterface();
                 if (!jogoInicializado) { jogoInicializado = true; carregarQuestao(); }
@@ -175,24 +178,22 @@
             let progresso = Math.min((goldDB / metaAtual) * 100, 100);
             document.getElementById('progressBar').style.width = progresso + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(progresso) + "%";
-            document.getElementById('txtMeta').innerText = `Meta: ${(metaAtual/1000).toFixed(1)}k Gold`;
             
             const btnVideo = document.getElementById('btnVideo');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            if (totalVideosHoje >= LIMITE_DIARIO) {
-                btnVideo.disabled = true; aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
-            } else if (acertosNoCiclo < REQUISITO_ACERTOS) {
+            if (acertosNoCiclo < REQUISITO_ACERTOS) {
                 btnVideo.disabled = true;
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${REQUISITO_ACERTOS - acertosNoCiclo}</span> QUESTÕES`;
             } else {
                 btnVideo.disabled = false;
-                aviso.innerHTML = `ASSISTA <span style="color:#28a745">${REQUISITO_VIDEOS - videosAssistidos}</span> VÍDEOS`;
+                aviso.innerHTML = `<span style="color:#28a745">QUESTÕES COMPLETAS!</span>`;
             }
         }
 
         window.setResgate = (el, valor) => {
             metaAtual = valor;
+            document.getElementById('txtMeta').innerText = `Meta: ${(valor/1000).toFixed(1)}k Gold`;
             document.querySelectorAll('.resgate-opt').forEach(opt => opt.classList.remove('active'));
             el.classList.add('active');
             atualizarInterface();
@@ -202,8 +203,8 @@
             const container = document.getElementById('opcoes');
             const textoQuestao = document.getElementById('perguntaTexto');
             if (acertosNoCiclo >= REQUISITO_ACERTOS) {
-                textoQuestao.innerText = "Meta de questões atingida!";
-                container.innerHTML = `<p style='text-align:center; color:var(--gold);'>Assista aos vídeos abaixo para liberar mais questões.</p>`;
+                textoQuestao.innerText = "Meta atingida!";
+                container.innerHTML = `<p style='text-align:center; font-size:0.8rem;'>Assista ao anúncio para resetar.</p>`;
                 return;
             }
             const q = perguntasBase[Math.floor(Math.random() * perguntasBase.length)];
