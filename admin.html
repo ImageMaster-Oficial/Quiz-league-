@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin - Quiz Legends</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#010a13">
     <style>
         body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; margin: 0; }
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #010a13; display: flex; align-items: center; justify-content: center; z-index: 10000; }
@@ -21,6 +23,8 @@
 </head>
 <body>
 
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
     <div id="lock-screen">
         <div class="lock-box">
             <h2 style="border:none; margin-top:0;">ADMIN</h2>
@@ -32,7 +36,7 @@
 
     <div id="painel_conteudo">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>CONTROLE DE PAGAMENTOS</h2>
+            <h2>PAGAMENTOS</h2>
             <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px">Sair</button>
         </div>
         <div id="lista_pedidos">Carregando solicitações...</div>
@@ -43,7 +47,6 @@
         import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const SENHA_MESTRA = "Belial10"; 
-
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
             authDomain: "quizlegends-f58fc.firebaseapp.com",
@@ -55,14 +58,39 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const audio = document.getElementById("notifSound");
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // Pedir permissão de notificação
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
 
         function iniciarPainel() {
             const q = query(collection(db, "resgates"), orderBy("timestamp", "desc"));
             
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
-                container.innerHTML = "";
                 
+                // Lógica de Notificação para novos pedidos
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added" && !snapshot.metadata.fromCache) {
+                        const novo = change.doc.data();
+                        audio.play().catch(() => {});
+                        if (Notification.permission === "granted") {
+                            new Notification("Novo Resgate PIX!", {
+                                body: `Valor: ${novo.valorReais} para ${novo.usuarioId}`,
+                                icon: "https://cdn-icons-png.flaticon.com/512/218/218381.png"
+                            });
+                        }
+                    }
+                });
+
+                container.innerHTML = "";
                 if (snapshot.empty) {
                     container.innerHTML = "<p style='color:#888'>Nenhum pedido na fila.</p>";
                     return;
@@ -71,8 +99,6 @@
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
                     const id = pedido.id;
-                    
-                    // Verificação de segurança: Se o gold anterior era menor que o custo, é suspeito
                     const suspeito = data.goldAnterior < data.valorGold;
 
                     const card = document.createElement('div');
@@ -81,17 +107,15 @@
                         <div class="info">
                             <p><b>Usuário:</b> ${data.usuarioId}</p>
                             <p><b>PIX:</b> <span style="color:#fff; background:#222; padding:2px 5px;">${data.chavePix}</span></p>
-                            <p><b>Valor a Pagar:</b> <span style="color:#28a745; font-weight:bold;">R$ ${data.valorReais}</span></p>
-                            
+                            <p><b>Valor a Pagar:</b> <span style="color:#28a745; font-weight:bold;">${data.valorReais}</span></p>
                             <div class="saldos ${suspeito ? 'alerta-hacker' : ''}">
-                                <b>Data do Pedido:</b> ${data.data} <br>
-                                <b>Saldo Anterior:</b> ${Number(data.goldAnterior).toLocaleString('pt-BR')} Gold <br>
-                                <b>Custo Resgate:</b> -${Number(data.valorGold).toLocaleString('pt-BR')} Gold <br>
-                                <b>Saldo Resultante:</b> ${Number(data.goldPosResgate).toLocaleString('pt-BR')} Gold
-                                ${suspeito ? '<br><b style="color:#ff4444;">⚠️ ALERTA: Saldo insuficiente detectado!</b>' : ''}
+                                <b>Data:</b> ${data.data} <br>
+                                <b>Anterior:</b> ${Number(data.goldAnterior).toLocaleString('pt-BR')} | 
+                                <b>Resultante:</b> ${Number(data.goldPosResgate).toLocaleString('pt-BR')}
+                                ${suspeito ? '<br><b style="color:#ff4444;">⚠️ SALDO SUSPEITO!</b>' : ''}
                             </div>
                         </div>
-                        <button class="btn-pago" onclick="confirmarPagamento('${id}')">CONCLUIR</button>
+                        <button class="btn-pago" onclick="confirmarPagamento('${id}')">PAGO</button>
                     `;
                     container.appendChild(card);
                 });
@@ -103,13 +127,15 @@
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
                 iniciarPainel();
+                // Tenta tocar um som mudo para "destravar" o áudio no celular
+                audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => {});
             } else {
                 document.getElementById('erro_msg').innerText = "Senha incorreta!";
             }
         };
 
         window.confirmarPagamento = async (id) => {
-            if (confirm("Confirmar pagamento e remover da lista?")) {
+            if (confirm("Confirmar pagamento?")) {
                 await deleteDoc(doc(db, "resgates", id));
             }
         };
