@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - Quiz Legends</title>
+    <title>Admin - Quiz Legends</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#010a13">
@@ -12,19 +12,25 @@
     <link rel="apple-touch-icon" href="icone-admin.png">
 
     <style>
-        body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; margin: 0; }
+        body { background: #010a13; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; }
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #010a13; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-box { border: 2px solid #c89b3c; padding: 40px; background: #091428; border-radius: 10px; text-align: center; width: 300px; }
+        .lock-box { border: 2px solid #c89b3c; padding: 40px; background: #091428; border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 0 20px rgba(200, 155, 60, 0.2); }
         #painel_conteudo { display: none; max-width: 800px; margin: 0 auto; }
-        h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; text-transform: uppercase; }
+        h2 { color: #c89b3c; border-bottom: 2px solid #c89b3c; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         input { padding: 14px; border-radius: 5px; border: 1px solid #c89b3c; background: #000; color: #fff; width: 100%; box-sizing: border-box; margin-bottom: 15px; font-size: 16px; }
-        button.btn-entrar { background: #c89b3c; color: black; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        button.btn-entrar { background: #c89b3c; color: black; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button.btn-entrar:hover { background: #f0c36d; }
+        
+        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; position: relative; }
         .info b { color: #c89b3c; }
-        .saldos { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 5px; border-left: 4px solid #c89b3c; font-size: 13px; line-height: 1.6; }
-        .alerta-hacker { border-left-color: #ff4444 !important; background: rgba(255, 0, 0, 0.15) !important; }
-        .btn-pago { background: #28a745; color: white; border: none; padding: 12px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .erro-alerta { background: #ff4444; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
+        .pix-box { background: #000; padding: 8px; border-radius: 4px; color: #00ffcc; font-family: monospace; font-size: 1.1em; margin: 10px 0; border: 1px dashed #444; }
+        
+        .saldos-container { margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 5px; border-left: 4px solid #c89b3c; font-size: 14px; }
+        .alerta-hacker { border-left-color: #ff4444 !important; background: rgba(255, 0, 0, 0.1) !important; animation: blink 2s infinite; }
+        
+        .btn-pago { background: #28a745; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%; font-size: 16px; }
+        
+        @keyframes blink { 50% { border-left-color: transparent; } }
     </style>
 </head>
 <body>
@@ -35,22 +41,22 @@
         <div class="lock-box">
             <h2 style="border:none; margin-top:0;">ADMIN</h2>
             <input type="password" id="admin_pass" placeholder="Senha Mestra">
-            <button class="btn-entrar" id="btn_acessar">LIBERAR ACESSO</button>
+            <button class="btn-entrar" id="btn_acessar">LIBERAR PAINEL</button>
             <p id="erro_msg" style="color: #ff4444; font-size: 13px; margin-top: 15px;"></p>
         </div>
     </div>
 
     <div id="painel_conteudo">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>PAGAMENTOS</h2>
+            <h2>FILA DE RESGATES</h2>
             <button onclick="location.reload()" style="background:#444; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px">Sair</button>
         </div>
-        <div id="lista_pedidos">Carregando solicitações...</div>
+        <div id="lista_pedidos">Carregando notificações...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const SENHA_MESTRA = "Belial10"; 
         const firebaseConfig = {
@@ -67,48 +73,54 @@
         const audio = document.getElementById("notifSound");
 
         function iniciarPainel() {
-            // Mudamos a query para facilitar: Se o orderBy falhar, removeremos ele temporariamente para testar
             const q = query(collection(db, "resgates"), orderBy("timestamp", "desc"));
             
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
                 
+                // Som de notificação para novos pedidos
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added" && !snapshot.metadata.fromCache) {
-                        audio.play().catch(() => {});
-                        if (Notification.permission === "granted") {
-                            new Notification("Novo Resgate!", { body: "Um usuário solicitou PIX" });
-                        }
+                        audio.play().catch(e => console.log("Áudio aguardando interação"));
                     }
                 });
 
                 container.innerHTML = "";
                 if (snapshot.empty) {
-                    container.innerHTML = "<p style='color:#888'>Nenhum pedido pendente.</p>";
+                    container.innerHTML = "<p style='color:#888; text-align:center;'>Nenhuma solicitação no momento.</p>";
                     return;
                 }
 
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
+                    const id = pedido.id;
+
+                    // Lógica de verificação de fraude (se saldo anterior era menor que o custo)
+                    const suspeito = Number(data.goldAnterior) < Number(data.valorGold);
+
                     const card = document.createElement('div');
                     card.className = 'pedido-card';
                     card.innerHTML = `
                         <div class="info">
-                            <p><b>Usuário:</b> ${data.usuarioId}</p>
-                            <p><b>PIX:</b> ${data.chavePix}</p>
-                            <p><b>Valor:</b> R$ ${data.valorReais}</p>
+                            <p><b>ID Usuário:</b> ${data.usuarioId}</p>
+                            <p><b>Chave PIX:</b></p>
+                            <div class="pix-box">${data.chavePix}</div>
+                            <p><b>Valor a Transferir:</b> <span style="color:#28a745; font-weight:bold; font-size:1.2em;">R$ ${data.valorReais}</span></p>
+                            
+                            <div class="saldos-container ${suspeito ? 'alerta-hacker' : ''}">
+                                <b>Relatório de Saldo:</b><br>
+                                • Saldo Anterior: ${Number(data.goldAnterior || 0).toLocaleString('pt-BR')} Gold<br>
+                                • Custo do Saque: -${Number(data.valorGold || 0).toLocaleString('pt-BR')} Gold<br>
+                                • Saldo Atual: ${Number(data.goldPosResgate || 0).toLocaleString('pt-BR')} Gold
+                                ${suspeito ? '<br><br><b style="color:#ff4444;">⚠️ ATENÇÃO: USUÁRIO SEM SALDO SUFICIENTE!</b>' : ''}
+                            </div>
                         </div>
-                        <button class="btn-pago" onclick="confirmarPagamento('${pedido.id}')">CONCLUÍDO</button>
+                        <button class="btn-pago" onclick="confirmarPagamento('${id}')">MARCAR COMO PAGO</button>
                     `;
                     container.appendChild(card);
                 });
             }, (error) => {
-                console.error("Erro detectado:", error);
-                document.getElementById('lista_pedidos').innerHTML = `
-                    <div class="erro-alerta">
-                        <b>Erro de Conexão:</b> ${error.message}<br><br>
-                        <em>Dica: Verifique as Regras do Firestore ou se o Índice ainda está sendo criado.</em>
-                    </div>`;
+                document.getElementById('lista_pedidos').innerHTML = "<p style='color:red'>Erro de permissão ou índice. Verifique o console.</p>";
             });
         }
 
@@ -116,7 +128,6 @@
             if (document.getElementById('admin_pass').value === SENHA_MESTRA) {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
-                if (Notification.permission !== "granted") Notification.requestPermission();
                 iniciarPainel();
             } else {
                 document.getElementById('erro_msg').innerText = "Senha incorreta!";
@@ -124,8 +135,12 @@
         };
 
         window.confirmarPagamento = async (id) => {
-            if (confirm("Remover este pedido?")) {
-                await deleteDoc(doc(db, "resgates", id));
+            if (confirm("Você confirma que já fez o PIX? O pedido será removido da lista.")) {
+                try {
+                    await deleteDoc(doc(db, "resgates", id));
+                } catch (e) {
+                    alert("Erro ao remover: " + e.message);
+                }
             }
         };
     </script>
