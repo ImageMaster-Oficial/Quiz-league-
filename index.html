@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Quiz Legends</title>
+    
+    <link rel="manifest" href="manifest-jogo.json">
+    <meta name="theme-color" content="#c89b3c">
+    <link rel="apple-touch-icon" href="icone-jogo.png">
+
     <style>
         :root {
             --ouro: #c89b3c;
@@ -193,6 +198,15 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // REGISTRO DO SERVICE WORKER PARA HABILITAR PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('PWA carregado com sucesso!'))
+                    .catch(err => console.log('Falha ao carregar PWA:', err));
+            });
+        }
 
         document.getElementById('btnLogin').onclick = async () => {
             const usuarioInput = document.getElementById('user').value.trim();
