@@ -97,16 +97,18 @@
                 if (permission === "granted") {
                     await getToken(messaging, { vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" });
                 }
-            } catch (e) { console.warn("Push bloqueado."); }
+            } catch (e) {}
         }
 
-        // --- NOVA FUNÇÃO DE LIMPEZA AGRESSIVA DE GOLD ---
-        function formatarGold(valor) {
+        // --- FUNÇÃO CORRIGIDA PARA REMOVER O .0k ---
+        function limparGold(valor) {
             if (!valor) return "0";
-            // Converte para string e remove ".0k", ".0", "k" e qualquer coisa que não seja número
-            let limpo = String(valor).toLowerCase().replace(/\.0k/g, '000').replace(/k/g, '000').replace(/[^0-9]/g, '');
-            // Formata com os pontos de milhar brasileiros
-            return Number(limpo).toLocaleString('pt-BR');
+            let str = String(valor).toLowerCase();
+            // Remove o ".0k" e substitui por "k" ou formata
+            str = str.replace(".0k", "k"); 
+            // Se você preferir que mostre "150.000" em vez de "150k", use esta linha abaixo:
+            // str = str.replace(".0k", "000").replace("k", "000"); 
+            return str;
         }
 
         function formatarData(timestamp) {
@@ -134,10 +136,10 @@
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
                     
-                    // Lógica para detecção de fraude baseada em números limpos
-                    const goldAntNum = Number(String(data.goldAnterior).replace(/[^0-9]/g, ''));
-                    const valorGNum = Number(String(data.valorGold).replace(/[^0-9]/g, ''));
-                    const suspeito = goldAntNum < valorGNum;
+                    // Converte para número apenas para comparar fraude
+                    const n1 = parseFloat(String(data.goldAnterior).replace('k', '000'));
+                    const n2 = parseFloat(String(data.valorGold).replace('k', '000'));
+                    const suspeito = n1 < n2;
                     
                     const card = document.createElement('div');
                     card.className = `pedido-card ${suspeito ? 'blink-alerta' : ''}`;
@@ -155,9 +157,9 @@
                             
                             <div class="status-box ${suspeito ? 'alerta-fraude' : ''}">
                                 <strong>📊 Relatório de Gold:</strong><br>
-                                • Saldo Inicial: ${formatarGold(data.goldAnterior)} <br>
-                                • Custo Saque: -${formatarGold(data.valorGold)} <br>
-                                • Saldo Final: ${formatarGold(data.goldPosResgate)}
+                                • Saldo Inicial: ${limparGold(data.goldAnterior)} <br>
+                                • Custo Saque: -${limparGold(data.valorGold)} <br>
+                                • Saldo Final: ${limparGold(data.goldPosResgate)}
                                 ${suspeito ? '<br><br><strong style="color:#ff4444;">⚠️ ALERTA: SALDO INSUFICIENTE!</strong>' : ''}
                             </div>
                         </div>
