@@ -3,19 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Quiz Legends</title>
+    <title>Painel Admin - Quiz Legends</title>
     
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#010a13">
+
     <style>
-        body { background: #010a13; color: white; font-family: sans-serif; padding: 20px; }
-        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #010a13; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-box { border: 2px solid #c89b3c; padding: 30px; background: #091428; border-radius: 10px; text-align: center; }
-        #painel_conteudo { display: none; max-width: 600px; margin: 0 auto; }
-        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #c89b3c; }
-        button { background: #c89b3c; color: black; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; }
-        .pedido-card { background: #091428; border: 1px solid #c89b3c; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .pix-box { background: #000; padding: 10px; color: #00ffcc; font-family: monospace; margin: 10px 0; border: 1px dashed #444; }
-        .btn-pago { background: #28a745; color: white; margin-top: 10px; }
+        :root {
+            --ouro: #c89b3c;
+            --fundo: #010a13;
+            --card: #091428;
+            --verde: #28a745;
+        }
+
+        body { background: var(--fundo); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; }
+        
+        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--fundo); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .lock-box { border: 2px solid var(--ouro); padding: 40px; background: var(--card); border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 0 30px rgba(200, 155, 60, 0.2); }
+        
+        #painel_conteudo { display: none; max-width: 700px; margin: 0 auto; }
+        
+        h2 { color: var(--ouro); border-bottom: 2px solid var(--ouro); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; display: flex; justify-content: space-between; align-items: center; }
+        
+        input { padding: 14px; border-radius: 5px; border: 1px solid var(--ouro); background: #000; color: #fff; width: 100%; box-sizing: border-box; margin-bottom: 15px; font-size: 16px; }
+        
+        button.primary { background: var(--ouro); color: black; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+
+        .pedido-card { background: var(--card); border: 1px solid var(--ouro); padding: 20px; border-radius: 12px; margin-bottom: 25px; position: relative; animation: slideIn 0.3s ease-out; }
+        
+        .timestamp { font-size: 12px; color: #888; margin-bottom: 10px; display: block; }
+        
+        .pix-container { background: #000; padding: 15px; border-radius: 6px; border: 1px dashed #444; margin: 15px 0; cursor: pointer; position: relative; }
+        .pix-container:hover { border-color: var(--ouro); }
+        .pix-text { color: #00ffcc; font-family: 'Courier New', monospace; font-size: 1.1em; word-break: break-all; }
+        .copy-label { position: absolute; top: -10px; right: 10px; background: var(--ouro); color: black; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+        .valor-txt { font-size: 1.5em; color: var(--verde); font-weight: bold; margin: 10px 0; display: block; }
+
+        .status-box { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 6px; border-left: 4px solid var(--ouro); margin-top: 15px; font-size: 14px; line-height: 1.6; }
+        .alerta-fraude { border-left-color: #ff4444; background: rgba(255,0,0,0.1); }
+        
+        .btn-pago { background: var(--verde); color: white; border: none; padding: 15px; border-radius: 6px; width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-pago:active { transform: scale(0.98); }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes blink { 50% { border-color: transparent; } }
+        .blink-alerta { animation: blink 1s infinite; border: 2px solid #ff4444; }
     </style>
 </head>
 <body>
@@ -24,15 +57,19 @@
 
     <div id="lock-screen">
         <div class="lock-box">
-            <h2 style="color:#c89b3c">ADMIN</h2>
+            <h2 style="border:none; margin-bottom:20px; justify-content:center;">Painel Admin</h2>
             <input type="password" id="admin_pass" placeholder="Senha Mestra">
-            <button id="btn_acessar">ENTRAR NO PAINEL</button>
+            <button class="primary" id="btn_acessar">Acessar Sistema</button>
+            <p id="erro_msg" style="color: #ff4444; font-size: 13px; margin-top: 15px;"></p>
         </div>
     </div>
 
     <div id="painel_conteudo">
-        <h2>PEDIDOS DE RESGATE</h2>
-        <div id="lista_pedidos">Conectando...</div>
+        <h2>
+            <span>Fila de Resgates</span>
+            <button onclick="location.reload()" style="background:transparent; color:#888; border:none; cursor:pointer; font-size:12px;">Desconectar</button>
+        </h2>
+        <div id="lista_pedidos">Buscando novos pedidos...</div>
     </div>
 
     <script type="module">
@@ -54,42 +91,64 @@
         const messaging = getMessaging(app);
         const audio = document.getElementById("notifSound");
 
-        async function ativarPush() {
+        async function registrarPush() {
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === "granted") {
-                    // COLE SUA CHAVE VAPID ABAIXO
                     await getToken(messaging, { vapidKey: "BLlYRA_DSLn_ACEEdqKEwACeDkrPfny85TnEFvCHDY9zktsOCPga-cAWjTeYS2UCReH43o9oUQFDjVoyxJhiKc0" });
                 }
-            } catch (e) { console.log("Push desativado"); }
+            } catch (e) { console.warn("Push bloqueado ou sem HTTPS"); }
         }
 
-        function carregarDados() {
+        function formatarData(timestamp) {
+            if(!timestamp) return "Data desconhecida";
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('pt-BR');
+        }
+
+        function iniciarPainel() {
             const q = query(collection(db, "resgates"), orderBy("timestamp", "desc"));
+            
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
                 
-                // Som de alerta
-                if (!snapshot.metadata.fromCache && snapshot.docChanges().some(c => c.type === "added")) {
+                if (snapshot.docChanges().some(c => c.type === "added") && !snapshot.metadata.fromCache) {
                     audio.play().catch(() => {});
                 }
 
                 container.innerHTML = "";
                 if (snapshot.empty) {
-                    container.innerHTML = "<p>Nenhum pedido pendente.</p>";
+                    container.innerHTML = "<p style='text-align:center; color:#666; margin-top:40px;'>Tudo limpo por aqui! Ninguém pediu saque ainda.</p>";
                     return;
                 }
 
-                snapshot.forEach((p) => {
-                    const d = p.data();
+                snapshot.forEach((pedido) => {
+                    const data = pedido.data();
+                    const suspeito = Number(data.goldAnterior) < Number(data.valorGold);
+                    
                     const card = document.createElement('div');
-                    card.className = 'pedido-card';
+                    card.className = `pedido-card ${suspeito ? 'blink-alerta' : ''}`;
                     card.innerHTML = `
-                        <b>ID:</b> ${d.usuarioId}<br>
-                        <div class="pix-box">${d.chavePix}</div>
-                        <b>Valor: R$ ${d.valorReais}</b><br>
-                        <small>Anterior: ${d.goldAnterior} | Atual: ${d.goldPosResgate}</small><br>
-                        <button class="btn-pago" onclick="marcarPago('${p.id}')">MARCAR COMO PAGO</button>
+                        <span class="timestamp">📅 Solicitado em: ${formatarData(data.timestamp)}</span>
+                        <div class="info">
+                            <b>Usuário:</b> <span style="color:var(--ouro)">${data.usuarioId}</span>
+                            
+                            <div class="pix-container" onclick="navigator.clipboard.writeText('${data.chavePix}'); alert('PIX Copiado!')">
+                                <span class="copy-label">CLIQUE PARA COPIAR</span>
+                                <span class="pix-text">${data.chavePix}</span>
+                            </div>
+
+                            <span class="valor-txt">R$ ${data.valorReais}</span>
+                            
+                            <div class="status-box ${suspeito ? 'alerta-fraude' : ''}">
+                                <strong>📊 Relatório de Gold:</strong><br>
+                                • Saldo Inicial: ${Number(data.goldAnterior || 0).toLocaleString()} <br>
+                                • Custo Saque: -${Number(data.valorGold || 0).toLocaleString()} <br>
+                                • Saldo Final: ${Number(data.goldPosResgate || 0).toLocaleString()}
+                                ${suspeito ? '<br><br><strong style="color:#ff4444;">⚠️ ALERTA: SALDO INSUFICIENTE!</strong>' : ''}
+                            </div>
+                        </div>
+                        <button class="btn-pago" onclick="confirmarPagamento('${pedido.id}')">MARCAR COMO PAGO</button>
                     `;
                     container.appendChild(card);
                 });
@@ -100,13 +159,17 @@
             if (document.getElementById('admin_pass').value === "Belial10") {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
-                ativarPush();
-                carregarDados();
+                registrarPush();
+                iniciarPainel();
+            } else {
+                document.getElementById('erro_msg').innerText = "Senha incorreta!";
             }
         };
 
-        window.marcarPago = async (id) => {
-            if (confirm("Confirmar pagamento?")) await deleteDoc(doc(db, "resgates", id));
+        window.confirmarPagamento = async (id) => {
+            if (confirm("Você confirma que o PIX foi enviado? O pedido sairá da lista.")) {
+                await deleteDoc(doc(db, "resgates", id));
+            }
         };
     </script>
 </body>
