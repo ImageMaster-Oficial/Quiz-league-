@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin - Quiz Legends</title>
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="admin.png">
+    <link rel="apple-touch-icon" href="admin.png">
+    
     <meta name="theme-color" content="#010a13">
 
     <style>
@@ -89,7 +91,6 @@
         const db = getFirestore(app);
         const audio = document.getElementById("notifSound");
 
-        // FUNÇÃO DE FORMATAÇÃO AJUSTADA
         function limparGold(valor) {
             if (valor === undefined || valor === null) return "0";
             let num = parseFloat(String(valor).replace('k', '000'));
@@ -114,8 +115,6 @@
 
                 snapshot.forEach((pedido) => {
                     const data = pedido.data();
-                    
-                    // Lógica de fraude: Se o saldo anterior for menor que o custo do saque
                     const nAnterior = parseFloat(data.goldAnterior) || 0;
                     const nCusto = parseFloat(data.valorGold) || 0;
                     const suspeito = nAnterior < nCusto;
