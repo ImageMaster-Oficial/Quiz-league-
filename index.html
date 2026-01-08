@@ -2,10 +2,15 @@
 <html lang="pt-br">
 <head>
     <meta name="monetag" content="1c60255a133066275a558c891b1f4a9b">
-
+    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Legends - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Quiz Legends</title>
+    
+    <link rel="manifest" href="manifest-jogo.json">
+    <meta name="theme-color" content="#c89b3c">
+    <link rel="apple-touch-icon" href="app-192.png">
+
     <style>
         :root {
             --ouro: #c89b3c;
@@ -22,109 +27,192 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            min-height: 100vh; 
+            height: 100vh; 
             margin: 0;
             overflow: hidden;
         }
 
-        /* Recuperando o tamanho e estilo original da box */
-        .login-box { 
-            position: relative;
-            border: 2px solid var(--ouro); 
-            padding: 30px 25px; 
-            background: rgba(9, 20, 40, 0.9); 
-            width: 85%;
-            max-width: 320px; 
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%);
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.15;
+            pointer-events: none;
         }
 
-        .logo-area {
-            color: var(--ouro);
-            font-size: 1.5rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+        .login-box { 
+            position: relative;
+            border: 3px solid var(--ouro); 
+            padding: 45px 35px; 
+            background: linear-gradient(135deg, rgba(9, 20, 40, 0.98) 0%, rgba(1, 10, 19, 1) 100%); 
+            border-radius: 4px; 
+            width: 330px; 
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(200, 155, 60, 0.1);
+            text-align: center;
+            box-sizing: border-box;
+            z-index: 1;
         }
+
+        .logo-container {
+            position: relative;
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 30px;
+        }
+
+        .logo-diamond {
+            width: 100%; height: 100%;
+            background: #010a13;
+            border: 3px solid var(--ouro); 
+            transform: rotate(45deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(200, 155, 60, 0.4);
+        }
+
+        .logo-text {
+            transform: rotate(-45deg);
+            font-family: 'Georgia', serif;
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--ouro);
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.8), 0 0 10px var(--ouro);
+        }
+
+        .login-title { 
+            color: var(--ouro); 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            margin-bottom: 10px; 
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            display: block;
+        }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
 
         input { 
             width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border: 1px solid var(--ouro); 
-            background: #010a13; 
-            color: #fff; 
+            padding: 16px 15px; 
+            border: 2px solid var(--ouro); 
+            background: rgba(5, 10, 20, 0.9); 
+            color: #f0e6d2; 
             box-sizing: border-box; 
+            font-size: 16px; 
             outline: none;
         }
 
+        input:focus { border-color: #fff; box-shadow: 0 0 15px rgba(200, 155, 60, 0.5); }
+
         button { 
-            background: var(--ouro); 
-            color: #000; 
-            padding: 12px; 
+            background: linear-gradient(to bottom, #c89b3c 0%, #a07a2d 100%); 
+            color: #010a13; 
+            padding: 18px; 
             width: 100%; 
-            border: none; 
-            margin-top: 15px; 
-            font-weight: 900; 
+            border: 2px solid var(--ouro); 
+            font-weight: bold; 
             cursor: pointer; 
-            text-transform: uppercase;
-            clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
-        }
-
-        #msg { 
             margin-top: 10px; 
-            font-size: 0.7rem; 
-            color: var(--erro); 
+            font-size: 14px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+        }
+
+        .footer-links { margin-top: 35px; font-size: 11px; color: #888; }
+        .footer-links a { color: var(--ouro) !important; text-decoration: none; font-weight: bold; display: block; margin-top: 10px; font-size: 13px; }
+
+        /* --- DESIGN DO MODAL --- */
+        #modal-alerta {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-azul);
+            border: 2px solid var(--ouro);
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 300px;
+            width: 85%;
+            box-shadow: 0 0 40px rgba(200, 155, 60, 0.5);
+            animation: surgindo 0.3s ease-out;
+        }
+
+        .modal-content h3 { margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 2px; font-size: 20px; }
+        .modal-content p { color: #fff; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+
+        .btn-modal {
+            background: var(--ouro);
+            color: #010a13;
+            border: none;
+            padding: 12px;
+            width: 100%;
             font-weight: bold;
-            text-transform: uppercase;
+            cursor: pointer;
         }
 
-        .footer-links {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        @keyframes surgindo {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        .footer-links a { 
-            color: var(--ouro); 
-            text-decoration: none; 
-            font-size: 0.75rem; 
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .policy-link {
-            display: block;
-            margin-top: 15px;
-            font-size: 0.6rem;
-            color: var(--ouro);
+        #btnInstall {
+            display: none; 
+            font-size: 10px;
             opacity: 0.6;
-            text-decoration: none;
-            text-transform: uppercase;
+            margin-top: 15px;
+            text-decoration: underline;
+            cursor: pointer;
+            color: var(--ouro);
         }
     </style>
 </head>
 <body>
 
+    <div id="modal-alerta">
+        <div class="modal-content">
+            <h3 id="modal-titulo">AVISO</h3>
+            <p id="modal-msg">Mensagem...</p>
+            <button class="btn-modal" id="btnAcaoModal">ENTENDIDO</button>
+        </div>
+    </div>
+
     <div class="login-box">
-        <div class="logo-area">QUIZ LEGENDS</div>
+        <div class="logo-container">
+            <div class="logo-diamond">
+                <span class="logo-text">L</span>
+            </div>
+        </div>
         
-        <input type="text" id="user" placeholder="NOME DE USUÁRIO" autocomplete="off">
-        <input type="password" id="pass" placeholder="SENHA">
+        <label class="login-title">Login</label>
         
-        <button id="btnLogin">ENTRAR NO JOGO</button>
+        <div class="input-group">
+            <input type="text" id="user" placeholder="USUÁRIO" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <input type="password" id="pass" placeholder="SENHA">
+        </div>
+        
+        <button id="btnLogin">Entrar no Reino</button>
+        
+        <a href="recuperar.html" style="color: var(--ouro); text-decoration: none; font-size: 11px; display: block; margin-top: 15px; font-weight: bold; opacity: 0.8;">ESQUECI MINHA SENHA</a>
         
         <div id="msg"></div>
 
         <div class="footer-links">
-            <a href="cadastro.html">Não tem uma conta? Crie aqui</a>
-            <a href="recuperar.html">Esqueceu a senha?</a>
+            AINDA NÃO TEM CONTA?<br>
+            <a href="cadastro.html">CRIAR CONTA LENDÁRIA</a>
+            <a href="politica.html" style="font-size: 10px; opacity: 0.6; margin-top: 20px;">POLÍTICA DE PRIVACIDADE</a>
+            <a id="btnInstall">INSTALE O APP NO CELULAR</a>
         </div>
-
-        <a href="politica.html" class="policy-link">Política de Privacidade</a>
     </div>
 
     <script type="module">
@@ -143,36 +231,84 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // FUNÇÃO EXIBIR MODAL
+        function exibirModal(titulo, mensagem, corTitulo) {
+            const modal = document.getElementById('modal-alerta');
+            const tituloH3 = document.getElementById('modal-titulo');
+            const msgP = document.getElementById('modal-msg');
+            const btn = document.getElementById('btnAcaoModal');
+
+            tituloH3.innerText = titulo;
+            tituloH3.style.color = corTitulo;
+            msgP.innerText = mensagem;
+            modal.style.display = 'flex';
+
+            btn.onclick = () => { modal.style.display = 'none'; };
+        }
+
+        // --- LÓGICA DO PWA ---
+        let deferredPrompt;
+        const btnInstall = document.getElementById('btnInstall');
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Adicionamos a Monetag ao sw.js aqui internamente se necessário
+                navigator.serviceWorker.register('sw.js?v=2')
+                    .then(reg => console.log('PWA ativo'))
+                    .catch(err => console.error('Erro SW:', err));
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            btnInstall.style.display = 'block'; 
+        });
+
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') btnInstall.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+
+        // --- LÓGICA DE LOGIN ---
         document.getElementById('btnLogin').onclick = async () => {
-            const usuario = document.getElementById('user').value.trim();
-            const senha = document.getElementById('pass').value;
-            const msg = document.getElementById('msg');
+            const usuarioInput = document.getElementById('user').value.trim();
+            const senhaInput = document.getElementById('pass').value;
             const btn = document.getElementById('btnLogin');
 
-            if (!usuario || !senha) {
-                msg.innerText = "Preencha todos os campos!";
+            if (!navigator.onLine) {
+                exibirModal("FALHA DE CONEXÃO", "Você precisa de internet para entrar no reino.", "var(--erro)");
+                return;
+            }
+
+            if (!usuarioInput || !senhaInput) {
+                exibirModal("CAMPOS VAZIOS", "Por favor, preencha todos os campos.", "var(--ouro)");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "CARREGANDO...";
+            btn.innerText = "AUTENTICANDO...";
 
             try {
-                const userRef = doc(db, "usuarios", usuario);
-                const userSnap = await getDoc(userRef);
+                const docRef = doc(db, "usuarios", usuarioInput);
+                const snap = await getDoc(docRef);
 
-                if (userSnap.exists() && userSnap.data().senha === senha) {
-                    localStorage.setItem("usuarioLogado", usuario);
+                if (snap.exists() && snap.data().senha === senhaInput) {
+                    localStorage.setItem("usuarioLogado", usuarioInput);
                     window.location.href = "resgate.html";
                 } else {
-                    msg.innerText = "DADOS INCORRETOS!";
+                    exibirModal("ACESSO NEGADO", "Usuário ou senha incorretos!", "var(--erro)");
                     btn.disabled = false;
-                    btn.innerText = "ENTRAR NO JOGO";
+                    btn.innerText = "Entrar no Reino";
                 }
             } catch (e) {
-                msg.innerText = "ERRO DE CONEXÃO!";
+                exibirModal("FALHA TÉCNICA", "Erro ao conectar ao servidor.", "var(--erro)");
                 btn.disabled = false;
-                btn.innerText = "ENTRAR NO JOGO";
+                btn.innerText = "Entrar no Reino";
             }
         };
     </script>
