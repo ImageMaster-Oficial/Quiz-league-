@@ -2,281 +2,209 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz Legends - Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Legends - Resgate</title>
     <style>
-        :root { 
-            --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
-            --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 70px; 
-            --correct: #28a745; --wrong: #dc3545;
+        :root {
+            --ouro: #c89b3c;
+            --ouro-brilhante: #f0e6d2;
+            --fundo-profundo: #010a13;
+            --card-azul: #091428;
+            --borda-azul: #1e2328;
         }
-        
-        html, body { 
+
+        body { 
+            background: var(--fundo-profundo); 
+            color: white; 
             font-family: 'Segoe UI', sans-serif; 
-            background: radial-gradient(circle, #051421 0%, #010a13 100%);
-            color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; width: 100vw; overflow-y: auto; overflow-x: hidden; 
-            overscroll-behavior-y: contain;
+            margin: 0; 
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* --- ESTILOS DO MODAL --- */
-        #custom-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); z-index: 3000; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-        .modal-content {
-            width: 85%; max-width: 350px; background: var(--lol-blue); border: 2px solid var(--gold);
-            padding: 25px; text-align: center; position: relative;
-            clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%);
-            box-shadow: 0 0 30px rgba(200, 155, 60, 0.4);
-            animation: modalPop 0.3s ease-out;
-        }
-        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .modal-title { color: var(--gold); font-weight: 900; text-transform: uppercase; margin-bottom: 12px; font-size: 1.1rem; }
-        .modal-text { font-size: 0.9rem; line-height: 1.4; color: var(--gold-bright); margin-bottom: 20px; }
-        .modal-footer { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        
-        .modal-btn-confirm { 
-            background: linear-gradient(to bottom, var(--gold), var(--gold-dark)); border: 1px solid var(--gold-bright);
-            color: #000; padding: 12px 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; width: 100%;
-            clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
-        }
-        .modal-btn-close { background: transparent; border: none; color: var(--gold); text-decoration: underline; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; opacity: 0.7; }
-
-        /* --- DESIGN GERAL --- */
-        #pull-to-refresh { position: fixed; top: -60px; left: 0; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; z-index: 2000; transition: transform 0.2s ease; }
-        .refresh-badge { border: 2px solid var(--gold); padding: 8px 20px; background: rgba(9, 20, 40, 0.95); color: var(--gold); font-weight: 900; font-size: 0.8rem; text-transform: uppercase; clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%); }
-        .app-container { flex: 1; display: flex; flex-direction: column; padding: 15px 0; gap: 10px; width: 94%; max-width: 400px; box-sizing: border-box; margin-bottom: var(--ad-space); justify-content: center; transition: transform 0.2s ease; }
-        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
-        .title-legends h1 { font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase; background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; }
-        .hex-frame { background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; display: flex; flex-direction: column; box-sizing: border-box; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%); margin-bottom: 5px; }
-        .option-btn { background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 12px; margin: 5px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
-        .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; }
-        .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; }
-        
-        .video-btn { 
-            background: #1e2328; border: 1px solid #333; color: #666; 
-            padding: 12px; width: 100%; font-weight: bold; text-transform: uppercase; cursor: not-allowed; font-size: 0.75rem; margin-top: 8px; transition: 0.3s;
-        }
-        .video-btn.active {
-            background: linear-gradient(to bottom, #c8a355, #785a28); border: 1px solid var(--gold-bright); 
-            color: #f0e6d2; cursor: pointer; box-shadow: 0 0 10px rgba(200, 155, 60, 0.4);
+        .header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 2px solid var(--ouro);
+            margin-bottom: 20px;
         }
 
-        .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
-        .resgate-opt { flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold); padding: 12px 2px; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-align: center; }
-        .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); }
-        input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 8px 0; box-sizing: border-box; }
-        .footer-ad-space { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--ad-space); background: #000; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow: hidden; }
-        .link-politica-quadro { display: block; text-align: center; color: var(--gold); font-size: 9px; text-decoration: none; margin-top: 10px; opacity: 0.5; text-transform: uppercase; }
+        .gold-display {
+            color: var(--ouro);
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding-bottom: 100px; /* Espaço para o rodapé de anúncio */
+        }
+
+        .card {
+            background: var(--card-azul);
+            border: 1px solid var(--ouro);
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--ouro-brilhante);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-resgate {
+            background: linear-gradient(to bottom, #c89b3c 0%, #a07a2d 100%);
+            color: #010a13;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* ESTILO DO BOTÃO DE ANÚNCIO */
+        .btn-anuncio {
+            background: #1e2328;
+            color: var(--ouro);
+            border: 1px solid var(--ouro);
+            padding: 15px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-anuncio:hover {
+            background: var(--ouro);
+            color: black;
+        }
+
+        /* RODAPÉ PARA ANÚNCIO (ESPAÇO RESERVADO) */
+        #footer-ad {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: #000;
+            border-top: 1px solid var(--ouro);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
 
-    <div id="custom-modal">
-        <div class="modal-content">
-            <div class="modal-title" id="m-title">AVISO</div>
-            <div class="modal-text" id="m-text">Sua mensagem aqui.</div>
-            <div class="modal-footer" id="m-footer"></div>
+    <div class="header">
+        <span id="nomeUsuario">CARREGANDO...</span>
+        <span class="gold-display">💰 <span id="saldoGold">0</span></span>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h3>Bônus Diário</h3>
+            <p>Assista a um vídeo promocional e ganhe Gold instantaneamente!</p>
+            <button class="btn-anuncio" id="btnAnuncio">ASSISTIR ANÚNCIO (+300 GOLD)</button>
+        </div>
+
+        <div class="card">
+            <h3>Resgate PIX - R$ 10,00</h3>
+            <p>Custo: 10.000 Gold</p>
+            <button class="btn-resgate" onclick="solicitarResgate(10)">RESGATAR</button>
+        </div>
+
+        <div class="card">
+            <h3>Resgate PIX - R$ 20,00</h3>
+            <p>Custo: 20.000 Gold</p>
+            <button class="btn-resgate" onclick="solicitarResgate(20)">RESGATAR</button>
         </div>
     </div>
 
-    <div id="pull-to-refresh">
-        <div class="refresh-badge">Solte para Recarregar</div>
+    <div id="footer-ad">
+        <span style="font-size: 10px; color: #555;">PUBLICIDADE</span>
     </div>
-
-    <div class="app-container" id="main-content">
-        <div class="header-section">
-            <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
-            <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
-        </div>
-        
-        <div class="hex-frame">
-            <div id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Carregando...</p>
-                <div id="opcoes"></div>
-                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
-            </div>
-            <div style="text-align: center;">
-                <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário: <span id="limitDiario">0/35</span></span>
-                <button id="btnVideo" class="video-btn">📺 ASSISTIR ANÚNCIO (+300)</button>
-            </div>
-        </div>
-
-        <div class="hex-frame">
-            <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;">
-                <span id="txtMeta">Meta: 15.8k</span>
-                <span id="txtPorcentagem">0%</span>
-            </div>
-            <div class="resgate-selector">
-                <div class="resgate-opt active" onclick="setResgate(this, 15800, '0,50')">R$ 0,50</div>
-                <div class="resgate-opt" onclick="setResgate(this, 31500, '1,00')">R$ 1,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 150000, '5,00')">R$ 5,00</div>
-            </div>
-            <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
-            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
-            <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
-        </div>
-    </div>
-
-    <div class="footer-ad-space">
-        </div>
 
     <script type="module">
-        const modal = document.getElementById('custom-modal');
-        const mTitle = document.getElementById('m-title');
-        const mText = document.getElementById('m-text');
-        const mFooter = document.getElementById('m-footer');
-
-        function openModal(title, text, type = 'alert', onConfirm = null) {
-            mTitle.innerText = title; mText.innerText = text; mFooter.innerHTML = '';
-            mTitle.style.color = "var(--gold)";
-            if (type === 'confirm') {
-                const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR E ENVIAR';
-                bC.onclick = () => { onConfirm(); };
-                const bX = document.createElement('button'); bX.className = 'modal-btn-close'; bX.innerText = 'VOLTAR E CONFERIR';
-                bX.onclick = () => { modal.style.display = 'none'; };
-                mFooter.appendChild(bC); mFooter.appendChild(bX);
-            } else {
-                const bO = document.createElement('button'); bO.className = 'modal-btn-confirm'; bO.innerText = 'ENTENDI';
-                bO.onclick = () => { modal.style.display = 'none'; }; mFooter.appendChild(bO);
-            }
-            modal.style.display = 'flex';
-        }
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { bancoPerguntas } from './pergunta.js';
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", authDomain: "quizlegends-f58fc.firebaseapp.com", projectId: "quizlegends-f58fc", storageBucket: "quizlegends-f58fc.firebasestorage.app", messagingSenderId: "1050463164018", appId: "1:1050463164018:web:91de002b8afc8e678f54eb" };
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
+            authDomain: "quizlegends-f58fc.firebaseapp.com",
+            projectId: "quizlegends-f58fc",
+            storageBucket: "quizlegends-f58fc.firebasestorage.app",
+            messagingSenderId: "1050463164018",
+            appId: "1:1050463164018:web:91de002b8afc8e678f54eb"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let metaAtual = 15800, valorReaisMeta = "0,50", usuarioLogado = localStorage.getItem("usuarioLogado");
-        const userRef = doc(db, "usuarios", usuarioLogado);
-        let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
+        const usuarioLogado = localStorage.getItem("usuarioLogado");
 
-        onSnapshot(userRef, async (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const hoje = new Date().toLocaleDateString('pt-BR');
-                if (data.ultimaDataAcesso !== hoje) { await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); return; }
-                goldDB = data.saldo || 0; acertosNoCiclo = data.acertos || 0; videosAssistidos = data.videosAssistidos || 0; totalVideosHoje = data.totalVideosHoje || 0;
-                atualizarInterface();
-                if (!jogoInicializado) { jogoInicializado = true; carregarQuestao(); }
-            }
-        });
+        if (!usuarioLogado) {
+            window.location.href = "index.html";
+        }
 
-        function atualizarInterface() {
-            document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
-            document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
-            document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
-            document.getElementById('txtMeta').innerText = `Meta: ${(metaAtual/1000).toFixed(1)}k`;
-            
-            const btnV = document.getElementById('btnVideo'), aviso = document.getElementById('avisoStatusQuiz');
-            
-            if (totalVideosHoje >= 35) {
-                btnV.disabled = true; btnV.classList.remove('active');
-                aviso.innerText = "LIMITE DIÁRIO ATINGIDO!";
-            } else if (acertosNoCiclo < 10) {
-                btnV.disabled = true; btnV.classList.remove('active');
-                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEO`;
-            } else {
-                btnV.disabled = false; btnV.classList.add('active');
-                aviso.innerHTML = `<span style="color:var(--gold)">META ATINGIDA!</span><br>ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> VÍDEOS PARA LIBERAR O QUIZ`;
+        // Carregar dados do usuário
+        async function carregarDados() {
+            const userRef = doc(db, "usuarios", usuarioLogado);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                document.getElementById('nomeUsuario').innerText = usuarioLogado.toUpperCase();
+                document.getElementById('saldoGold').innerText = userSnap.data().gold || 0;
             }
         }
 
-        window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
+        carregarDados();
 
-        document.getElementById('btnResgate').onclick = () => {
-            const chave = document.getElementById('chavePix').value.trim();
-            if (goldDB < metaAtual) { openModal("SALDO INSUFICIENTE", "Atinga a meta de moedas para resgatar."); return; }
-            if (chave.length < 5) { openModal("CHAVE PIX INVÁLIDA", "Insira sua chave Pix corretamente."); return; }
-            openModal("ATENÇÃO!", "Verifique se sua chave Pix está correta. Após o envio não será possível modificá-la!", 'confirm', enviarResgateFirebase);
-        };
+        // --- LÓGICA DO ANÚNCIO SMARTLINK ---
+        const linkAnuncio = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
 
-        async function enviarResgateFirebase() {
-            const chave = document.getElementById('chavePix').value.trim();
-            const saldoAntes = goldDB;
-            const saldoDepois = goldDB - metaAtual;
-            try {
-                await addDoc(collection(db, "resgates"), { 
-                    usuarioId: usuarioLogado, chavePix: chave, valorGold: metaAtual, valorReais: valorReaisMeta,
-                    goldAnterior: saldoAntes, goldPosResgate: saldoDepois, status: "Pendente", 
-                    data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() 
-                });
-                await updateDoc(userRef, { saldo: saldoDepois });
-                openModal("SOLICITAÇÃO FEITA COM SUCESSO", "O envio do Pix pode demorar até 2 horas!");
-                document.getElementById('chavePix').value = "";
-            } catch (e) { openModal("ERRO", "Falha ao processar."); }
-        }
-
-        // --- LÓGICA DO BOTÃO DE VÍDEO COM ANÚNCIO ---
-        document.getElementById('btnVideo').onclick = async () => {
-            const btn = document.getElementById('btnVideo'); if(btn.disabled) return;
-            
-            // 3. COLE O SEU "DIRECT LINK" DA MONETAG/ADSTERRA ABAIXO
-            const linkAnuncio = "https://seulinkdeanuncioaqui.com"; 
-
-            // Abre o anúncio em uma nova aba
+        document.getElementById('btnAnuncio').onclick = () => {
+            // 1. Abre o anúncio da Adsterra
             window.open(linkAnuncio, '_blank');
 
-            // Inicia o contador visual para o usuário
-            btn.disabled = true; let t = 3; 
-            const i = setInterval(() => { 
-                btn.innerText = `ASSISTINDO... ${t}s`; 
-                t--; 
-                if(t<0){ clearInterval(i); finalizarVideo(); } 
-            }, 1000);
+            // 2. Crédito do Gold (Simulando que ele assistiu)
+            setTimeout(async () => {
+                try {
+                    const userRef = doc(db, "usuarios", usuarioLogado);
+                    const userSnap = await getDoc(userRef);
+                    const novoGold = (userSnap.data().gold || 0) + 300;
+
+                    await updateDoc(userRef, { gold: novoGold });
+                    
+                    alert("Você recebeu 300 Gold pela visualização!");
+                    location.reload(); 
+                } catch (e) {
+                    alert("Erro ao processar recompensa.");
+                }
+            }, 3000); // 3 segundos de delay para o usuário ver o anúncio abrir
         };
 
-        async function finalizarVideo() {
-            let nv = videosAssistidos + 1; 
-            let d = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-            if (nv >= 3) { d.acertos = 0; d.videosAssistidos = 0; }
-            await updateDoc(userRef, d); 
-            document.getElementById('btnVideo').innerText = "📺 ASSISTIR ANÚNCIO (+300)"; 
-            carregarQuestao();
-        }
+        // Função de resgate (Exemplo)
+        window.solicitarResgate = (valor) => {
+            alert("Saldo insuficiente para resgatar R$ " + valor + ",00. Continue jogando!");
+        };
 
-        function carregarQuestao() {
-            const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-            if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
-            const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
-            let opts = q.opcoes.map((o, i) => { return { texto: o, correta: i === q.correta }; }).sort(() => Math.random() - 0.5);
-            t.innerText = q.pergunta; c.innerHTML = "";
-            opts.forEach((o) => {
-                const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
-                b.onclick = async () => {
-                    const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
-                    if (o.correta) { b.classList.add('btn-correct'); await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) }); }
-                    else { b.classList.add('btn-wrong'); opts.forEach((obj, idx) => { if(obj.correta) all[idx].classList.add('btn-correct'); }); }
-                    setTimeout(carregarQuestao, 1200);
-                };
-                c.appendChild(b);
-            });
-        }
-        
-        let sY = 0; window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
-        window.addEventListener('touchmove', (e) => {
-            const p = e.touches[0].pageY - sY;
-            if(window.scrollY === 0 && p > 0) {
-                const m = Math.min(p*0.5, 80);
-                document.getElementById('pull-to-refresh').style.transform = `translateY(${m}px)`;
-                document.getElementById('main-content').style.transform = `translateY(${m}px)`;
-            }
-        }, {passive:true});
-        window.addEventListener('touchend', () => {
-            if (new WebKitCSSMatrix(window.getComputedStyle(document.getElementById('pull-to-refresh')).transform).m42 >= 60) location.reload();
-            else { document.getElementById('pull-to-refresh').style.transform = 'translateY(0)'; document.getElementById('main-content').style.transform = 'translateY(0)'; }
-        });
     </script>
 </body>
 </html>
