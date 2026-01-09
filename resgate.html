@@ -190,7 +190,8 @@
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEO`;
             } else {
                 btnV.disabled = false; btnV.classList.add('active');
-                aviso.innerHTML = `<span style="color:var(--gold)">META ATINGIDA!</span><br>ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> VÍDEOS PARA LIBERAR O QUIZ`;
+                // Aqui removemos a frase repetida "META ATINGIDA!" da parte de baixo
+                aviso.innerHTML = `ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> VÍDEOS PARA LIBERAR O QUIZ`;
             }
         }
 
@@ -264,10 +265,15 @@
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
             if (acertosNoCiclo >= 10) { 
+                // Ajustado para cor dourada e tamanho maior como solicitado
                 t.innerText = "META DE ACERTOS ATINGIDA!"; 
+                t.style.color = "var(--gold)"; 
                 c.innerHTML = ""; 
                 return; 
             }
+            // Reset de cor caso volte ao normal
+            t.style.color = "var(--gold-bright)";
+            
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
             let opts = q.opcoes.map((o, i) => { return { texto: o, correta: i === q.correta }; }).sort(() => Math.random() - 0.5);
             t.innerText = q.pergunta; c.innerHTML = "";
