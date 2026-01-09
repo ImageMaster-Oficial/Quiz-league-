@@ -83,7 +83,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Uso do initializeFirestore para habilitar cache persistente (acesso instantâneo no celular)
+        import { initializeFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -95,18 +96,20 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        
+        // Ativando Cache para Celular (Evita os 60 segundos de espera)
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+        });
+        
         const auth = getAuth(app);
         const audio = document.getElementById("notifSound");
 
         // --- CONTROLE DE ACESSO ---
-        
-        // Verifica se já está logado
         onAuthStateChanged(auth, (user) => {
-            // AJUSTE: Mude para o seu e-mail de administrador real
             const emailAdmin = "ianfelixbelial@gmail.com"; 
 
-            if (user && user.email === emailAdmin) {
+            if (user && user.email.toLowerCase() === emailAdmin.toLowerCase()) {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('painel_conteudo').style.display = 'block';
                 iniciarPainel();
@@ -116,22 +119,22 @@
             }
         });
 
-        // Lógica de Login
         document.getElementById('btn_acessar').onclick = async () => {
-            const email = document.getElementById('admin_email').value;
+            const email = document.getElementById('admin_email').value.trim();
             const pass = document.getElementById('admin_pass').value;
             const erroMsg = document.getElementById('erro_msg');
 
             try {
-                erroMsg.innerText = "Verificando...";
+                erroMsg.style.color = "var(--ouro)";
+                erroMsg.innerText = "Conectando ao servidor...";
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (error) {
+                erroMsg.style.color = "#ff4444";
                 erroMsg.innerText = "Erro: Acesso não autorizado.";
                 console.error("Erro no login:", error.message);
             }
         };
 
-        // Lógica de Logout
         document.getElementById('btn_sair').onclick = () => {
             signOut(auth).then(() => {
                 location.reload();
@@ -139,7 +142,6 @@
         };
 
         // --- FUNÇÕES DO PAINEL ---
-
         function limparGold(valor) {
             if (valor === undefined || valor === null) return "0";
             let num = parseFloat(String(valor).replace('k', '000'));
@@ -147,11 +149,13 @@
         }
 
         function iniciarPainel() {
+            // Consulta otimizada
             const q = query(collection(db, "resgates"), orderBy("timestamp", "desc"));
             
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('lista_pedidos');
                 
+                // Só toca o som se for um dado novo vindo do servidor, não do cache local
                 if (snapshot.docChanges().some(c => c.type === "added") && !snapshot.metadata.fromCache) {
                     audio.play().catch(() => {});
                 }
@@ -194,6 +198,8 @@
                     `;
                     container.appendChild(card);
                 });
+            }, (error) => {
+                console.error("Erro ao buscar dados:", error);
             });
         }
 
