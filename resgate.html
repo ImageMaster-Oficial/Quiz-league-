@@ -8,7 +8,7 @@
         :root { 
             --bg-dark: #010a13; --lol-blue: #091428; --gold: #c89b3c; 
             --gold-dark: #785a28; --gold-bright: #f0e6d2; --text: #f0e6d2;
-            --ad-space: 70px; 
+            --ad-space: 65px; /* Ajustado para o banner de 50px + margem */
             --correct: #28a745; --wrong: #dc3545;
         }
         
@@ -71,7 +71,15 @@
         .resgate-opt { flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold); padding: 12px 2px; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-align: center; }
         .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); }
         input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 8px 0; box-sizing: border-box; }
-        .footer-ad-space { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--ad-space); background: #000; border-top: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; z-index: 1000; }
+        
+        /* FOOTER AJUSTADO PARA O ANÚNCIO */
+        .footer-ad-space { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            height: var(--ad-space); background: #000; 
+            border-top: 2px solid var(--gold); 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 1000; 
+        }
         .link-politica-quadro { display: block; text-align: center; color: var(--gold); font-size: 9px; text-decoration: none; margin-top: 10px; opacity: 0.5; text-transform: uppercase; }
     </style>
 </head>
@@ -125,10 +133,20 @@
     </div>
 
     <div class="footer-ad-space" id="adsterra-banner">
-        <span style="font-size: 10px; opacity: 0.5;">ANÚNCIO</span>
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '48065e37c41fa1904ce5bbacf7c25eb4',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/48065e37c41fa1904ce5bbacf7c25eb4/invoke.js"></script>
     </div>
 
     <script type="module">
+        // (O resto do seu script permanece idêntico)
         const modal = document.getElementById('custom-modal');
         const mTitle = document.getElementById('m-title');
         const mText = document.getElementById('m-text');
@@ -174,7 +192,6 @@
                 totalVideosHoje = data.totalVideosHoje || 0;
                 
                 atualizarInterface();
-                // SÓ CARREGA A QUESTÃO NA PRIMEIRA VEZ QUE ABRE A PÁGINA
                 if (!jogoInicializado) { 
                     jogoInicializado = true; 
                     carregarQuestao(); 
@@ -222,7 +239,7 @@
                     data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() 
                 });
                 await updateDoc(userRef, { saldo: saldoDepois });
-                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas, devido a alta demanda de solicitações dos usuários!");
+                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas!");
                 document.getElementById('chavePix').value = "";
             } catch (e) { openModal("ERRO", "Falha ao processar."); }
         }
@@ -268,21 +285,18 @@
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-            
             if (totalVideosHoje >= 35) {
                 t.innerText = "LIMITE DIÁRIO ATINGIDO, VOLTE AMANHÃ!";
                 t.style.color = "var(--gold)";
                 c.innerHTML = "";
                 return;
             }
-
             if (acertosNoCiclo >= 10) { 
                 t.innerText = "META DE ACERTOS ATINGIDA!"; 
                 t.style.color = "var(--gold)"; 
                 c.innerHTML = ""; 
                 return; 
             }
-            
             t.style.color = "var(--gold-bright)";
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
             let opts = q.opcoes.map((o, i) => { return { texto: o, correta: i === q.correta }; }).sort(() => Math.random() - 0.5);
@@ -293,7 +307,6 @@
                     const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
                     if (o.correta) { 
                         b.classList.add('btn-correct'); 
-                        // SÓ ATUALIZA O FIREBASE, O SNAPSHOT CUIDARÁ DOS NÚMEROS NA TELA
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) }); 
                     }
                     else { 
@@ -303,7 +316,6 @@
                             if(corretaOriginal) btnInner.classList.add('btn-correct');
                         }); 
                     }
-                    // CHAMA A PRÓXIMA QUESTÃO MANUALMENTE
                     setTimeout(carregarQuestao, 1200);
                 };
                 c.appendChild(b);
