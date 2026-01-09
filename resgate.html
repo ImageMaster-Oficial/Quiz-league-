@@ -222,7 +222,7 @@
                     data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() 
                 });
                 await updateDoc(userRef, { saldo: saldoDepois });
-                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas!");
+                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas, devido a alta demanda de solicitações dos usuários!");
                 document.getElementById('chavePix').value = "";
             } catch (e) { openModal("ERRO", "Falha ao processar."); }
         }
