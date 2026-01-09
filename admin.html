@@ -65,8 +65,9 @@
     <div id="lock-screen">
         <div class="lock-box">
             <h2 style="border:none; margin-bottom:20px; justify-content:center;">Painel Admin</h2>
+            <input type="email" id="admin_email" placeholder="E-mail Administrativo">
             <input type="password" id="admin_pass" placeholder="Senha Mestra">
-            <button class="primary" id="btn_acessar">Acessar Sistema</button>
+            <button class="primary" id="btn_acessar">Autenticar Sistema</button>
             <p id="erro_msg" style="color: #ff4444; font-size: 13px; margin-top: 15px;"></p>
         </div>
     </div>
@@ -74,14 +75,15 @@
     <div id="painel_conteudo">
         <h2>
             <span>Fila de Resgates</span>
-            <button onclick="location.reload()" style="background:transparent; color:#888; border:none; cursor:pointer; font-size:12px;">Desconectar</button>
+            <button id="btn_sair" style="background:transparent; color:#888; border:none; cursor:pointer; font-size:12px;">Sair / Desconectar</button>
         </h2>
         <div id="lista_pedidos">Buscando novos pedidos...</div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -94,7 +96,49 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
         const audio = document.getElementById("notifSound");
+
+        // --- CONTROLE DE ACESSO ---
+        
+        // Verifica se já está logado
+        onAuthStateChanged(auth, (user) => {
+            // AJUSTE: Mude para o seu e-mail de administrador real
+            const emailAdmin = "ianfelixbelial@gmail.com"; 
+
+            if (user && user.email === emailAdmin) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('painel_conteudo').style.display = 'block';
+                iniciarPainel();
+            } else {
+                document.getElementById('lock-screen').style.display = 'flex';
+                document.getElementById('painel_conteudo').style.display = 'none';
+            }
+        });
+
+        // Lógica de Login
+        document.getElementById('btn_acessar').onclick = async () => {
+            const email = document.getElementById('admin_email').value;
+            const pass = document.getElementById('admin_pass').value;
+            const erroMsg = document.getElementById('erro_msg');
+
+            try {
+                erroMsg.innerText = "Verificando...";
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                erroMsg.innerText = "Erro: Acesso não autorizado.";
+                console.error("Erro no login:", error.message);
+            }
+        };
+
+        // Lógica de Logout
+        document.getElementById('btn_sair').onclick = () => {
+            signOut(auth).then(() => {
+                location.reload();
+            });
+        };
+
+        // --- FUNÇÕES DO PAINEL ---
 
         function limparGold(valor) {
             if (valor === undefined || valor === null) return "0";
@@ -153,21 +197,13 @@
             });
         }
 
-        document.getElementById('btn_acessar').onclick = () => {
-            if (document.getElementById('admin_pass').value === "Belial10") {
-                document.getElementById('lock-screen').style.display = 'none';
-                document.getElementById('painel_conteudo').style.display = 'block';
-                iniciarPainel();
-            } else {
-                document.getElementById('erro_msg').innerText = "Senha incorreta!";
-            }
-        };
-
         window.confirmarPagamento = async (id) => {
             if (confirm("Confirmar pagamento? O pedido será removido da lista.")) {
                 try {
                     await deleteDoc(doc(db, "resgates", id));
-                } catch(e) { alert("Erro ao deletar pedido."); }
+                } catch(e) { 
+                    alert("Erro ao deletar pedido: Sem permissão."); 
+                }
             }
         };
     </script>
