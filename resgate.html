@@ -167,12 +167,18 @@
                 const data = docSnap.data();
                 const hoje = new Date().toLocaleDateString('pt-BR');
                 if (data.ultimaDataAcesso !== hoje) { await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); return; }
-                goldDB = data.saldo || 0; acertosNoCiclo = data.acertos || 0; videosAssistidos = data.videosAssistidos || 0; totalVideosHoje = data.totalVideosHoje || 0;
                 
-                // Chamamos carregarQuestao primeiro para decidir o texto do título
-                carregarQuestao();
+                goldDB = data.saldo || 0; 
+                acertosNoCiclo = data.acertos || 0; 
+                videosAssistidos = data.videosAssistidos || 0; 
+                totalVideosHoje = data.totalVideosHoje || 0;
+                
                 atualizarInterface();
-                jogoInicializado = true;
+                // SÓ CARREGA A QUESTÃO NA PRIMEIRA VEZ QUE ABRE A PÁGINA
+                if (!jogoInicializado) { 
+                    jogoInicializado = true; 
+                    carregarQuestao(); 
+                }
             }
         });
 
@@ -187,7 +193,7 @@
             
             if (totalVideosHoje >= 35) {
                 btnV.disabled = true; btnV.classList.remove('active');
-                aviso.innerText = ""; // Limpa o aviso de baixo quando o limite diário é atingido
+                aviso.innerText = "";
             } else if (acertosNoCiclo < 10) {
                 btnV.disabled = true; btnV.classList.remove('active');
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEO`;
@@ -263,7 +269,6 @@
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
             
-            // LÓGICA DE MENSAGEM FINAL
             if (totalVideosHoje >= 35) {
                 t.innerText = "LIMITE DIÁRIO ATINGIDO, VOLTE AMANHÃ!";
                 t.style.color = "var(--gold)";
@@ -286,7 +291,11 @@
                 const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
                 b.onclick = async () => {
                     const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
-                    if (o.correta) { b.classList.add('btn-correct'); await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) }); }
+                    if (o.correta) { 
+                        b.classList.add('btn-correct'); 
+                        // SÓ ATUALIZA O FIREBASE, O SNAPSHOT CUIDARÁ DOS NÚMEROS NA TELA
+                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1) }); 
+                    }
                     else { 
                         b.classList.add('btn-wrong'); 
                         all.forEach(btnInner => {
@@ -294,6 +303,7 @@
                             if(corretaOriginal) btnInner.classList.add('btn-correct');
                         }); 
                     }
+                    // CHAMA A PRÓXIMA QUESTÃO MANUALMENTE
                     setTimeout(carregarQuestao, 1200);
                 };
                 c.appendChild(b);
