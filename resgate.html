@@ -53,7 +53,6 @@
         .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .title-legends h1 { font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase; background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* NOVO: Badge do Elo */
         .elo-badge { border: 1px solid var(--gold); padding: 4px 10px; background: rgba(200, 155, 60, 0.1); color: var(--gold-bright); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%); margin-right: 5px;}
         .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; }
         
@@ -62,7 +61,6 @@
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; }
         
-        /* AJUSTE BOTÕES DUPLOS */
         .video-buttons-container { display: flex; gap: 8px; margin-top: 8px; }
         .video-btn { 
             flex: 1; background: #1e2328; border: 1px solid #333; color: #666; 
@@ -207,7 +205,6 @@
         let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false, xpDB = 0;
         let userRef = null, nomeUsuario = "Usuário";
 
-        // Lógica de Cálculo de Elo
         function calcularElo(xp) {
             if (xp < 500) return "Ferro V";
             if (xp < 1000) return "Ferro IV";
@@ -271,24 +268,21 @@
             const btnVXP = document.getElementById('btnVideoXP');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            // Lógica de Liberação dos botões (Ambos após 10 acertos)
             btnV.disabled = true; btnV.classList.remove('active');
             btnVXP.disabled = true; btnVXP.classList.remove('active');
 
             if (acertosNoCiclo < 10) {
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
             } else {
-                // Botão Moedas: Respeita o limite de 35
                 if (totalVideosHoje < 35) {
                     btnV.disabled = false; btnV.classList.add('active');
                 } else {
                     btnV.innerHTML = "📺 MOEDAS<span>LIMITE ATINGIDO</span>";
                 }
 
-                // Botão XP: Sempre livre após as 10 questões
                 btnVXP.disabled = false; btnVXP.classList.add('active');
                 
-                if (videosAssistidos < 3 && totalVideosHoje < 35) {
+                if (videosAssistidos < 3) {
                    aviso.innerHTML = `ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ`;
                 } else {
                    aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
@@ -326,9 +320,7 @@
 
         const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
 
-        // Clique Vídeo Moedas
         document.getElementById('btnVideo').onclick = () => processarVideo(true);
-        // Clique Vídeo XP
         document.getElementById('btnVideoXP').onclick = () => processarVideo(false);
 
         async function processarVideo(isMoeda) {
@@ -353,19 +345,29 @@
         async function finalizarVideoMoeda() {
             const proximoVideoCount = videosAssistidos + 1;
             let dadosUpdate = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-            if (proximoVideoCount >= 3) { dadosUpdate.acertos = 0; dadosUpdate.videosAssistidos = 0; }
+            
+            if (proximoVideoCount >= 3) { 
+                dadosUpdate.acertos = 0; 
+                dadosUpdate.videosAssistidos = 0; 
+            }
+            
             await updateDoc(userRef, dadosUpdate);
             document.getElementById('btnVideo').innerHTML = "📺 +300 MOEDAS <span>LIMITE DIÁRIO</span>";
             openModal("RECOMPENSA", "Você recebeu 300 moedas!");
-            carregarQuestao();
         }
 
         async function finalizarVideoXP() {
-            // XP não conta para os 3 vídeos de liberar quiz, mas reseta acertos para forçar novo ciclo
-            await updateDoc(userRef, { xp: increment(300), acertos: 0 });
+            const proximoVideoCount = videosAssistidos + 1;
+            let dadosUpdate = { xp: increment(300), videosAssistidos: increment(1) };
+            
+            if (proximoVideoCount >= 3) { 
+                dadosUpdate.acertos = 0; 
+                dadosUpdate.videosAssistidos = 0; 
+            }
+            
+            await updateDoc(userRef, dadosUpdate);
             document.getElementById('btnVideoXP').innerHTML = "📺 +300 XP <span>SUBIR DE ELO</span>";
             openModal("RECOMPENSA", "Você recebeu 300 XP!");
-            carregarQuestao();
         }
 
         function carregarQuestao() {
