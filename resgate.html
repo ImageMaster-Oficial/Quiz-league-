@@ -238,7 +238,7 @@
                 aviso.innerText = "LIMITE DIÁRIO ATINGIDO";
             } else if (acertosNoCiclo < 10) {
                 btnV.disabled = true; btnV.classList.remove('active');
-                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR VÍDEO`;
+                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIO`;
             } else if (videosAssistidos < 3) {
                 btnV.disabled = false; btnV.classList.add('active');
                 aviso.innerHTML = `ASSISTA <span style="color:#28a745">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ`;
