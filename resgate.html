@@ -20,6 +20,21 @@
             overscroll-behavior-y: contain;
         }
 
+        /* --- NOVO: ANIMAÇÃO DO PDL FLUTUANTE --- */
+        .floating-pdl {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 900;
+            font-size: 1.2rem;
+            z-index: 5000;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+
         #custom-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); z-index: 3000; align-items: center; justify-content: center;
@@ -63,7 +78,7 @@
         .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; white-space: nowrap; }
         
         .hex-frame { background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; display: flex; flex-direction: column; box-sizing: border-box; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%); margin-bottom: 5px; width: 100%;}
-        .option-btn { background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 12px; margin: 5px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
+        .option-btn { background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 12px; margin: 5px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; position: relative; }
         .btn-correct { background-color: var(--correct) !important; border-color: #fff !important; }
         .btn-wrong { background-color: var(--wrong) !important; border-color: #fff !important; }
         
@@ -173,7 +188,6 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Variável para armazenar as perguntas que serão carregadas em segundo plano
         let bancoPerguntas = [];
 
         const firebaseConfig = { 
@@ -194,21 +208,26 @@
         const mContent = document.getElementById('modal-body-content');
         const mFooter = document.getElementById('m-footer');
 
-        // --- CARREGAMENTO ASSÍNCRONO DAS PERGUNTAS ---
         async function carregarBanco() {
             try {
                 const modulo = await import('./pergunta.js');
                 bancoPerguntas = modulo.bancoPerguntas;
-                // Se o login já tiver ocorrido, tenta iniciar a questão
-                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) {
-                    carregarQuestao();
-                }
-            } catch (e) {
-                console.error("Erro ao carregar perguntas:", e);
-                document.getElementById('perguntaTexto').innerText = "Erro ao carregar perguntas. Recarregue a página.";
-            }
+                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
+            } catch (e) { console.error("Erro ao carregar perguntas:", e); }
         }
         carregarBanco();
+
+        // --- FUNÇÃO PARA CRIAR O TEXTO FLUTUANTE ---
+        function showFloatingPDL(text, color, x, y) {
+            const el = document.createElement('div');
+            el.className = 'floating-pdl';
+            el.innerText = text;
+            el.style.color = color;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
 
         function openModal(title, text, type = 'alert', onConfirm = null) {
             mTitle.innerText = title; 
@@ -239,12 +258,7 @@
         function gerarEloComDivisoes(nome, min, max) {
             let passo = (max - min) / 5;
             divisoes.forEach((div, i) => {
-                configElo.push({ 
-                    nome: `${nome} ${div}`, 
-                    min: min + (passo * i), 
-                    max: min + (passo * (i + 1)), 
-                    ...coresElos[nome] 
-                });
+                configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
             });
         }
 
@@ -300,14 +314,11 @@
                         processarDadosUsuario(data);
                         if (!carregadoPelaPrimeiraVez) {
                             carregadoPelaPrimeiraVez = true;
-                            // Só chama carregarQuestao se as perguntas já estiverem prontas
                             if (bancoPerguntas.length > 0) carregarQuestao(); 
                         }
                     }
                 });
-            } else { 
-                window.location.href = "index.html"; 
-            }
+            } else { window.location.href = "index.html"; }
         });
 
         async function processarDadosUsuario(data) {
@@ -440,13 +451,7 @@
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-            
-            // Verificação de segurança caso o arquivo de perguntas demore a baixar
-            if (bancoPerguntas.length === 0) {
-                t.innerText = "Sincronizando perguntas...";
-                return;
-            }
-
+            if (bancoPerguntas.length === 0) { t.innerText = "Sincronizando perguntas..."; return; }
             if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) {
                 t.innerText = "LIMITE DIÁRIO ATINGIDO, VOLTE AMANHÃ!";
                 t.style.color = "var(--gold)"; c.innerHTML = ""; return;
@@ -455,7 +460,6 @@
                 t.innerText = "META DE ACERTOS ATINGIDA!"; t.style.color = "var(--gold)"; c.innerHTML = ""; return; 
             }
             t.style.color = "var(--gold-bright)";
-            
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
             let opts = q.opcoes.map((o, i) => { return { texto: o, correta: i === q.correta }; }).sort(() => Math.random() - 0.5);
             t.innerText = q.pergunta; 
@@ -464,14 +468,22 @@
                 const b = document.createElement('button'); 
                 b.className = "option-btn"; 
                 b.innerText = o.texto;
-                b.onclick = async () => {
+                b.onclick = async (event) => {
                     const all = c.querySelectorAll('button'); 
                     all.forEach(x => x.disabled = true);
+                    
+                    // --- CAPTURA A POSIÇÃO DO CLIQUE ---
+                    const rect = b.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top;
+
                     if (o.correta) { 
                         b.classList.add('btn-correct'); 
+                        showFloatingPDL("+10 PDL", "#28a745", centerX, centerY);
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) }); 
                     } else { 
                         b.classList.add('btn-wrong'); 
+                        showFloatingPDL("-2 PDL", "#dc3545", centerX, centerY);
                         await updateDoc(userRef, { xp: increment(-2) });
                         all.forEach(btnInner => {
                             if(opts.find(opt => opt.texto === btnInner.innerText && opt.correta)) btnInner.classList.add('btn-correct');
