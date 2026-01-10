@@ -426,14 +426,14 @@
 
         window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
 
-        // --- RESGATE PIX DEFINITIVO PARA O ADMIN ---
+        // --- RESGATE SINCRONIZADO COM SEU ADMIN.HTML ---
         const btnResgate = document.getElementById('btnResgate');
         if(btnResgate) {
             btnResgate.onclick = async () => {
                 const chave = document.getElementById('chavePix').value.trim();
-                const saldoReal = Number(goldDB);
+                const saldoAtualNum = Number(goldDB);
 
-                if (saldoReal < metaAtual || chave.length < 5) { 
+                if (saldoAtualNum < metaAtual || chave.length < 5) { 
                     openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); 
                     return; 
                 }
@@ -441,20 +441,19 @@
                 openModal("CONFIRMAR", `Deseja resgatar R$ ${valorReaisMeta} para: ${chave}?`, 'confirm', async () => {
                     modal.style.display = 'none';
                     try {
+                        const custoNum = Number(metaAtual);
                         await addDoc(collection(db, "resgates"), {
                             usuarioId: auth.currentUser.uid,
-                            nome: nomeUsuario,
                             chavePix: chave,
-                            valorGold: Number(metaAtual),
-                            saldo: saldoReal, // Envia como 'saldo' para o Admin ler
-                            saldoAtual: saldoReal, // Alternativa para o Admin
-                            saldoNoMomento: saldoReal,
+                            valorGold: custoNum,         // Seu Admin lê aqui para "Custo"
+                            goldAnterior: saldoAtualNum, // SEU ADMIN PRECISA DESTA CHAVE EXATA
+                            goldPosResgate: (saldoAtualNum - custoNum), // SEU ADMIN PRECISA DESTA CHAVE EXATA
                             valorReais: valorReaisMeta, 
                             status: "Pendente",
                             data: new Date().toLocaleString('pt-BR'),
                             timestamp: Date.now()
                         });
-                        await updateDoc(userRef, { saldo: increment(-Number(metaAtual)) });
+                        await updateDoc(userRef, { saldo: increment(-custoNum) });
                         openModal("ENVIADO", "Solicitação feita com sucesso!");
                     } catch (e) { openModal("ERRO", "Falha ao processar."); }
                 });
@@ -480,15 +479,4 @@
             });
         }
     </script>
-
-    <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
-        <div id="adsterra-banner">
-            <script type="text/javascript">
-                atOptions = { 'key' : '48065e37c41fa1904ce5bbacf7c25eb4', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/48065e37c41fa1904ce5bbacf7c25eb4/invoke.js"></script>
-        </div>
-    </div>
-</body>
-</html>
-              
+        
