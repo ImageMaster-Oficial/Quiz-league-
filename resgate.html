@@ -20,6 +20,38 @@
             overscroll-behavior-y: contain;
         }
 
+        /* --- ANIMAÇÃO DE TRANSIÇÃO DE ELO --- */
+        #elo-transition-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            animation: fadeInElo 0.5s ease forwards;
+        }
+        .elo-ani-title {
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .elo-ani-name {
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 0 20px currentColor;
+            animation: scaleUpElo 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes fadeInElo { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUpElo { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         /* --- NOVO: ANIMAÇÃO DO PDL FLUTUANTE --- */
         .floating-pdl {
             position: fixed;
@@ -102,6 +134,11 @@
     </style>
 </head>
 <body>
+
+    <div id="elo-transition-overlay">
+        <div class="elo-ani-title" id="elo-status-label">NOVO ELO ALCANÇADO</div>
+        <div class="elo-ani-name" id="elo-ani-text">PLATINA IV</div>
+    </div>
 
     <div id="custom-modal">
         <div class="modal-content">
@@ -303,6 +340,7 @@
         let pdlInterno = 0; 
         let userRef = null, nomeUsuario = "Usuário";
         let carregadoPelaPrimeiraVez = false;
+        let ultimoEloNome = null; // Rastreia mudança de elo
 
         onAuthStateChanged(auth, (user) => {
             if (user) { 
@@ -332,10 +370,44 @@
             videosAssistidos = data.videosAssistidos || 0;
             totalVideosHoje = data.totalVideosHoje || 0;
             nomeUsuario = data.nome || "Usuário";
-            pdlInterno = data.xp || 0; 
+            
+            // Lógica de Detecção de Mudança de Elo
+            const novoPdl = data.xp || 0;
+            const infoNovoElo = getEloInfo(novoPdl);
+
+            if (ultimoEloNome && ultimoEloNome !== infoNovoElo.nome) {
+                exibirAnimacaoElo(infoNovoElo, novoPdl > pdlInterno);
+            }
+
+            pdlInterno = novoPdl;
+            ultimoEloNome = infoNovoElo.nome;
+
             atualizarInterface();
             if (jogoInicializado && acertosNoCiclo === 0 && acAnterior >= 10) carregarQuestao();
             jogoInicializado = true;
+        }
+
+        // Função da Animação de Elo
+        function exibirAnimacaoElo(infoElo, subiu) {
+            const overlay = document.getElementById('elo-transition-overlay');
+            const label = document.getElementById('elo-status-label');
+            const text = document.getElementById('elo-ani-text');
+
+            label.innerText = subiu ? "PROMOÇÃO DE ELO" : "QUEDA DE ELO";
+            label.style.color = subiu ? "#28a745" : "#dc3545";
+            
+            text.innerText = infoElo.nome;
+            text.style.color = infoElo.color;
+            
+            overlay.style.display = 'flex';
+
+            setTimeout(() => {
+                overlay.style.animation = "fadeInElo 0.5s ease reverse";
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    overlay.style.animation = "fadeInElo 0.5s ease";
+                }, 450);
+            }, 3000);
         }
 
         function atualizarInterface() {
