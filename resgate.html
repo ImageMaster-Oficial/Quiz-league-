@@ -169,8 +169,11 @@
         const mFooter = document.getElementById('m-footer');
 
         function openModal(title, text, type = 'alert', onConfirm = null) {
-            mTitle.innerText = title; mText.innerText = text; mFooter.innerHTML = '';
-            mTitle.style.color = "var(--gold)";
+            mTitle.innerText = title; 
+            mText.innerText = text; 
+            mFooter.innerHTML = '';
+            mTitle.style.color = "var(--gold)"; // Garante que o título seja dourado
+            
             if (type === 'confirm') {
                 const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR E ENVIAR';
                 bC.onclick = () => { onConfirm(); };
@@ -184,7 +187,6 @@
             modal.style.display = 'flex';
         }
 
-        // VARIÁVEL DE INICIALIZAÇÃO DA META ATUALIZADA
         let metaAtual = 195000, valorReaisMeta = "0,50";
         let goldDB, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
         let userRef = null;
@@ -231,7 +233,6 @@
             document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
             
-            // Lógica para exibir K ou M na meta para não quebrar o layout
             let metaTexto = metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(2) + "M" : (metaAtual/1000).toFixed(0) + "k";
             document.getElementById('txtMeta').innerText = `Meta: ${metaTexto}`;
             
@@ -270,6 +271,10 @@
         async function enviarResgateFirebase() {
             const chave = document.getElementById('chavePix').value.trim();
             const saldoDepois = goldDB - metaAtual;
+            
+            // Fecha o modal de confirmação anterior
+            modal.style.display = 'none';
+
             try {
                 await addDoc(collection(db, "resgates"), { 
                     usuarioId: auth.currentUser.uid,
@@ -285,11 +290,18 @@
                     data: new Date().toLocaleString('pt-BR'), 
                     timestamp: Date.now() 
                 });
+                
                 await updateDoc(userRef, { saldo: saldoDepois });
-                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas!");
+                
+                // Limpa o campo de texto
                 document.getElementById('chavePix').value = "";
-                modal.style.display = 'none';
-            } catch (e) { openModal("ERRO", "Falha ao processar resgate."); }
+                
+                // NOVO AVISO DE SUCESSO
+                openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas, devido a Alta demanda de solicitações dos usuários!");
+
+            } catch (e) { 
+                openModal("ERRO", "Falha ao processar resgate."); 
+            }
         }
 
         const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
