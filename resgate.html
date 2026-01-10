@@ -378,7 +378,7 @@
             if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
                 clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
                 mTitle.innerText = "VALIDAÇÃO FALHOU!";
-                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo!</div>`;
+                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo, aguarde 15 segundos para fechar o anúncio e receber sua recompensa!</div>`;
                 mFooter.innerHTML = '';
                 const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'RE-TENTAR';
                 btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensaMoeda); };
