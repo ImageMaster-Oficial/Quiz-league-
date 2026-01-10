@@ -67,8 +67,31 @@
             color: #f0e6d2; cursor: pointer; box-shadow: 0 0 10px rgba(200, 155, 60, 0.4);
         }
 
-        .resgate-selector { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
-        .resgate-opt { flex: 1; background: #010a13; border: 1px solid var(--gold-dark); color: var(--gold); padding: 12px 2px; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-align: center; }
+        /* AJUSTE PARA SCROLL DOS BOTÕES */
+        .resgate-selector { 
+            display: flex; 
+            justify-content: flex-start; 
+            gap: 6px; 
+            margin-top: 8px; 
+            overflow-x: auto; 
+            padding-bottom: 10px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .resgate-selector::-webkit-scrollbar { display: none; }
+
+        .resgate-opt { 
+            flex: 0 0 auto; /* Impede que o botão esmague */
+            min-width: 85px; 
+            background: #010a13; 
+            border: 1px solid var(--gold-dark); 
+            color: var(--gold); 
+            padding: 12px 5px; 
+            font-size: 0.8rem; 
+            font-weight: 900; 
+            cursor: pointer; 
+            text-align: center; 
+        }
         .resgate-opt.active { background: var(--gold); color: #000; border-color: var(--gold-bright); }
         input { width: 100%; padding: 12px; background: #010a13; color: white; border: 1px solid var(--gold-dark); margin: 8px 0; box-sizing: border-box; }
         
@@ -124,6 +147,9 @@
                 <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
                 <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
                 <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
             </div>
             <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
             <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
@@ -172,7 +198,7 @@
             mTitle.innerText = title; 
             mText.innerText = text; 
             mFooter.innerHTML = '';
-            mTitle.style.color = "var(--gold)"; // Garante que o título seja dourado
+            mTitle.style.color = "var(--gold)"; 
             
             if (type === 'confirm') {
                 const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR E ENVIAR';
@@ -233,7 +259,7 @@
             document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
             
-            let metaTexto = metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(2) + "M" : (metaAtual/1000).toFixed(0) + "k";
+            let metaTexto = metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k";
             document.getElementById('txtMeta').innerText = `Meta: ${metaTexto}`;
             
             const btnV = document.getElementById('btnVideo'), aviso = document.getElementById('avisoStatusQuiz');
@@ -271,8 +297,6 @@
         async function enviarResgateFirebase() {
             const chave = document.getElementById('chavePix').value.trim();
             const saldoDepois = goldDB - metaAtual;
-            
-            // Fecha o modal de confirmação anterior
             modal.style.display = 'none';
 
             try {
@@ -292,11 +316,7 @@
                 });
                 
                 await updateDoc(userRef, { saldo: saldoDepois });
-                
-                // Limpa o campo de texto
                 document.getElementById('chavePix').value = "";
-                
-                // NOVO AVISO DE SUCESSO
                 openModal("SOLICITAÇÃO FEITA", "O envio do Pix pode demorar até 2 horas, devido a Alta demanda de solicitações dos usuários!");
 
             } catch (e) { 
