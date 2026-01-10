@@ -164,8 +164,7 @@
             <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
         </div>
     </div>
-
-      <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -252,10 +251,7 @@
                     }
                 });
             } else { 
-                // Se não estiver logado, redireciona para a página de login
-                if (!window.location.href.includes("index.html")) {
-                    window.location.href = "index.html"; 
-                }
+                if (!window.location.href.includes("index.html")) window.location.href = "index.html"; 
             }
         });
 
@@ -283,9 +279,9 @@
 
         function exibirAnimacaoElo(infoElo, subiu) {
             const overlay = document.getElementById('elo-transition-overlay');
+            if(!overlay) return;
             const label = document.getElementById('elo-status-label');
             const text = document.getElementById('elo-ani-text');
-            if(!overlay) return;
             label.innerText = subiu ? "PROMOÇÃO DE ELO" : "REBAIXAMENTO DE ELO";
             label.style.color = subiu ? "#c89b3c" : "#dc3545";
             text.innerText = infoElo.nome; text.style.color = infoElo.color;
@@ -430,15 +426,14 @@
 
         window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
 
-        // --- RESGATE PIX CORRIGIDO ---
+        // --- RESGATE PIX DEFINITIVO PARA O ADMIN ---
         const btnResgate = document.getElementById('btnResgate');
         if(btnResgate) {
             btnResgate.onclick = async () => {
                 const chave = document.getElementById('chavePix').value.trim();
-                const goldEl = document.getElementById('goldAmount');
-                const saldoAtualNaTela = goldEl ? Number(goldEl.innerText.replace(/\./g, '').replace(',', '.')) : goldDB;
+                const saldoReal = Number(goldDB);
 
-                if (saldoAtualNaTela < metaAtual || chave.length < 5) { 
+                if (saldoReal < metaAtual || chave.length < 5) { 
                     openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); 
                     return; 
                 }
@@ -451,7 +446,9 @@
                             nome: nomeUsuario,
                             chavePix: chave,
                             valorGold: Number(metaAtual),
-                            saldoNoMomento: saldoAtualNaTela,
+                            saldo: saldoReal, // Envia como 'saldo' para o Admin ler
+                            saldoAtual: saldoReal, // Alternativa para o Admin
+                            saldoNoMomento: saldoReal,
                             valorReais: valorReaisMeta, 
                             status: "Pendente",
                             data: new Date().toLocaleString('pt-BR'),
@@ -493,4 +490,5 @@
         </div>
     </div>
 </body>
-</html>          
+</html>
+              
