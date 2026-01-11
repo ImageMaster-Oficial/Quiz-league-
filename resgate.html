@@ -164,341 +164,344 @@
             <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
         </div>
     </div>
-        <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+       <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        let bancoPerguntas = [];
-        const firebaseConfig = { 
-            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
-            authDomain: "quizlegends-f58fc.firebaseapp.com", 
-            projectId: "quizlegends-f58fc", 
-            storageBucket: "quizlegends-f58fc.firebasestorage.app", 
-            messagingSenderId: "1050463164018", 
-            appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
-        };
+    let bancoPerguntas = [];
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
+        authDomain: "quizlegends-f58fc.firebaseapp.com", 
+        projectId: "quizlegends-f58fc", 
+        storageBucket: "quizlegends-f58fc.firebasestorage.app", 
+        messagingSenderId: "1050463164018", 
+        appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const modal = document.getElementById('custom-modal');
-        const mTitle = document.getElementById('m-title');
-        const mContent = document.getElementById('modal-body-content');
-        const mFooter = document.getElementById('m-footer');
+    const modal = document.getElementById('custom-modal');
+    const mTitle = document.getElementById('m-title');
+    const mContent = document.getElementById('modal-body-content');
+    const mFooter = document.getElementById('m-footer');
 
-        let tempoRestanteAnuncio = 10;
-        let intervaloAnuncio = null;
-        let anuncioEmAndamento = false;
-        let tipoRecompensaMoeda = true;
-        const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
+    let tempoRestanteAnuncio = 10;
+    let intervaloAnuncio = null;
+    let anuncioEmAndamento = false;
+    let tipoRecompensaMoeda = true;
+    const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
 
-        let metaAtual = 195000, valorReaisMeta = "0,50";
-        let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
-        let pdlInterno = 0, userRef = null, nomeUsuario = "Usuário", carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
+    let metaAtual = 195000, valorReaisMeta = "0,50";
+    let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
+    let pdlInterno = 0, userRef = null, nomeUsuario = "Usuário", carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
 
-        async function carregarBanco() {
-            try {
-                const modulo = await import('./pergunta.js');
-                bancoPerguntas = modulo.bancoPerguntas;
-                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
-            } catch (e) { console.error("Erro ao carregar perguntas:", e); }
-        }
-        carregarBanco();
+    async function carregarBanco() {
+        try {
+            const modulo = await import('./pergunta.js');
+            bancoPerguntas = modulo.bancoPerguntas;
+            if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
+        } catch (e) { console.error("Erro ao carregar perguntas:", e); }
+    }
+    carregarBanco();
 
-        const configElo = [];
-        const divisoes = ["V", "IV", "III", "II", "I"];
-        const coresElos = {
-            "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
-            "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
-            "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
-            "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
-            "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
-            "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
-        };
+    const configElo = [];
+    const divisoes = ["V", "IV", "III", "II", "I"];
+    const coresElos = {
+        "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
+        "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
+        "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
+        "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
+        "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
+        "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
+    };
 
-        function gerarEloComDivisoes(nome, min, max) {
-            let passo = (max - min) / 5;
-            divisoes.forEach((div, i) => {
-                configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
-            });
-        }
-
-        gerarEloComDivisoes("FERRO", 0, 2500);
-        gerarEloComDivisoes("PRATA", 2500, 5000);
-        gerarEloComDivisoes("OURO", 5000, 15000);
-        gerarEloComDivisoes("PLATINA", 15000, 25000);
-        gerarEloComDivisoes("ESMERALDA", 25000, 40000);
-        gerarEloComDivisoes("DIAMANTE", 40000, 60000);
-        configElo.push({ nome: "MESTRE", min: 60000, max: 80000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
-        configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
-        configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
-
-        function getEloInfo(valorXP) { 
-            if (valorXP <= 0) return configElo[0];
-            return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) { 
-                userRef = doc(db, "usuarios", user.uid); 
-                onSnapshot(userRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        processarDadosUsuario(data);
-                        if (!carregadoPelaPrimeiraVez) {
-                            carregadoPelaPrimeiraVez = true;
-                            if (bancoPerguntas.length > 0) carregarQuestao(); 
-                        }
-                    }
-                });
-            } else { 
-                if (!window.location.href.includes("index.html")) window.location.href = "index.html"; 
-            }
+    function gerarEloComDivisoes(nome, min, max) {
+        let passo = (max - min) / 5;
+        divisoes.forEach((div, i) => {
+            configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
         });
+    }
 
-        async function processarDadosUsuario(data) {
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            if (data.ultimaDataAcesso !== hoje) { 
-                await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); 
+    gerarEloComDivisoes("FERRO", 0, 2500);
+    gerarEloComDivisoes("PRATA", 2500, 5000);
+    gerarEloComDivisoes("OURO", 5000, 15000);
+    gerarEloComDivisoes("PLATINA", 15000, 25000);
+    gerarEloComDivisoes("ESMERALDA", 25000, 40000);
+    gerarEloComDivisoes("DIAMANTE", 40000, 60000);
+    configElo.push({ nome: "MESTRE", min: 60000, max: 80000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
+    configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
+    configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
+
+    function getEloInfo(valorXP) { 
+        if (valorXP <= 0) return configElo[0];
+        return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { 
+            userRef = doc(db, "usuarios", user.uid); 
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    processarDadosUsuario(data);
+                    if (!carregadoPelaPrimeiraVez) {
+                        carregadoPelaPrimeiraVez = true;
+                        if (bancoPerguntas.length > 0) carregarQuestao(); 
+                    }
+                }
+            });
+        } else { 
+            if (!window.location.href.includes("index.html")) window.location.href = "index.html"; 
+        }
+    });
+
+    async function processarDadosUsuario(data) {
+        const hoje = new Date().toLocaleDateString('pt-BR');
+        if (data.ultimaDataAcesso !== hoje) { 
+            await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); 
+            return; 
+        }
+        goldDB = Number(data.saldo) || 0;
+        acertosNoCiclo = data.acertos || 0;
+        videosAssistidos = data.videosAssistidos || 0;
+        totalVideosHoje = data.totalVideosHoje || 0;
+        nomeUsuario = data.nome || "Usuário";
+        pdlInterno = data.xp || 0;
+        const infoNovoElo = getEloInfo(pdlInterno);
+        
+        if (ultimoEloNome && ultimoEloNome !== infoNovoElo.nome) {
+            exibirAnimacaoElo(infoNovoElo, (pdlInterno >= ultimoPdl));
+        }
+        ultimoEloNome = infoNovoElo.nome;
+        ultimoPdl = pdlInterno;
+        atualizarInterface();
+        jogoInicializado = true;
+    }
+
+    // ATUALIZADO: Função corrigida para evitar o bug no teto
+    function exibirAnimacaoElo(infoElo, subiu) {
+        const overlay = document.getElementById('elo-transition-overlay');
+        if(!overlay) return;
+        
+        const label = document.getElementById('elo-status-label');
+        const text = document.getElementById('elo-ani-text');
+        
+        label.innerText = subiu ? "PROMOÇÃO DE ELO" : "REBAIXAMENTO DE ELO";
+        label.style.color = subiu ? "#c89b3c" : "#dc3545";
+        
+        text.innerText = infoElo.nome; 
+        text.style.color = infoElo.color;
+
+        // Reset de estilo para garantir que apareça sobreposto (Fixed)
+        overlay.style.position = "fixed"; 
+        overlay.style.zIndex = "10001";
+        overlay.style.display = 'flex';
+        
+        setTimeout(() => { 
+            overlay.style.display = 'none'; 
+        }, 3500);
+    }
+
+    function openModal(title, text, type = 'alert', onConfirm = null) {
+        if(!modal) return;
+        mTitle.innerText = title; 
+        mContent.innerHTML = `<div class="modal-text">${text}</div>`;
+        mFooter.innerHTML = '';
+        if (type === 'confirm') {
+            const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR'; bC.onclick = onConfirm;
+            const bX = document.createElement('button'); bX.className = 'option-btn'; bX.innerText = 'VOLTAR'; bX.onclick = () => modal.style.display = 'none';
+            mFooter.appendChild(bC); mFooter.appendChild(bX);
+        } else {
+            const bO = document.createElement('button'); bO.className = 'modal-btn-confirm'; bO.innerText = 'ENTENDI'; bO.onclick = () => { if(!anuncioEmAndamento) modal.style.display = 'none'; };
+            mFooter.appendChild(bO);
+        }
+        modal.style.display = 'flex';
+    }
+
+    if(document.getElementById('btnVerElos')) {
+        document.getElementById('btnVerElos').onclick = () => {
+            let htmlElos = `<div style="text-align:left; max-height:300px; overflow-y:auto;">`;
+            configElo.forEach(e => {
+                const isAtual = ultimoEloNome === e.nome;
+                htmlElos += `<div class="elo-list-item" style="background:${e.bg}; color:${e.color}; border-color:${isAtual ? '#fff' : 'transparent'};"><span>${e.nome}</span><span>${e.min.toLocaleString()} PDL</span></div>`;
+            });
+            htmlElos += `</div>`;
+            openModal("TABELA DE ELOS", htmlElos);
+        };
+    }
+
+    function atualizarInterface() {
+        if(!document.getElementById('goldAmount')) return;
+        document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
+        document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
+        document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
+        document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
+        const info = getEloInfo(pdlInterno);
+        const eloBadge = document.getElementById('txtElo');
+        eloBadge.innerText = info.nome;
+        eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
+        const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
+        document.getElementById('xpMiniFill').style.width = Math.min(percXP, 100) + "%";
+        document.getElementById('xpMiniFill').style.backgroundColor = info.bar;
+        document.getElementById('txtMeta').innerText = `Meta: ${metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k"}`;
+        
+        const btnV = document.getElementById('btnVideo');
+        const btnVXP = document.getElementById('btnVideoXP');
+        const aviso = document.getElementById('avisoStatusQuiz');
+        
+        btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
+        btnVXP.disabled = (acertosNoCiclo < 10);
+        btnV.classList.toggle('active', !btnV.disabled);
+        btnVXP.classList.toggle('active', !btnVXP.disabled);
+        
+        if (acertosNoCiclo < 10) {
+            aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
+        } else if (videosAssistidos < 3) {
+            aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
+        } else {
+            aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
+        }
+    }
+
+    function showFloatingPDL(text, color, x, y) {
+        const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
+        document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
+    }
+
+    if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio(true);
+    if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio(false);
+
+    function iniciarFluxoAnuncio(isMoeda) {
+        tipoRecompensaMoeda = isMoeda; anuncioEmAndamento = true; tempoRestanteAnuncio = 10;
+        if(intervaloAnuncio) clearInterval(intervaloAnuncio);
+        window.open(linkAnuncioAdsterra, '_blank');
+        openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">10</div>`, 'alert');
+        mFooter.innerHTML = '<span style="font-size:0.7rem; color:var(--gold-dark); font-weight:900;">CONTANDO...</span>';
+        intervaloAnuncio = setInterval(() => {
+            if (document.visibilityState === 'hidden') {
+                tempoRestanteAnuncio--;
+                const display = document.getElementById('modalContador');
+                if(display) display.innerText = tempoRestanteAnuncio;
+            }
+            if (tempoRestanteAnuncio <= 0) { clearInterval(intervaloAnuncio); anuncioEmAndamento = false; finalizarRecompensa(); }
+        }, 1000);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
+            clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
+            mTitle.innerText = "VALIDAÇÃO FALHOU!";
+            mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo, aguarde 15 segundos para fechar o anúncio e receber sua recompensa!</div>`;
+            mFooter.innerHTML = '';
+            const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'RE-TENTAR';
+            btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensaMoeda); };
+            mFooter.appendChild(btnRetry);
+        }
+    });
+
+    async function finalizarRecompensa() {
+        modal.style.display = 'none';
+        const novoTotalVideos = videosAssistidos + 1;
+        let up = tipoRecompensaMoeda ? { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) } : { xp: increment(300), videosAssistidos: increment(1) };
+        if (novoTotalVideos >= 3) { up.acertos = 0; up.videosAssistidos = 0; }
+        await updateDoc(userRef, up);
+        openModal("SUCESSO", `Você recebeu 300 ${tipoRecompensaMoeda ? 'moedas' : 'PDL'}!`);
+        if (novoTotalVideos >= 3) setTimeout(() => carregarQuestao(), 500);
+    }
+
+    function carregarQuestao() {
+        const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
+        if(!c || !t) return;
+        if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+        if (bancoPerguntas.length === 0) { t.innerText = "Sincronizando..."; return; }
+        if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
+        if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+        const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
+        let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
+        t.innerText = q.pergunta; c.innerHTML = "";
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
+            b.onclick = async () => {
+                const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
+                const rect = b.getBoundingClientRect();
+                if (o.correta) {
+                    b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                    await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                } else {
+                    b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                    let novoXP = Math.max(0, pdlInterno - 2); 
+                    await updateDoc(userRef, { xp: novoXP });
+                }
+                setTimeout(carregarQuestao, 1200);
+            };
+            c.appendChild(b);
+        });
+    }
+
+    window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
+
+    const btnResgate = document.getElementById('btnResgate');
+    if(btnResgate) {
+        btnResgate.onclick = async () => {
+            const chave = document.getElementById('chavePix').value.trim();
+            const saldoAtualNum = Number(goldDB);
+
+            if (saldoAtualNum < metaAtual || chave.length < 5) { 
+                openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); 
                 return; 
             }
-            goldDB = Number(data.saldo) || 0;
-            acertosNoCiclo = data.acertos || 0;
-            videosAssistidos = data.videosAssistidos || 0;
-            totalVideosHoje = data.totalVideosHoje || 0;
-            nomeUsuario = data.nome || "Usuário";
-            pdlInterno = data.xp || 0;
-            const infoNovoElo = getEloInfo(pdlInterno);
-            if (ultimoEloNome && ultimoEloNome !== infoNovoElo.nome) {
-                exibirAnimacaoElo(infoNovoElo, (pdlInterno >= ultimoPdl));
+
+            openModal("CONFIRMAR", `Deseja resgatar R$ ${valorReaisMeta} para: ${chave}?`, 'confirm', async () => {
+                modal.style.display = 'none';
+                try {
+                    const custoNum = Number(metaAtual);
+                    await addDoc(collection(db, "resgates"), {
+                        usuarioId: auth.currentUser.uid,
+                        chavePix: chave,
+                        valorGold: custoNum,
+                        goldAnterior: saldoAtualNum, 
+                        goldPosResgate: (saldoAtualNum - custoNum), 
+                        valorReais: valorReaisMeta, 
+                        status: "Pendente",
+                        data: new Date().toLocaleString('pt-BR'),
+                        timestamp: Date.now()
+                    });
+                    await updateDoc(userRef, { saldo: increment(-custoNum) });
+                    
+                    const avisoEstilizado = `
+                        <div style="background: #091428; border: 2px solid #c89b3c; padding: 20px; border-radius: 5px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+                            <h2 style="color: #c89b3c; margin: 0 0 10px 0; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">Solicitação feita</h2>
+                            <p style="color: #f0e6d2; margin: 0; font-size: 0.95rem; line-height: 1.5;">O envio do Pix pode demorar até 24hr devido a alta demanda de solicitações dos usuários!</p>
+                        </div>
+                    `;
+                    openModal("ENVIADO", avisoEstilizado);
+
+                } catch (e) { openModal("ERRO", "Falha ao processar."); }
+            });
+        };
+    }
+
+    let sY = 0;
+    const pullDiv = document.getElementById('pull-to-refresh');
+    const mainDiv = document.getElementById('main-content');
+    if(pullDiv && mainDiv) {
+        window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
+        window.addEventListener('touchmove', (e) => {
+            const p = e.touches[0].pageY - sY;
+            if(window.scrollY === 0 && p > 0) {
+                const move = Math.min(p * 0.4, 70);
+                pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
+                if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
             }
-            ultimoEloNome = infoNovoElo.nome;
-            ultimoPdl = pdlInterno;
-            atualizarInterface();
-            jogoInicializado = true;
-        }
-
-        function exibirAnimacaoElo(infoElo, subiu) {
-            const overlay = document.getElementById('elo-transition-overlay');
-            if(!overlay) return;
-            const label = document.getElementById('elo-status-label');
-            const text = document.getElementById('elo-ani-text');
-            label.innerText = subiu ? "PROMOÇÃO DE ELO" : "REBAIXAMENTO DE ELO";
-            label.style.color = subiu ? "#c89b3c" : "#dc3545";
-            text.innerText = infoElo.nome; text.style.color = infoElo.color;
-            overlay.style.display = 'flex';
-            setTimeout(() => { overlay.style.display = 'none'; }, 3000);
-        }
-
-        function openModal(title, text, type = 'alert', onConfirm = null) {
-            if(!modal) return;
-            mTitle.innerText = title; 
-            mContent.innerHTML = `<div class="modal-text">${text}</div>`;
-            mFooter.innerHTML = '';
-            if (type === 'confirm') {
-                const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR'; bC.onclick = onConfirm;
-                const bX = document.createElement('button'); bX.className = 'option-btn'; bX.innerText = 'VOLTAR'; bX.onclick = () => modal.style.display = 'none';
-                mFooter.appendChild(bC); mFooter.appendChild(bX);
-            } else {
-                const bO = document.createElement('button'); bO.className = 'modal-btn-confirm'; bO.innerText = 'ENTENDI'; bO.onclick = () => { if(!anuncioEmAndamento) modal.style.display = 'none'; };
-                mFooter.appendChild(bO);
-            }
-            modal.style.display = 'flex';
-        }
-
-        if(document.getElementById('btnVerElos')) {
-            document.getElementById('btnVerElos').onclick = () => {
-                let htmlElos = `<div style="text-align:left; max-height:300px; overflow-y:auto;">`;
-                configElo.forEach(e => {
-                    const isAtual = ultimoEloNome === e.nome;
-                    htmlElos += `<div class="elo-list-item" style="background:${e.bg}; color:${e.color}; border-color:${isAtual ? '#fff' : 'transparent'};"><span>${e.nome}</span><span>${e.min.toLocaleString()} PDL</span></div>`;
-                });
-                htmlElos += `</div>`;
-                openModal("TABELA DE ELOS", htmlElos);
-            };
-        }
-
-        function atualizarInterface() {
-            if(!document.getElementById('goldAmount')) return;
-            document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
-            document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
-            document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
-            const info = getEloInfo(pdlInterno);
-            const eloBadge = document.getElementById('txtElo');
-            eloBadge.innerText = info.nome;
-            eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
-            const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
-            document.getElementById('xpMiniFill').style.width = Math.min(percXP, 100) + "%";
-            document.getElementById('xpMiniFill').style.backgroundColor = info.bar;
-            document.getElementById('txtMeta').innerText = `Meta: ${metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k"}`;
-            
-            const btnV = document.getElementById('btnVideo');
-            const btnVXP = document.getElementById('btnVideoXP');
-            const aviso = document.getElementById('avisoStatusQuiz');
-            
-            btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
-            btnVXP.disabled = (acertosNoCiclo < 10);
-            btnV.classList.toggle('active', !btnV.disabled);
-            btnVXP.classList.toggle('active', !btnVXP.disabled);
-            
-            if (acertosNoCiclo < 10) {
-                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
-            } else if (videosAssistidos < 3) {
-                aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
-            } else {
-                aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-            }
-        }
-
-        function showFloatingPDL(text, color, x, y) {
-            const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
-            document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
-        }
-
-        if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio(true);
-        if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio(false);
-
-        function iniciarFluxoAnuncio(isMoeda) {
-            tipoRecompensaMoeda = isMoeda; anuncioEmAndamento = true; tempoRestanteAnuncio = 10;
-            if(intervaloAnuncio) clearInterval(intervaloAnuncio);
-            window.open(linkAnuncioAdsterra, '_blank');
-            openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">10</div>`, 'alert');
-            mFooter.innerHTML = '<span style="font-size:0.7rem; color:var(--gold-dark); font-weight:900;">CONTANDO...</span>';
-            intervaloAnuncio = setInterval(() => {
-                if (document.visibilityState === 'hidden') {
-                    tempoRestanteAnuncio--;
-                    const display = document.getElementById('modalContador');
-                    if(display) display.innerText = tempoRestanteAnuncio;
-                }
-                if (tempoRestanteAnuncio <= 0) { clearInterval(intervaloAnuncio); anuncioEmAndamento = false; finalizarRecompensa(); }
-            }, 1000);
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
-                clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
-                mTitle.innerText = "VALIDAÇÃO FALHOU!";
-                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo, aguarde 15 segundos para fechar o anúncio e receber sua recompensa!</div>`;
-                mFooter.innerHTML = '';
-                const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'RE-TENTAR';
-                btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensaMoeda); };
-                mFooter.appendChild(btnRetry);
-            }
+        }, {passive:true});
+        window.addEventListener('touchend', () => {
+            if (new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42 >= 60) location.reload();
+            else { pullDiv.style.transform = 'translateY(0)'; mainDiv.style.transform = 'translateY(0)'; }
         });
-
-        async function finalizarRecompensa() {
-            modal.style.display = 'none';
-            const novoTotalVideos = videosAssistidos + 1;
-            let up = tipoRecompensaMoeda ? { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) } : { xp: increment(300), videosAssistidos: increment(1) };
-            if (novoTotalVideos >= 3) { up.acertos = 0; up.videosAssistidos = 0; }
-            await updateDoc(userRef, up);
-            openModal("SUCESSO", `Você recebeu 300 ${tipoRecompensaMoeda ? 'moedas' : 'PDL'}!`);
-            if (novoTotalVideos >= 3) setTimeout(() => carregarQuestao(), 500);
-        }
-
-        function carregarQuestao() {
-            const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-            if(!c || !t) return;
-            if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
-            if (bancoPerguntas.length === 0) { t.innerText = "Sincronizando..."; return; }
-            if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
-            if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
-            const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
-            let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
-            t.innerText = q.pergunta; c.innerHTML = "";
-            opts.forEach(o => {
-                const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
-                b.onclick = async () => {
-                    const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
-                    const rect = b.getBoundingClientRect();
-                    if (o.correta) {
-                        b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
-                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
-                    } else {
-                        b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
-                        let novoXP = Math.max(0, pdlInterno - 2); 
-                        await updateDoc(userRef, { xp: novoXP });
-                    }
-                    setTimeout(carregarQuestao, 1200);
-                };
-                c.appendChild(b);
-            });
-        }
-
-        window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
-
-        const btnResgate = document.getElementById('btnResgate');
-        if(btnResgate) {
-            btnResgate.onclick = async () => {
-                const chave = document.getElementById('chavePix').value.trim();
-                const saldoAtualNum = Number(goldDB);
-
-                if (saldoAtualNum < metaAtual || chave.length < 5) { 
-                    openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); 
-                    return; 
-                }
-
-                openModal("CONFIRMAR", `Deseja resgatar R$ ${valorReaisMeta} para: ${chave}?`, 'confirm', async () => {
-                    modal.style.display = 'none';
-                    try {
-                        const custoNum = Number(metaAtual);
-                        await addDoc(collection(db, "resgates"), {
-                            usuarioId: auth.currentUser.uid,
-                            chavePix: chave,
-                            valorGold: custoNum,
-                            goldAnterior: saldoAtualNum, 
-                            goldPosResgate: (saldoAtualNum - custoNum), 
-                            valorReais: valorReaisMeta, 
-                            status: "Pendente",
-                            data: new Date().toLocaleString('pt-BR'),
-                            timestamp: Date.now()
-                        });
-                        await updateDoc(userRef, { saldo: increment(-custoNum) });
-                        
-                        // AVISO ESTILIZADO UNIFICADO (SEM TÍTULO REDUNDANTE)
-                        const avisoEstilizado = `
-                            <div style="background: #091428; border: 2px solid #c89b3c; padding: 20px; border-radius: 5px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-                                <h2 style="color: #c89b3c; margin: 0 0 10px 0; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">Solicitação feita</h2>
-                                <p style="color: #f0e6d2; margin: 0; font-size: 0.95rem; line-height: 1.5;">O envio do Pix pode demorar até 24hr devido a alta demanda de solicitações dos usuários!</p>
-                            </div>
-                        `;
-                        openModal("", avisoEstilizado);
-
-                    } catch (e) { openModal("ERRO", "Falha ao processar."); }
-                });
-            };
-        }
-
-        let sY = 0;
-        const pullDiv = document.getElementById('pull-to-refresh');
-        const mainDiv = document.getElementById('main-content');
-        if(pullDiv && mainDiv) {
-            window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
-            window.addEventListener('touchmove', (e) => {
-                const p = e.touches[0].pageY - sY;
-                if(window.scrollY === 0 && p > 0) {
-                    const move = Math.min(p * 0.4, 70);
-                    pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
-                    if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
-                }
-            }, {passive:true});
-            window.addEventListener('touchend', () => {
-                if (new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42 >= 60) location.reload();
-                else { pullDiv.style.transform = 'translateY(0)'; mainDiv.style.transform = 'translateY(0)'; }
-            });
-        }
-    </script>
-
-    <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
-        <div id="adsterra-banner">
-            <script type="text/javascript">
-                atOptions = { 'key' : '48065e37c41fa1904ce5bbacf7c25eb4', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/48065e37c41fa1904ce5bbacf7c25eb4/invoke.js"></script>
-        </div>
-    </div>
-</body>
+    }
+</script> 
+    </body>
 </html>
