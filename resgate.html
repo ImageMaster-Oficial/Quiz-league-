@@ -197,47 +197,143 @@
         </div>
     </div>
       <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        let bancoPerguntas = [];
-        const firebaseConfig = { 
-            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
-            authDomain: "quizlegends-f58fc.firebaseapp.com", 
-            projectId: "quizlegends-f58fc", 
-            storageBucket: "quizlegends-f58fc.firebasestorage.app", 
-            messagingSenderId: "1050463164018", 
-            appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
+        // CONFIGURAÇÃO FIREBASE (Mantenha a sua original aqui)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_DOMINIO",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_BUCKET",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        const modal = document.getElementById('custom-modal');
-        const mTitle = document.getElementById('m-title');
-        const mContent = document.getElementById('modal-body-content');
-        const mFooter = document.getElementById('m-footer');
+        // VARIÁVEIS DE CONTROLE GLOBAIS
+        let bancoPerguntas = [];
+        let indicesDisponiveis = []; // Lista para evitar repetição
+        let userRef = null;
+        let pdlInterno = 0;
+        let videosAssistidos = 0;
+        let acertosNoCiclo = 0;
+        let totalVideosHoje = 0;
+        let carregadoPelaPrimeiraVez = true;
 
-        let tempoRestanteAnuncio = 10;
-        let intervaloAnuncio = null;
-        let anuncioEmAndamento = false;
-        let tipoRecompensaMoeda = true;
-        const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
-
-        let metaAtual = 195000, valorReaisMeta = "0,50";
-        let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
-        let pdlInterno = 0, userRef = null, nomeUsuario = "Usuário", carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
-
+        // 1. CARREGAR BANCO DE PERGUNTAS (Com sistema de persistência)
         async function carregarBanco() {
             try {
-                const modulo = await import('./pergunta.js');
+                // O ?t= evita que o navegador use um erro salvo no cache
+                const modulo = await import(`./pergunta.js?t=${Date.now()}`);
                 bancoPerguntas = modulo.bancoPerguntas;
-                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
-            } catch (e) { console.error("Erro ao carregar perguntas:", e); }
+                console.log("Banco carregado:", bancoPerguntas.length, "perguntas.");
+                
+                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) {
+                    verificarEQuestao();
+                }
+            } catch (e) {
+                console.error("Erro crítico ao carregar pergunta.js:", e);
+                document.getElementById('perguntaTexto').innerText = "Erro de conexão. Recarregue a página.";
+            }
         }
+
+        // 2. FUNÇÃO AUXILIAR PARA GARANTIR QUE TUDO ESTÁ PRONTO
+        function verificarEQuestao() {
+            if (userRef && bancoPerguntas.length > 0) {
+                carregarQuestao();
+                carregadoPelaPrimeiraVez = false;
+            }
+        }
+
+        // 3. LÓGICA DE EMBARALHAMENTO FISHER-YATES
+        function embaralharBaralho() {
+            indicesDisponiveis = bancoPerguntas.map((_, i) => i);
+            for (let i = indicesDisponiveis.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indicesDisponiveis[i], indicesDisponiveis[j]] = [indicesDisponiveis[j], indicesDisponiveis[i]];
+            }
+        }
+
+        // 4. CARREGAR QUESTÃO (Sem repetição)
+        async function carregarQuestao() {
+            const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
+            if(!c || !t) return;
+
+            // Suas regras de negócio (Vídeos/Acertos)
+            if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = "Assista vídeos para liberar mais questões!"; c.innerHTML = ""; return; }
+            if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
+            if (acertosNoCiclo >= 10) { t.innerText = "Ciclo concluído! Carregando..."; c.innerHTML = ""; return; }
+
+            // Se o baralho acabar, embaralha de novo
+            if (indicesDisponiveis.length === 0) {
+                embaralharBaralho();
+            }
+
+            const indexSorteado = indicesDisponiveis.pop();
+            const q = bancoPerguntas[indexSorteado];
+
+            // Embaralha as opções
+            let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
+            
+            t.innerText = q.pergunta; 
+            c.innerHTML = "";
+
+            opts.forEach(o => {
+                const b = document.createElement('button');
+                b.className = "option-btn";
+                b.innerText = o.texto;
+                b.onclick = async () => {
+                    const all = c.querySelectorAll('button');
+                    all.forEach(x => x.disabled = true);
+                    const rect = b.getBoundingClientRect();
+                    
+                    if (o.correta) {
+                        b.classList.add('btn-correct');
+                        showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                    } else {
+                        b.classList.add('btn-wrong');
+                        showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                        let novoXP = Math.max(0, pdlInterno - 2);
+                        await updateDoc(userRef, { xp: novoXP });
+                    }
+                    setTimeout(carregarQuestao, 1200);
+                };
+                c.appendChild(b);
+            });
+        }
+
+        // 5. MONITOR DE AUTENTICAÇÃO
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userRef = doc(db, "usuarios", user.uid);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    pdlInterno = data.xp || 0;
+                    videosAssistidos = data.videosAssistidos || 0;
+                    acertosNoCiclo = data.acertosNoCiclo || 0;
+                    totalVideosHoje = data.totalVideosHoje || 0;
+                    
+                    document.getElementById('user-pdl').innerText = pdlInterno;
+                    document.getElementById('user-coins').innerText = data.saldo || 0;
+                    atualizarElo(pdlInterno);
+                    verificarEQuestao();
+                }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Inicia o carregamento do banco
         carregarBanco();
+
+        // (Mantenha aqui as suas funções auxiliares: atualizarElo, showFloatingPDL, etc.)
 
         const configElo = [];
         const divisoes = ["V", "IV", "III", "II", "I"];
