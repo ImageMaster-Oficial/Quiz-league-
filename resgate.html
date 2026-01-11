@@ -231,11 +231,32 @@
         let pdlInterno = 0, userRef = null, nomeUsuario = "Usuário", carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
 
         async function carregarBanco() {
-            try {
-                const modulo = await import('./pergunta.js');
-                bancoPerguntas = modulo.bancoPerguntas;
-                if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
-            } catch (e) { console.error("Erro ao carregar perguntas:", e); }
+            const statusText = document.getElementById('perguntaTexto');
+            let tentativas = 0;
+            const maxTentativas = 5;
+
+            async function tentarImportar() {
+                try {
+                    // O ?t= força o navegador a ignorar o erro antigo e baixar do zero
+                    const modulo = await import(`./pergunta.js?t=${Date.now()}`);
+                    bancoPerguntas = modulo.bancoPerguntas;
+                    
+                    if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) {
+                        carregarQuestao();
+                    }
+                } catch (e) {
+                    tentativas++;
+                    console.error(`Falha no carregamento (${tentativas}/${maxTentativas}):`, e);
+                    
+                    if (tentativas < maxTentativas) {
+                        if(statusText) statusText.innerText = `Reconectando ao servidor... (${tentativas})`;
+                        setTimeout(tentarImportar, 2500); // Espera 2.5 segundos e tenta de novo
+                    } else {
+                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável. Tente usar Dados Móveis ou recarregar a página.";
+                    }
+                }
+            }
+            tentarImportar();
         }
         carregarBanco();
 
