@@ -20,28 +20,29 @@
             overscroll-behavior-y: contain;
         }
 
-        /* --- NOVO: CSS DO BOTÃO DE RANKING --- */
-        .btn-ranking-tiny {
-            display: inline-flex;
+        /* --- NOVO: CSS DO BOTÃO DE RANKING (ESTILO GRANDE ACIMA DAS MOEDAS) --- */
+        .btn-ranking-top {
+            display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--lol-blue);
+            background: rgba(9, 20, 40, 0.9);
             border: 1px solid var(--gold);
             color: var(--gold);
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 2px;
+            padding: 10px;
+            border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
             transition: 0.2s;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
             width: 100%;
             box-sizing: border-box;
+            margin-bottom: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .btn-ranking-tiny:hover {
+        .btn-ranking-top:hover {
             background: var(--gold);
             color: var(--bg-dark);
         }
@@ -95,15 +96,16 @@
             clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
         }
 
-        .header-section { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; width: 100%; box-sizing: border-box;}
+        .header-section { display: flex; flex-direction: column; align-items: center; padding: 0 10px; width: 100%; box-sizing: border-box; gap: 10px;}
         .title-legends h1 { font-size: 1.6rem; margin: 0; color: var(--gold); text-transform: uppercase; background: linear-gradient(to bottom, var(--gold-bright), var(--gold), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .elo-container { display: flex; flex-direction: column; align-items: center; min-width: 95px; margin-right: 5px; cursor: pointer; }
-        .elo-badge { border: 1px solid var(--gold); padding: 4px 6px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; border-radius: 4px; width: 100%; text-align: center; box-sizing: border-box; transition: 0.2s; }
-        .xp-mini-bar-bg { width: 100%; height: 4px; background: rgba(0,0,0,0.5); border: 1px solid rgba(200, 155, 60, 0.3); border-radius: 2px; margin-top: 3px; overflow: hidden; }
+        /* --- ELO GRANDE NOVAMENTE --- */
+        .elo-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 250px; cursor: pointer; margin-bottom: 5px; }
+        .elo-badge { border: 2px solid var(--gold); padding: 8px 15px; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; border-radius: 4px; width: 100%; text-align: center; box-sizing: border-box; transition: 0.2s; background: rgba(1, 10, 19, 0.5); }
+        .xp-mini-bar-bg { width: 100%; height: 6px; background: rgba(0,0,0,0.5); border: 1px solid rgba(200, 155, 60, 0.3); border-radius: 3px; margin-top: 5px; overflow: hidden; }
         .xp-mini-bar-fill { height: 100%; width: 0%; transition: width 0.3s ease; }
 
-        .coin-badge { border: 2px solid var(--gold); padding: 6px 12px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; white-space: nowrap; }
+        .coin-badge { border: 2px solid var(--gold); padding: 8px 20px; background: rgba(1, 10, 19, 0.9); color: var(--gold); font-weight: 900; font-size: 1.1rem; width: 100%; text-align: center; box-sizing: border-box; }
         
         .hex-frame { background: var(--lol-blue); border: 2px solid var(--gold); position: relative; padding: 12px; display: flex; flex-direction: column; box-sizing: border-box; clip-path: polygon(4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%, 0 8%); margin-bottom: 5px; width: 100%;}
         .option-btn { background: #1e2328; border: 1px solid var(--gold-dark); color: var(--gold-bright); padding: 12px; margin: 5px 0; width: 100%; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; position: relative; }
@@ -147,20 +149,20 @@
     <div class="app-container" id="main-content">
         <div class="header-section">
             <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
-            <div style="display: flex; align-items: center;">
-                <div class="elo-container">
-                    <a href="ranking.html" class="btn-ranking-tiny">🏆 RANKING</a>
-                    
-                    <div id="btnVerElos" style="width: 100%;">
-                        <span class="elo-badge" id="txtElo">...</span>
-                        <div class="xp-mini-bar-bg"><div id="xpMiniFill" class="xp-mini-bar-fill"></div></div>
-                    </div>
+            
+            <a href="ranking.html" class="btn-ranking-top">🏆 VER RANKING GLOBAL</a>
+            
+            <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
+
+            <div class="elo-container" id="btnVerElos">
+                <span class="elo-badge" id="txtElo">...</span>
+                <div class="xp-mini-bar-bg">
+                    <div id="xpMiniFill" class="xp-mini-bar-fill"></div>
                 </div>
-                <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
             </div>
         </div>
-        
-        <div class="hex-frame">
+ 
+       <div class="hex-frame">
             <div id="quizContent">
                 <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Autenticando...</p>
                 <div id="opcoes"></div>
