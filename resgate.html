@@ -235,7 +235,6 @@
         configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
         configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
 
-        // TRAVA 1: Se o PDL for 0 ou menor, ele trava no primeiro elo da lista (FERRO V)
         function getEloInfo(valorXP) { 
             if (valorXP <= 0) return configElo[0];
             return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
@@ -420,8 +419,6 @@
                         await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
                     } else {
                         b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
-                        
-                        // TRAVA 2: Impede que o PDL no banco de dados fique menor que zero
                         let novoXP = Math.max(0, pdlInterno - 2); 
                         await updateDoc(userRef, { xp: novoXP });
                     }
@@ -460,7 +457,16 @@
                             timestamp: Date.now()
                         });
                         await updateDoc(userRef, { saldo: increment(-custoNum) });
-                        openModal("ENVIADO", "Solicitação feita com sucesso!");
+                        
+                        // NOVO AVISO ESTILIZADO (AZUL E DOURADO)
+                        const avisoEstilizado = `
+                            <div style="background: #091428; border: 2px solid #c89b3c; padding: 20px; border-radius: 5px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+                                <h2 style="color: #c89b3c; margin: 0 0 10px 0; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">Solicitação feita</h2>
+                                <p style="color: #f0e6d2; margin: 0; font-size: 0.95rem; line-height: 1.5;">O envio do Pix pode demorar até 24hr devido a alta demanda de solicitações dos usuários!</p>
+                            </div>
+                        `;
+                        openModal("ENVIADO", avisoEstilizado);
+
                     } catch (e) { openModal("ERRO", "Falha ao processar."); }
                 });
             };
@@ -495,7 +501,5 @@
         </div>
     </div>
 </body>
-</html>    
-        
-
-                            
+</html>
+                        
