@@ -27,7 +27,6 @@
             margin: 0 auto;
         }
 
-        /* Título Estilo League */
         .header-ranking {
             text-align: center;
             margin-bottom: 30px;
@@ -44,7 +43,6 @@
             text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
         }
 
-        /* Lista de Ranking */
         #lista-ranking {
             display: flex;
             flex-direction: column;
@@ -68,7 +66,6 @@
             background: var(--card-azul);
         }
 
-        /* Posição 1°, 2°, 3° */
         .posicao {
             font-weight: 900;
             font-size: 1.1rem;
@@ -82,7 +79,6 @@
             text-shadow: 0 0 5px var(--ouro);
         }
 
-        /* Nome do Jogador */
         .nome {
             flex-grow: 1;
             font-weight: bold;
@@ -95,7 +91,6 @@
             white-space: nowrap;
         }
 
-        /* Badge do Elo */
         .elo-badge {
             font-size: 0.65rem;
             font-weight: 900;
@@ -107,7 +102,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* PDL do Jogador */
         .pdl-valor {
             font-size: 0.85rem;
             color: var(--ouro-brilhante);
@@ -117,7 +111,6 @@
             text-align: right;
         }
 
-        /* Botão Voltar */
         .btn-voltar {
             display: block;
             width: fit-content;
@@ -162,7 +155,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, query, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
@@ -176,7 +169,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // CONFIGURAÇÃO DE ELOS (Igual ao seu sistema principal)
         const configElo = [];
         const divisoes = ["V", "IV", "III", "II", "I"];
         const coresElos = {
@@ -209,15 +201,14 @@
             return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
         }
 
-        // LÓGICA DO RANKING
         async function carregarRanking() {
             try {
-                // Query rigorosa: Ordena por XP descendente (maior PDL primeiro)
-                const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
+                // MUDANÇA DE TESTE: Removido o orderBy para testar conexão
+                const q = query(collection(db, "usuarios"), limit(50));
                 const querySnapshot = await getDocs(q);
                 
                 const container = document.getElementById('lista-ranking');
-                container.innerHTML = ""; // Limpa o loading
+                container.innerHTML = "";
 
                 let posicao = 1;
 
@@ -241,13 +232,16 @@
                     posicao++;
                 });
 
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<div class='loading'>Nenhum guerreiro encontrado.</div>";
+                }
+
             } catch (error) {
-                console.error("Erro ao carregar ranking:", error);
+                console.error("Erro detalhado:", error);
                 document.getElementById('lista-ranking').innerHTML = "Erro ao carregar dados.";
             }
         }
 
-        // Inicia a carga do ranking ao abrir a página
         carregarRanking();
     </script>
 </body>
