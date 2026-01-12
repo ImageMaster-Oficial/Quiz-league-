@@ -172,10 +172,13 @@
             <div style="text-align: center;">
                 <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário Moedas: <span id="limitDiario">0/35</span></span>
                 <div class="video-buttons-container">
-    <button id="btnVideo" class="video-btn">📺 +300 MOEDAS <br><span>LIMITE 35</span></button>
-    <button id="btnVideoLivre" class="video-btn active">📺 +10M | +25P <br><span>SEM META</span></button>
-    <button id="btnVideoXP" class="video-btn">📺 +300 PDL <br><span>SUBIR ELO</span></button>
-</div>
+                    <button id="btnVideo" class="video-btn">📺 +300 MOEDAS <span>META 10</span></button>
+                    <button id="btnVideoLivre" class="video-btn active">📺 +10M | +25P <span>SEM META</span></button>
+                    <button id="btnVideoXP" class="video-btn">📺 +300 PDL <span>META 10</span></button>
+                </div>
+            </div>
+        </div>
+
         <div class="hex-frame">
             <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
             <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;"><span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span></div>
@@ -218,10 +221,10 @@
         const mContent = document.getElementById('modal-body-content');
         const mFooter = document.getElementById('m-footer');
 
-        let tempoRestanteAnuncio = 10;
+        let tempoRestanteAnuncio = 15; // JÁ ATUALIZADO PARA 15s
         let intervaloAnuncio = null;
         let anuncioEmAndamento = false;
-        let tipoRecompensaMoeda = true;
+        let tipoRecompensa = "moeda"; // ATUALIZADO PARA SUPORTAR 'livre'
         const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
 
         let metaAtual = 195000, valorReaisMeta = "0,50";
@@ -235,22 +238,19 @@
 
             async function tentarImportar() {
                 try {
-                    // O ?t= força o navegador a ignorar o erro antigo e baixar do zero
                     const modulo = await import(`./pergunta.js?t=${Date.now()}`);
                     bancoPerguntas = modulo.bancoPerguntas;
-                    
                     if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) {
                         carregarQuestao();
                     }
                 } catch (e) {
                     tentativas++;
                     console.error(`Falha no carregamento (${tentativas}/${maxTentativas}):`, e);
-                    
                     if (tentativas < maxTentativas) {
                         if(statusText) statusText.innerText = `Reconectando ao servidor... (${tentativas})`;
-                        setTimeout(tentarImportar, 2500); // Espera 2.5 segundos e tenta de novo
+                        setTimeout(tentarImportar, 2500);
                     } else {
-                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável. Tente usar Dados Móveis ou recarregar a página.";
+                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável.";
                     }
                 }
             }
@@ -388,10 +388,17 @@
             
             const btnV = document.getElementById('btnVideo');
             const btnVXP = document.getElementById('btnVideoXP');
+            const btnVLivre = document.getElementById('btnVideoLivre'); // REFERÊNCIA AO NOVO BOTÃO
             const aviso = document.getElementById('avisoStatusQuiz');
             
+            // Botões normais precisam de meta 10
             btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
             btnVXP.disabled = (acertosNoCiclo < 10);
+            
+            // Botão Livre SEMPRE ATIVO
+            btnVLivre.disabled = false;
+            btnVLivre.classList.add('active');
+
             btnV.classList.toggle('active', !btnV.disabled);
             btnVXP.classList.toggle('active', !btnVXP.disabled);
             
@@ -404,85 +411,116 @@
             }
         }
 
-        function showFloatingPDL(text, color, x, y) {
+       function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
-        if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio(true);
-        if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio(false);
+        // --- GATILHOS DE CLIQUE ATUALIZADOS ---
+        if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio('moeda');
+        if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
+        if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
-        function iniciarFluxoAnuncio(isMoeda) {
-            tipoRecompensaMoeda = isMoeda; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
+        function iniciarFluxoAnuncio(tipo) {
+            tipoRecompensa = tipo; // Define qual prêmio será entregue no final
+            anuncioEmAndamento = true; 
+            tempoRestanteAnuncio = 15; // Atualizado para 15 segundos
+            
             if(intervaloAnuncio) clearInterval(intervaloAnuncio);
             window.open(linkAnuncioAdsterra, '_blank');
-            openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">10</div>`, 'alert');
+            
+            openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">15</div>`, 'alert');
+            
             mFooter.innerHTML = '<span style="font-size:0.7rem; color:var(--gold-dark); font-weight:900;">CONTANDO...</span>';
+            
             intervaloAnuncio = setInterval(() => {
                 if (document.visibilityState === 'hidden') {
                     tempoRestanteAnuncio--;
                     const display = document.getElementById('modalContador');
                     if(display) display.innerText = tempoRestanteAnuncio;
                 }
-                if (tempoRestanteAnuncio <= 0) { clearInterval(intervaloAnuncio); anuncioEmAndamento = false; finalizarRecompensa(); }
+                if (tempoRestanteAnuncio <= 0) { 
+                    clearInterval(intervaloAnuncio); 
+                    anuncioEmAndamento = false; 
+                    finalizarRecompensa(); 
+                }
             }, 1000);
         }
 
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
-                clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
+                clearInterval(intervaloAnuncio); 
+                anuncioEmAndamento = false;
                 mTitle.innerText = "VALIDAÇÃO FALHOU!";
-                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo, aguarde 15 segundos para fechar o anúncio e receber sua recompensa!</div>`;
+                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo, aguarde 15 segundos no anúncio para receber sua recompensa!</div>`;
                 mFooter.innerHTML = '';
                 const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'RE-TENTAR';
-                btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensaMoeda); };
+                btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensa); };
                 mFooter.appendChild(btnRetry);
             }
         });
 
-        // 1. Função de entrega de prêmios
-async function finalizarRecompensa() {
-    modal.style.display = 'none';
-    let up = {};
-    let msg = "";
+        async function finalizarRecompensa() {
+            modal.style.display = 'none';
+            let up = {};
+            let msg = "";
 
-    if (tipoRecompensa === "moeda") {
-        up = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-        msg = "Você recebeu 300 moedas!";
-    } 
-    else if (tipoRecompensa === "pdl") {
-        up = { xp: increment(300), videosAssistidos: increment(1) };
-        msg = "Você recebeu 300 PDL!";
-    } 
-    else if (tipoRecompensa === "livre") {
-        // Recompensa livre: não mexe nos contadores de meta de 10 acertos
-        up = { saldo: increment(10), xp: increment(25) };
-        msg = "Bônus Livre: +10 Moedas e +25 PDL!";
-    }
+            if (tipoRecompensa === "moeda") {
+                up = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+                msg = "Você recebeu 300 moedas!";
+            } else if (tipoRecompensa === "pdl") {
+                up = { xp: increment(300), videosAssistidos: increment(1) };
+                msg = "Você recebeu 300 PDL!";
+            } else if (tipoRecompensa === "livre") {
+                up = { saldo: increment(10), xp: increment(25) };
+                msg = "Bônus Livre: +10 Moedas e +25 PDL!";
+            }
 
-    // Lógica para resetar o ciclo do quiz apenas para os botões de meta (300)
-    if (tipoRecompensa !== "livre") {
-        const novoTotalVideos = videosAssistidos + 1;
-        if (novoTotalVideos >= 3) { 
-            up.acertos = 0; 
-            up.videosAssistidos = 0; 
-            setTimeout(() => carregarQuestao(), 500);
+            // Para recompensas de meta (300), checa se completou 3 vídeos para resetar o quiz
+            if (tipoRecompensa !== "livre") {
+                const novoTotalVideos = (videosAssistidos || 0) + 1;
+                if (novoTotalVideos >= 3) { 
+                    up.acertos = 0; 
+                    up.videosAssistidos = 0; 
+                    setTimeout(() => carregarQuestao(), 500);
+                }
+            }
+
+            await updateDoc(userRef, up);
+            openModal("SUCESSO", msg);
         }
-    }
 
-    await updateDoc(userRef, up);
-    openModal("SUCESSO", msg);
-}
+        function carregarQuestao() {
+            const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
+            if(!c || !t) return;
+            if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+            if (bancoPerguntas.length === 0) { t.innerText = "Sincronizando..."; return; }
+            if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
+            if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+            
+            const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
+            let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
+            t.innerText = q.pergunta; c.innerHTML = "";
+            
+            opts.forEach(o => {
+                const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
+                b.onclick = async () => {
+                    const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
+                    const rect = b.getBoundingClientRect();
+                    if (o.correta) {
+                        b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                    } else {
+                        b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                        let novoXP = Math.max(0, pdlInterno - 2); 
+                        await updateDoc(userRef, { xp: novoXP });
+                    }
+                    setTimeout(carregarQuestao, 1200);
+                };
+                c.appendChild(b);
+            });
+        }
 
-// 2. Configuração dos Cliques (Ficam ABAIXO da função)
-if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => { tipoRecompensa = "moeda"; iniciarFluxoAnuncio(); };
-if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => { tipoRecompensa = "livre"; iniciarFluxoAnuncio(); };
-if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => { tipoRecompensa = "pdl"; iniciarFluxoAnuncio(); };
-    // Se assistiu o 3º vídeo das metas grandes, recarrega o quiz
-    if (tipoRecompensa !== "livre" && (videosAssistidos + 1) >= 3) {
-        setTimeout(() => carregarQuestao(), 500);
-    }
-}
         window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
 
         const btnResgate = document.getElementById('btnResgate');
@@ -513,10 +551,9 @@ if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').
                         });
                         await updateDoc(userRef, { saldo: increment(-custoNum) });
                         
-                        // NOVO AVISO DE SOLICITAÇÃO FEITA
                         openModal(
                             `<span style="color:var(--gold)">SOLICITAÇÃO FEITA!</span>`, 
-                            `O envio do Pix pode demorar até <span style="color:var(--gold); font-weight:bold;">24hr</span> devido a Alta demanda de solicitações dos usuários!`, 
+                            `O envio do Pix pode demorar até <span style="color:var(--gold); font-weight:bold;">24hr</span> devido a Alta demanda!`, 
                             'alert'
                         );
                     } catch (e) { openModal("ERRO", "Falha ao processar."); }
