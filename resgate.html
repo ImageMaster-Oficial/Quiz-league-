@@ -319,7 +319,8 @@ function getEloInfo(valorXP) {
             totalVideosHoje = data.totalVideosHoje || 0;
             pdlInterno = data.xp || 0;
             const infoNovoElo = getEloInfo(pdlInterno);
-            if (ultimoEloNome && ultimoEloNome !== infoNovoElo.nome) exibirAnimacaoElo(infoNovoElo, (pdlInterno >= ultimoPdl));
+            
+            // Ajuste 100%: Removido disparo automático daqui para evitar duplicidade
             ultimoEloNome = infoNovoElo.nome; ultimoPdl = pdlInterno;
             atualizarInterface(); jogoInicializado = true;
         }
@@ -332,7 +333,7 @@ function getEloInfo(valorXP) {
             label.style.color = subiu ? "#c89b3c" : "#dc3545";
             text.innerText = infoElo.nome; text.style.color = infoElo.color;
             overlay.style.display = 'flex'; 
-            setTimeout(() => { overlay.style.display = 'none'; }, 5000); // Duração de 5 segundos conforme pedido
+            setTimeout(() => { overlay.style.display = 'none'; }, 5000); 
         }
 
         function openModal(title, text, type = 'alert', onConfirm = null) {
@@ -348,7 +349,7 @@ function getEloInfo(valorXP) {
                 bO.onclick = () => { 
                     if(!anuncioEmAndamento) {
                         modal.style.display = 'none';
-                        if(onConfirm) onConfirm(); // Executa a animação de elo após fechar
+                        if(onConfirm) onConfirm(); 
                     } 
                 };
                 mFooter.appendChild(bO);
@@ -356,7 +357,6 @@ function getEloInfo(valorXP) {
             modal.style.display = 'flex';
         }
 
-        // --- TABELA DE ELOS ADICIONADA AQUI ---
         if(document.getElementById('btnVerElos')) {
             document.getElementById('btnVerElos').onclick = () => {
                 let htmlElos = `<div style="text-align:left; max-height:300px; overflow-y:auto; padding:5px;">`;
@@ -485,7 +485,6 @@ function getEloInfo(valorXP) {
             
             await updateDoc(userRef, up);
             
-            // Modal de Sucesso com callback para disparar animação de elo ao clicar em "Entendi"
             openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
                 const infoNovo = getEloInfo(pdlInterno);
                 if (infoNovo.nome !== eloAntes) {
@@ -507,6 +506,7 @@ function getEloInfo(valorXP) {
             opts.forEach(o => {
                 const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
                 b.onclick = async () => {
+                    const eloAntesDoQuiz = getEloInfo(pdlInterno).nome;
                     const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
                     const rect = b.getBoundingClientRect();
                     try {
@@ -519,7 +519,13 @@ function getEloInfo(valorXP) {
                             await updateDoc(userRef, { xp: novoXP });
                         }
                     } catch (e) { console.log("Erro ao atualizar dados."); }
-                    finally { setTimeout(carregarQuestao, 1200); }
+                    finally { 
+                        setTimeout(() => {
+                            const infoNovo = getEloInfo(pdlInterno);
+                            if (infoNovo.nome !== eloAntesDoQuiz) exibirAnimacaoElo(infoNovo, (infoNovo.min > getEloInfo(pdlInterno).min));
+                            carregarQuestao();
+                        }, 1200); 
+                    }
                 };
                 c.appendChild(b);
             });
