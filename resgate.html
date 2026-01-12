@@ -336,7 +336,7 @@
             text.style.color = infoElo.color;
             
             overlay.style.display = 'flex'; // Certifique-se que isso está aqui!
-            setTimeout(() => { overlay.style.display = 'none'; }, 3500);
+            setTimeout(() => { overlay.style.display = 'none'; }, 5000);
         }
 
         function openModal(title, text, type = 'alert', onConfirm = null) {
@@ -450,67 +450,45 @@
         });
 
         async function finalizarRecompensa() {
-            // 1. Verificação de Segurança
             if (!chaveSeguranca) {
                 modal.style.display = 'none';
-                openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada.");
+                openModal("SISTEMA DE SEGURANÇA", "Ação inválida.");
                 return;
             }
-
             chaveSeguranca = false; 
-            let up = {}; 
-            let msg = "";
-            
-            // 2. Captura o estado antes da mudança
+            let up = {}; let msg = "";
             const eloAntes = getEloInfo(pdlInterno).nome;
 
-            // 3. Define os incrementos
             if (tipoRecompensa === "moeda") {
                 up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
                 msg = "Você recebeu 500 moedas!";
             } else if (tipoRecompensa === "pdl") {
                 up = { xp: increment(500), videosAssistidos: increment(1) };
                 msg = "Você recebeu 500 PDL!";
-                pdlInterno += 500; // Atualiza local para cálculo imediato
+                pdlInterno += 500; 
             } else if (tipoRecompensa === "livre") {
                 up = { saldo: increment(10), xp: increment(100) };
                 msg = "Bónus Livre: +10 Moedas e +100 PDL!";
                 pdlInterno += 100;
             }
 
-            // Lógica de reset de ciclo de quiz
-            if (tipoRecompensa !== "livre") {
-                const proxVideo = (videosAssistidos || 0) + 1;
-                if (proxVideo >= 3) { 
-                    up.acertos = 0; 
-                    up.videosAssistidos = 0; 
-                    setTimeout(() => carregarQuestao(), 1000); 
-                }
-            }
-            
             try {
-                // 4. Salva no Firebase primeiro
                 await updateDoc(userRef, up);
                 
-                // 5. Mostra o Modal de Sucesso
+                // Primeiro: Mostra a mensagem de recompensa
                 openModal("RECOMPENSA LIBERADA", msg);
 
-                // 6. Verifica mudança de elo COM ATRASO
-                // Usamos um delay maior para garantir que o Firebase já processou
-                setTimeout(() => {
-                    const infoNovo = getEloInfo(pdlInterno);
-                    if (infoNovo.nome !== eloAntes) {
-                        // Fecha o modal de sucesso para não ter conflito visual
-                        if(modal) modal.style.display = 'none';
-                        
-                        // Dispara a animação
-                        exibirAnimacaoElo(infoNovo, true);
-                    }
-                }, 2000); // 2 segundos após o sucesso, checa o elo
-
+                // Segundo: Verifica se mudou de elo
+                const infoNovo = getEloInfo(pdlInterno);
+                if (infoNovo.nome !== eloAntes) {
+                    // Esperamos 2.5 segundos com o modal de recompensa aberto antes de mostrar o ELO
+                    setTimeout(() => {
+                        if(modal) modal.style.display = 'none'; // Fecha o modal de moedas
+                        exibirAnimacaoElo(infoNovo, true);      // Abre a promoção de elo
+                    }, 2500);
+                }
             } catch (error) {
-                console.error("Erro ao salvar:", error);
-                openModal("ERRO", "Falha ao sincronizar pontos. Tente novamente.");
+                openModal("ERRO", "Falha ao salvar pontos.");
             }
         }
 
