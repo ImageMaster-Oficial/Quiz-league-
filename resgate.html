@@ -497,14 +497,17 @@ function getEloInfo(valorXP) {
                 b.onclick = async () => {
                     const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
                     const rect = b.getBoundingClientRect();
-                    if (o.correta) {
-                        b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
-                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
-                    } else {
-                        b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
-                        let novoXP = Math.max(0, pdlInterno - 2); await updateDoc(userRef, { xp: novoXP });
-                    }
-                    setTimeout(carregarQuestao, 1200);
+                    try {
+                        if (o.correta) {
+                            b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                            await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                        } else {
+                            b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                            let novoXP = Math.max(0, pdlInterno - 2); 
+                            await updateDoc(userRef, { xp: novoXP });
+                        }
+                    } catch (e) { console.log("Erro ao atualizar dados."); }
+                    finally { setTimeout(carregarQuestao, 1200); }
                 };
                 c.appendChild(b);
             });
