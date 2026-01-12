@@ -396,7 +396,7 @@
             }
         }
 
-    function showFloatingPDL(text, color, x, y) {
+   function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
@@ -436,6 +436,9 @@
         async function finalizarRecompensa() {
             modal.style.display = 'none';
             let up = {}; let msg = "";
+            
+            // --- DETECÇÃO DE ELO PRÉ-PRÉMIO ---
+            const eloAntes = getEloInfo(pdlInterno).nome;
 
             if (tipoRecompensa === "moeda") {
                 up = { saldo: increment(300), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
@@ -444,7 +447,6 @@
                 up = { xp: increment(500), videosAssistidos: increment(1) };
                 msg = "Ganhou 500 PDL!";
             } else if (tipoRecompensa === "livre") {
-                // ATUALIZADO PARA +100 PDL
                 up = { saldo: increment(10), xp: increment(100) };
                 msg = "Bónus Livre: +10 Moedas e +100 PDL!";
             }
@@ -453,8 +455,24 @@
                 const proxVideo = (videosAssistidos || 0) + 1;
                 if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
             }
+            
             await updateDoc(userRef, up);
+            
+            // Exibe o modal de sucesso
             openModal("SUCESSO", msg);
+
+            // --- VERIFICAÇÃO PÓS-PRÉMIO PARA PROMOÇÃO ---
+            // Pequeno atraso para garantir que o banco atualizou o pdlInterno local
+            setTimeout(() => {
+                const infoNovo = getEloInfo(pdlInterno);
+                if (infoNovo.nome !== eloAntes) {
+                    // Espera 2 segundos (tempo do usuário ler o sucesso) e mostra a promoção
+                    setTimeout(() => {
+                        modal.style.display = 'none'; // Fecha o modal de sucesso para mostrar o elo
+                        exibirAnimacaoElo(infoNovo, true);
+                    }, 2000);
+                }
+            }, 500);
         }
 
         function carregarQuestao() {
