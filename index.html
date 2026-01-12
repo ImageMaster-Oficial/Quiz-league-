@@ -155,7 +155,7 @@
             padding: 30px;
             border-radius: 8px;
             text-align: center;
-            max-width: 300px;
+            max-width: 350px;
             width: 85%;
             box-shadow: 0 0 40px rgba(200, 155, 60, 0.5);
             animation: surgindo 0.3s ease-out;
@@ -172,6 +172,7 @@
             width: 100%;
             font-weight: bold;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
         @keyframes surgindo {
@@ -233,6 +234,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -245,9 +247,10 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         // FUNÇÃO EXIBIR MODAL
-        function exibirModal(titulo, mensagem, corTitulo) {
+        function exibirModal(titulo, mensagem, corTitulo, callback = null) {
             const modal = document.getElementById('modal-alerta');
             const tituloH3 = document.getElementById('modal-titulo');
             const msgP = document.getElementById('modal-msg');
@@ -255,13 +258,59 @@
 
             tituloH3.innerText = titulo;
             tituloH3.style.color = corTitulo;
-            msgP.innerText = mensagem;
+            msgP.innerHTML = mensagem; // Alterado para innerHTML para aceitar negritos
             modal.style.display = 'flex';
 
-            btn.onclick = () => { modal.style.display = 'none'; };
+            btn.onclick = () => { 
+                modal.style.display = 'none'; 
+                if (callback) callback();
+            };
         }
 
-        // --- LÓGICA DE LOGIN COM FIREBASE AUTH ---
+        // --- LÓGICA DE BOAS-VINDAS ---
+        async function verificarBoasVindas(user) {
+            const userRef = doc(db, "usuarios", user.uid);
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (!data.boasVindasResgatado) {
+                    const textoEpico = `
+                        Saudações, Invocador!<br><br>
+                        Você acaba de entrar no <b>Quiz Legends</b>, o campo de batalha onde o raciocínio é sua habilidade mais valiosa. 
+                        Aqui, a diversão caminha lado a lado com a competição implacável. Esteja avisado: nossas questões não perdoam e foram forjadas para testar até os limites do seu conhecimento. 
+                        Muitos tentam, mas apenas os verdadeiros mestres de Runeterra possuem a precisão necessária para dominar o Ranking.<br><br>
+                        Prepare-se. O Top 3 é um trono reservado apenas para a elite.<br><br>
+                        Agora pegue o seu bônus de Boas-vindas para começarmos com o pé direito!
+                    `;
+
+                    // Altera o texto do botão temporariamente para o bônus
+                    const btn = document.getElementById('btnAcaoModal');
+                    btn.innerText = "RESGATAR 50.000 MOEDAS";
+                    btn.style.background = "linear-gradient(to bottom, #c89b3c, #855f13)";
+
+                    exibirModal("BEM-VINDO, INVOCADOR!", textoEpico, "var(--ouro)", async () => {
+                        // Ao clicar no botão de resgate
+                        await updateDoc(userRef, {
+                            saldo: increment(50000),
+                            boasVindasResgatado: true
+                        });
+                        // Restaura o botão original e redireciona
+                        btn.innerText = "ENTENDIDO";
+                        btn.style.background = "var(--ouro)";
+                        window.location.href = "resgate.html";
+                    });
+                } else {
+                    // Já resgatou, vai direto pro jogo
+                    window.location.href = "resgate.html";
+                }
+            } else {
+                // Caso o doc do usuário ainda não exista (primeiro login de fato)
+                window.location.href = "resgate.html";
+            }
+        }
+
+        // --- LÓGICA DE LOGIN ---
         document.getElementById('btnLogin').onclick = async () => {
             const emailInput = document.getElementById('user').value.trim();
             const senhaInput = document.getElementById('pass').value;
@@ -276,8 +325,9 @@
             btn.innerText = "AUTENTICANDO...";
 
             try {
-                await signInWithEmailAndPassword(auth, emailInput, senhaInput);
-                window.location.href = "resgate.html";
+                const userCredential = await signInWithEmailAndPassword(auth, emailInput, senhaInput);
+                // Em vez de redirecionar direto, verifica o bônus de boas-vindas
+                await verificarBoasVindas(userCredential.user);
             } catch (error) {
                 console.error(error);
                 let mensagemErro = "E-mail ou senha incorretos.";
