@@ -473,17 +473,57 @@
             }
 
             try {
-                await updateDoc(userRef, up);
+        await updateDoc(userRef, up);
+        
+        const infoNovo = getEloInfo(pdlInterno);
+
+        // Se mudou de elo, passa a função de animação para o botão 'ENTENDI'
+        if (infoNovo.nome !== eloAntes) {
+            openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
+                exibirAnimacaoElo(infoNovo, true);
+            });
+        } else {
+            // Se não mudou de elo, abre o modal simples
+            openModal("RECOMPENSA LIBERADA", msg);
+        }
+    } catch (error) {
+        openModal("ERRO", "Falha ao salvar pontos.");
+    }
                 
             
-             // Primeiro: Mostra a mensagem de recompensa
-       // Mudamos o comportamento do botão "ENTENDI" para disparar o elo ao ser clicado
-       openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
-        const infoNovo = getEloInfo(pdlInterno);
-        if (infoNovo.nome !== eloAntes) {
-        exibirAnimacaoElo(infoNovo, true);
-           }
-       });   
+       function openModal(title, text, type = 'alert', onConfirm = null) {
+    if(!modal) return;
+    mTitle.innerHTML = title; 
+    mContent.innerHTML = `<div class="modal-text">${text}</div>`;
+    mFooter.innerHTML = '';
+
+    if (type === 'confirm') {
+        const bC = document.createElement('button'); 
+        bC.className = 'modal-btn-confirm'; 
+        bC.innerText = 'CONFIRMAR'; 
+        bC.onclick = onConfirm;
+        
+        const bX = document.createElement('button'); 
+        bX.className = 'option-btn'; 
+        bX.innerText = 'VOLTAR'; 
+        bX.onclick = () => modal.style.display = 'none';
+        
+        mFooter.appendChild(bC); 
+        mFooter.appendChild(bX);
+    } else {
+        const bO = document.createElement('button'); 
+        bO.className = 'modal-btn-confirm'; 
+        bO.innerText = 'ENTENDI'; 
+        
+        // Se houver uma função extra (como abrir o elo), ela roda aqui
+        bO.onclick = () => { 
+            modal.style.display = 'none'; 
+            if (onConfirm) onConfirm(); 
+        };
+        mFooter.appendChild(bO);
+    }
+    modal.style.display = 'flex';
+}
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
