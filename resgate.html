@@ -405,42 +405,50 @@
         if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
         if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
+        // No topo do script, mude para:
+        let chaveSeguranca = false; 
+
+        // Dentro da função iniciarFluxoAnuncio:
         function iniciarFluxoAnuncio(tipo) {
+            chaveSeguranca = false; // Reseta a chave toda vez que inicia
             tipoRecompensa = tipo; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
+            
             if(intervaloAnuncio) clearInterval(intervaloAnuncio);
             window.open(linkAnuncioAdsterra, '_blank');
+            
             openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">15</div>`, 'alert');
-            mFooter.innerHTML = '<span style="font-size:0.7rem; color:var(--gold-dark); font-weight:900;">CONTANDO...</span>';
+            
             intervaloAnuncio = setInterval(() => {
                 if (document.visibilityState === 'hidden') {
                     tempoRestanteAnuncio--;
                     const display = document.getElementById('modalContador');
                     if(display) display.innerText = tempoRestanteAnuncio;
                 }
-                if (tempoRestanteAnuncio <= 0) { clearInterval(intervaloAnuncio); anuncioEmAndamento = false; finalizarRecompensa(); }
+                
+                if (tempoRestanteAnuncio <= 0) { 
+                    clearInterval(intervaloAnuncio); 
+                    anuncioEmAndamento = false; 
+                    chaveSeguranca = true; // SÓ AQUI A RECOMPENSA É LIBERADA
+                    finalizarRecompensa(); 
+                }
             }, 1000);
         }
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
-                clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
-                mTitle.innerText = "VALIDAÇÃO FALHOU!";
-                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo! Aguarde os 15 segundos no anúncio para receber o prémio.</div>`;
-                mFooter.innerHTML = '';
-                const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'TENTAR NOVAMENTE';
-                btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensa); };
-                mFooter.appendChild(btnRetry);
-            }
-        });
-
         async function finalizarRecompensa() {
+            // VERIFICAÇÃO ANTIFRAUDE: Se tentar chamar a função sem o contador zerar
+            if (!chaveSeguranca) {
+                modal.style.display = 'none';
+                openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada. Assista o anúncio até o fim.");
+                return;
+            }
+
+            chaveSeguranca = false; // Consome a chave para não reusar
             modal.style.display = 'none';
             let up = {}; let msg = "";
             
             const eloAntes = getEloInfo(pdlInterno).nome;
 
             if (tipoRecompensa === "moeda") {
-                // ATUALIZADO PARA +500 MOEDAS
                 up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
                 msg = "Ganhou 500 moedas!";
             } else if (tipoRecompensa === "pdl") {
@@ -451,13 +459,11 @@
                 msg = "Bónus Livre: +10 Moedas e +100 PDL!";
             }
 
-            if (tipoRecompensa !== "livre") {
-                const proxVideo = (videosAssistidos || 0) + 1;
-                if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
-            }
-            
             await updateDoc(userRef, up);
             openModal("SUCESSO", msg);
+
+            // ... resto da lógica de elo ...
+        }
 
             setTimeout(() => {
                 const infoNovo = getEloInfo(pdlInterno);
