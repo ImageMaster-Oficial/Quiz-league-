@@ -475,22 +475,15 @@
             try {
                 await updateDoc(userRef, up);
                 
-                // Primeiro: Mostra a mensagem de recompensa
-                openModal("RECOMPENSA LIBERADA", msg);
-
-                // Segundo: Verifica se mudou de elo
-                const infoNovo = getEloInfo(pdlInterno);
-                if (infoNovo.nome !== eloAntes) {
-                    // Esperamos 2.5 segundos com o modal de recompensa aberto antes de mostrar o ELO
-                    setTimeout(() => {
-                        if(modal) modal.style.display = 'none'; // Fecha o modal de moedas
-                        exibirAnimacaoElo(infoNovo, true);      // Abre a promoção de elo
-                    }, 4000);
-                }
-            } catch (error) {
-                openModal("ERRO", "Falha ao salvar pontos.");
-            }
-        }
+            
+             // Primeiro: Mostra a mensagem de recompensa
+       // Mudamos o comportamento do botão "ENTENDI" para disparar o elo ao ser clicado
+       openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
+        const infoNovo = getEloInfo(pdlInterno);
+        if (infoNovo.nome !== eloAntes) {
+        exibirAnimacaoElo(infoNovo, true);
+           }
+       });   
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
