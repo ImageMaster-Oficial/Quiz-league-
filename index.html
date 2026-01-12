@@ -272,7 +272,7 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Se nunca resgatou o bônus de boas-vindas
+                    
                     if (!data.boasVindasResgatado) {
                         const textoEpico = `
                             Saudações, Invocador!<br><br>
@@ -289,8 +289,14 @@
 
                         exibirModal("BEM-VINDO, INVOCADOR!", textoEpico, "var(--ouro)", async () => {
                             try {
-                                await updateDoc(userRef, { saldo: increment(50000), boasVindasResgatado: true });
-                            } catch (e) { console.error("Erro ao processar bônus"); }
+                                // Gravação direta e verificação de sucesso
+                                await updateDoc(userRef, { 
+                                    saldo: increment(50000), 
+                                    boasVindasResgatado: true 
+                                });
+                            } catch (e) { 
+                                console.error("Erro ao creditar bônus:", e); 
+                            }
                             window.location.href = "resgate.html";
                         });
                     } else {
@@ -300,7 +306,7 @@
                     window.location.href = "resgate.html";
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Erro na verificação:", err);
                 window.location.href = "resgate.html";
             }
         }
@@ -320,6 +326,7 @@
 
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, emailInput, senhaInput);
+                // Executa a verificação e aguarda o resultado antes de redirecionar
                 await verificarBoasVindas(userCredential.user);
             } catch (error) {
                 console.error(error);
@@ -331,7 +338,7 @@
             }
         };
 
-        // PWA
+        // PWA E SERVICE WORKER
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
         if ('serviceWorker' in navigator) {
