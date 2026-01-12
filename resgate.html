@@ -173,7 +173,7 @@
                 <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário Moedas: <span id="limitDiario">0/35</span></span>
                 <div class="video-buttons-container">
                     <button id="btnVideo" class="video-btn">📺 +300 MOEDAS <span>META 10</span></button>
-                    <button id="btnVideoLivre" class="video-btn active">📺 +10M | +25P <span>SEM META</span></button>
+                    <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">📺 +10M | +25P <span>SEM META</span></button>
                     <button id="btnVideoXP" class="video-btn">📺 +300 PDL <span>META 10</span></button>
                 </div>
             </div>
@@ -221,36 +221,39 @@
         const mContent = document.getElementById('modal-body-content');
         const mFooter = document.getElementById('m-footer');
 
-        let tempoRestanteAnuncio = 15; // JÁ ATUALIZADO PARA 15s
+        // CONFIGURAÇÕES ATUALIZADAS
+        let tempoRestanteAnuncio = 15; 
         let intervaloAnuncio = null;
         let anuncioEmAndamento = false;
-        let tipoRecompensa = "moeda"; // ATUALIZADO PARA SUPORTAR 'livre'
+        let tipoRecompensa = "moeda"; 
         const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
 
         let metaAtual = 195000, valorReaisMeta = "0,50";
         let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
         let pdlInterno = 0, userRef = null, nomeUsuario = "Usuário", carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
 
+        // LÓGICA DE WI-FI REFORÇADA (ANTI-TRAVAMENTO)
         async function carregarBanco() {
             const statusText = document.getElementById('perguntaTexto');
             let tentativas = 0;
-            const maxTentativas = 5;
+            const maxTentativas = 8;
 
             async function tentarImportar() {
                 try {
+                    // Força o Wi-Fi a ignorar o cache corrompido
                     const modulo = await import(`./pergunta.js?t=${Date.now()}`);
                     bancoPerguntas = modulo.bancoPerguntas;
+                    
                     if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) {
                         carregarQuestao();
                     }
                 } catch (e) {
                     tentativas++;
-                    console.error(`Falha no carregamento (${tentativas}/${maxTentativas}):`, e);
                     if (tentativas < maxTentativas) {
-                        if(statusText) statusText.innerText = `Reconectando ao servidor... (${tentativas})`;
-                        setTimeout(tentarImportar, 2500);
+                        if(statusText) statusText.innerText = `Sincronizando sinal... (${tentativas})`;
+                        setTimeout(tentarImportar, 2500); 
                     } else {
-                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável.";
+                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável. Tente usar Dados Móveis.";
                     }
                 }
             }
@@ -388,19 +391,16 @@
             
             const btnV = document.getElementById('btnVideo');
             const btnVXP = document.getElementById('btnVideoXP');
-            const btnVLivre = document.getElementById('btnVideoLivre'); // REFERÊNCIA AO NOVO BOTÃO
+            const btnVLivre = document.getElementById('btnVideoLivre');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            // Botões normais precisam de meta 10
             btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
             btnVXP.disabled = (acertosNoCiclo < 10);
-            
-            // Botão Livre SEMPRE ATIVO
-            btnVLivre.disabled = false;
-            btnVLivre.classList.add('active');
+            btnVLivre.disabled = false; // Sempre habilitado
 
             btnV.classList.toggle('active', !btnV.disabled);
             btnVXP.classList.toggle('active', !btnVXP.disabled);
+            btnVLivre.classList.add('active');
             
             if (acertosNoCiclo < 10) {
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
