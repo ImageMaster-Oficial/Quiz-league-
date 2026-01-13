@@ -192,19 +192,8 @@
 </head>
 <body>
 
-    <div id="custom-splash" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: #010a13 url('admin-vertical.png') no-repeat center center;
-    background-size: cover;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease-out;">
+<div id="custom-splash" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #010a13; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-out;">
+    <img src="admin-vertical.png" style="width: 100%; height: 100%; object-fit: cover;" fetchpriority="high">
 </div>
 
 <script>
@@ -214,7 +203,7 @@
             const splash = document.getElementById('custom-splash');
             splash.style.opacity = '0';
             setTimeout(() => splash.style.display = 'none', 500);
-        }, 3000); // 3 segundos de exibição
+        }, 3000); 
     });
 </script>
 
