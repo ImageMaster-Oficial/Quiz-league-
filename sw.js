@@ -21,8 +21,8 @@ messaging.onBackgroundMessage((payload) => {
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// 3. LÓGICA PWA - CACHE ESSENCIAL (Versão v7 para forçar limpeza de bordas brancas)
-const CACHE_NAME = 'quiz-legends-v7'; 
+// 3. LÓGICA PWA - LIMPEZA EXTREMA (Versão v10)
+const CACHE_NAME = 'quiz-legends-v10'; 
 const ASSETS_TO_CACHE = [
     './',
     'index.html',
@@ -32,38 +32,52 @@ const ASSETS_TO_CACHE = [
     'admin-vertical.png'
 ];
 
+// INSTALAÇÃO: Força o Service Worker a se tornar o ativo imediatamente
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Força a instalação imediata
+    self.skipWaiting(); 
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return Promise.allSettled(
-                ASSETS_TO_CACHE.map(asset => cache.add(asset))
+                ASSETS_TO_CACHE.map(asset => {
+                    // Adiciona um timestamp na URL de cache para garantir que baixe do servidor, não do cache local
+                    return cache.add(new Request(asset, { cache: 'reload' }));
+                })
             );
         })
     );
 });
 
+// ATIVAÇÃO: DESTRUIÇÃO TOTAL de caches antigos e controle imediato
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
-                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        console.log('Removendo cache antigo:', key);
+                        return caches.delete(key);
+                    }
+                })
             );
+        }).then(() => {
+            return self.clients.claim(); // Reivindica o controle das páginas abertas na hora
         })
     );
-    return self.clients.claim(); // Assume o controle das abas abertas imediatamente
 });
 
-// 4. ESTRATÉGIA CACHE FIRST (Carregamento Instantâneo da Splash Screen)
+// 4. ESTRATÉGIA CACHE FIRST (Com verificação de rede para o Manifest)
 self.addEventListener('fetch', (event) => {
+    // Se for o arquivo de manifest, tentamos sempre buscar a versão mais nova da rede primeiro
+    if (event.request.url.includes('manifest-jogo.json')) {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match(event.request))
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((response) => {
-            // Se encontrar no cache (como a imagem admin-vertical), entrega na hora
-            if (response) {
-                return response;
-            }
-            // Se não estiver no cache, vai buscar na internet
-            return fetch(event.request);
+            return response || fetch(event.request);
         })
     );
 });
