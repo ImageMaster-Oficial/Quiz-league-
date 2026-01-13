@@ -21,8 +21,8 @@ messaging.onBackgroundMessage((payload) => {
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// 3. LÓGICA PWA - CACHE ESSENCIAL (v4 para garantir atualização)
-const CACHE_NAME = 'quiz-legends-v4'; 
+// 3. LÓGICA PWA - CACHE ESSENCIAL (Versão v7 para forçar limpeza de bordas brancas)
+const CACHE_NAME = 'quiz-legends-v7'; 
 const ASSETS_TO_CACHE = [
     './',
     'index.html',
@@ -33,6 +33,7 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Força a instalação imediata
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return Promise.allSettled(
@@ -40,7 +41,6 @@ self.addEventListener('install', (event) => {
             );
         })
     );
-    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -51,17 +51,18 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    return self.clients.claim(); // Assume o controle das abas abertas imediatamente
 });
 
-// 4. ESTRATÉGIA CACHE FIRST (Carregamento Instantâneo)
+// 4. ESTRATÉGIA CACHE FIRST (Carregamento Instantâneo da Splash Screen)
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {
-            // Se encontrar no cache, entrega imediatamente (Adeus fundo preto!)
+            // Se encontrar no cache (como a imagem admin-vertical), entrega na hora
             if (response) {
                 return response;
             }
-            // Se não estiver no cache, busca na internet
+            // Se não estiver no cache, vai buscar na internet
             return fetch(event.request);
         })
     );
