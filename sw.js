@@ -11,18 +11,18 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 2. Gerenciamento de Notificações (CORRIGIDO: Removido admin.png que não existia)
+// 2. Gerenciamento de Notificações
 messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: 'app-512.png' // Usando o ícone que existe para evitar erro
+        icon: 'app-512.png'
     };
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// 3. LÓGICA PWA - CACHE ESSENCIAL
-const CACHE_NAME = 'quiz-legends-v3'; // Versão 3 para forçar atualização
+// 3. LÓGICA PWA - CACHE ESSENCIAL (v4 para garantir atualização)
+const CACHE_NAME = 'quiz-legends-v4'; 
 const ASSETS_TO_CACHE = [
     './',
     'index.html',
@@ -35,7 +35,6 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            // Adiciona os arquivos um por um para não travar se um falhar
             return Promise.allSettled(
                 ASSETS_TO_CACHE.map(asset => cache.add(asset))
             );
@@ -54,11 +53,16 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Evento Fetch (Obrigatório para o botão de instalar aparecer)
+// 4. ESTRATÉGIA CACHE FIRST (Carregamento Instantâneo)
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        fetch(event.request).catch(() => {
-            return caches.match(event.request);
+        caches.match(event.request).then((response) => {
+            // Se encontrar no cache, entrega imediatamente (Adeus fundo preto!)
+            if (response) {
+                return response;
+            }
+            // Se não estiver no cache, busca na internet
+            return fetch(event.request);
         })
     );
 });
