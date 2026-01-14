@@ -16,7 +16,7 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: 'app-512.png'
+        icon: 'appicon-quiz512.png'
     };
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
@@ -27,8 +27,8 @@ const ASSETS_TO_CACHE = [
     './',
     'index.html',
     'manifest-jogo.json',
-    'app-192.png',
-    'app-512.png',
+    'appicon-quiz192.png',
+    'appicon-quiz512.png',
     'admin-vertical.png'
 ];
 
