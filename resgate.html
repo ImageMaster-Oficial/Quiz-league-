@@ -58,7 +58,6 @@
             color: var(--bg-dark);
         }
 
-
         /* --- ANIMAÇÕES --- */
         #elo-transition-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -180,27 +179,22 @@
                 <div id="opcoes"></div>
                 <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
             </div>
+            
+            <div style="text-align: center;">
+                <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário Moedas: <span id="limitDiario">0/35</span></span>
+                <div class="video-buttons-container">
+                    <button id="btnVideo" class="video-btn">📺 +500 MOEDAS <span>META 10 ACERTOS</span></button>
+                    
+                    <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
+                        📺 +10 MOEDAS <span>+100 PDL</span>
+                    </button>
+                    
+                    <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
+                </div>
+            </div>
+        </div>
 
-           <div style="text-align: center; margin-bottom: 20px;">
-    <div class="video-buttons-container">
-        <button id="btnVideo" class="video-btn">
-            📺 +100 MOEDAS <span id="limitMoedas">0/35</span>
-            <span style="display: block; font-size: 0.6rem;">META 10 ACERTOS</span>
-        </button>
-        
-        <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
-            📺 +10 MOEDAS <span id="limitLivre">0/35</span>
-            <span style="display: block; font-size: 0.6rem;">+100 PDL</span>
-        </button>
-        
-        <button id="btnVideoXP" class="video-btn">
-            📺 +500 PDL 
-            <span style="display: block; font-size: 0.6rem;">META 10 ACERTOS</span>
-        </button>
-    </div>
-</div>
-
-                    <div class="hex-frame">
+        <div class="hex-frame">
             <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
             <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;"><span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span></div>
             
@@ -232,53 +226,6 @@
             messagingSenderId: "1050463164018", 
             appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
         };
-
-          // --- COLOQUE ISSO DENTRO DO SEU BLOCO DE SCRIPT EXISTENTE ---
-let startY = 0;
-const pullDiv = document.getElementById('pull-to-refresh');
-const appScroll = document.getElementById('app-scroll');
-const badge = pullDiv?.querySelector('.refresh-badge');
-
-if (pullDiv && appScroll) {
-    appScroll.addEventListener('touchstart', (e) => {
-        if (appScroll.scrollTop === 0) {
-            startY = e.touches[0].pageY;
-        }
-    }, { passive: true });
-
-    appScroll.addEventListener('touchmove', (e) => {
-        if (appScroll.scrollTop !== 0) return;
-        const distance = e.touches[0].pageY - startY;
-        if (distance > 0) {
-            const move = Math.min(distance * 0.4, 70);
-            pullDiv.style.transform = `translateY(${move}px)`;
-            appScroll.style.transform = `translateY(${move}px)`;
-            if (badge) {
-                badge.innerText = move >= 60 ? "Solte para Recarregar" : "Puxe para Recarregar";
-            }
-        }
-    }, { passive: true });
-
-    appScroll.addEventListener('touchend', () => {
-        const style = window.getComputedStyle(pullDiv);
-        const matrix = new WebKitCSSMatrix(style.transform);
-        const currentMove = matrix.m42;
-        if (currentMove >= 60) {
-            location.reload();
-        } else {
-            pullDiv.style.transition = "transform 0.3s ease";
-            appScroll.style.transition = "transform 0.3s ease";
-            pullDiv.style.transform = 'translateY(0)';
-            appScroll.style.transform = 'translateY(0)';
-            if (badge) badge.innerText = "Puxe para Recarregar";
-            setTimeout(() => {
-                pullDiv.style.transition = "";
-                appScroll.style.transition = "";
-            }, 300);
-        }
-    });
-}
-// -----------------------------------------------------------
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -388,7 +335,7 @@ if (pullDiv && appScroll) {
             atualizarInterface(); jogoInicializado = true;
         }
 
-           function exibirAnimacaoElo(infoElo, subiu) {
+        function exibirAnimacaoElo(infoElo, subiu) {
             const overlay = document.getElementById('elo-transition-overlay'); if(!overlay) return;
             const label = document.getElementById('elo-status-label');
             const text = document.getElementById('elo-ani-text');
@@ -455,31 +402,27 @@ if (pullDiv && appScroll) {
             const btnVLivre = document.getElementById('btnVideoLivre');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            if(btnV) btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
-            if(btnVXP) btnVXP.disabled = (acertosNoCiclo < 10);
-            if(btnVLivre) btnVLivre.disabled = false;
+            btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
+            btnVXP.disabled = (acertosNoCiclo < 10);
+            btnVLivre.disabled = false;
 
-            if(btnV) btnV.classList.toggle('active', !btnV.disabled);
-            if(btnVXP) btnVXP.classList.toggle('active', !btnVXP.disabled);
-            if(btnVLivre) btnVLivre.classList.add('active');
+            btnV.classList.toggle('active', !btnV.disabled);
+            btnVXP.classList.toggle('active', !btnVXP.disabled);
+            btnVLivre.classList.add('active');
             
-            if(aviso) {
-                if (acertosNoCiclo < 10) {
-                    aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
-                } else if (videosAssistidos < 3) {
-                    aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
-                } else {
-                    aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-                }
+            if (acertosNoCiclo < 10) {
+                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
+            } else if (videosAssistidos < 3) {
+                aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
+            } else {
+                aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
             }
         }
-
         function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
-        // Eventos dos botões
         if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio('moeda');
         if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
         if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
@@ -519,35 +462,111 @@ if (pullDiv && appScroll) {
         });
 
         async function finalizarRecompensa() {
-            if (!chaveSeguranca) { modal.style.display = 'none'; return; }
+            if (!chaveSeguranca) {
+                modal.style.display = 'none';
+                openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada. Assista o anúncio até o fim.");
+                return;
+            }
             chaveSeguranca = false;
             modal.style.display = 'none';
             let up = {}; let msg = "";
             const eloAntes = getEloInfo(pdlInterno).nome;
+            const centerW = window.innerWidth / 2;
+            const centerH = window.innerHeight / 2;
 
             if (tipoRecompensa === "moeda") {
                 up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
                 msg = "Você ganhou 500 moedas!";
+                showFloatingPDL("+500 Gold", "#c89b3c", centerW, centerH);
             } else if (tipoRecompensa === "pdl") {
                 up = { xp: increment(500), videosAssistidos: increment(1) };
                 msg = "Você ganhou 500 PDL!";
+                showFloatingPDL("+500 PDL", "#28a745", centerW, centerH);
             } else if (tipoRecompensa === "livre") {
                 up = { saldo: increment(10), xp: increment(100) };
-                msg = "Bônus: +10 Moedas e +100 PDL!";
+                msg = "Bônus Livre: +10 Moedas e +100 PDL!";
+                showFloatingPDL("+100 PDL", "#28a745", centerW, centerH);
             }
 
             if (tipoRecompensa !== "livre") {
                 const proxVideo = (videosAssistidos || 0) + 1;
-                if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; }
+                if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
             }
+            
             await updateDoc(userRef, up);
-            openModal("RECOMPENSA LIBERADA", msg);
+            
+            openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
+                const infoNovo = getEloInfo(pdlInterno);
+                if (infoNovo.nome !== eloAntes) {
+                    exibirAnimacaoElo(infoNovo, true);
+                }
+            });
         }
 
-        // PULL TO REFRESH USANDO O ID ANTIGO (main-content)
+        function carregarQuestao() {
+            const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
+            if(!c || !t) return;
+            if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+            if (bancoPerguntas.length === 0) { t.innerText = "A sincronizar questões..."; return; }
+            if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
+            if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
+            const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
+            let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
+            t.innerText = q.pergunta; c.innerHTML = "";
+            opts.forEach(o => {
+                const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
+                b.onclick = async () => {
+                    const eloAntesDoQuiz = getEloInfo(pdlInterno).nome;
+                    const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
+                    const rect = b.getBoundingClientRect();
+                    try {
+                        if (o.correta) {
+                            b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                            await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                        } else {
+                            b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                            let novoXP = Math.max(0, pdlInterno - 2); 
+                            await updateDoc(userRef, { xp: novoXP });
+                        }
+                    } catch (e) { console.log("Erro ao atualizar dados."); }
+                    finally { 
+                        setTimeout(() => {
+                            const infoNovo = getEloInfo(pdlInterno);
+                            if (infoNovo.nome !== eloAntesDoQuiz) exibirAnimacaoElo(infoNovo, (infoNovo.min > getEloInfo(pdlInterno).min));
+                            carregarQuestao();
+                        }, 1200); 
+                    }
+                };
+                c.appendChild(b);
+            });
+        }
+
+        window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
+
+        const btnResgate = document.getElementById('btnResgate');
+        if(btnResgate) {
+            btnResgate.onclick = async () => {
+                const chave = document.getElementById('chavePix').value.trim();
+                const saldoAtualNum = Number(goldDB);
+                if (saldoAtualNum < metaAtual || chave.length < 5) { openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); return; }
+                openModal("CONFIRMAR", `Deseja resgatar R$ ${valorReaisMeta} para: ${chave}?`, 'confirm', async () => {
+                    modal.style.display = 'none';
+                    try {
+                        const custoNum = Number(metaAtual);
+                        await addDoc(collection(db, "resgates"), {
+                            usuarioId: auth.currentUser.uid, chavePix: chave, valorGold: custoNum, goldAnterior: saldoAtualNum, 
+                            goldPosResgate: (saldoAtualNum - custoNum), valorReais: valorReaisMeta, status: "Pendente",
+                            data: new Date().toLocaleString('pt-BR'), timestamp: Date.now()
+                        });
+                        await updateDoc(userRef, { saldo: increment(-custoNum) });
+                        openModal(`<span style="color:var(--gold)">SOLICITAÇÃO ENVIADA!</span>`, `O envio pode demorar até <span style="color:var(--gold); font-weight:bold;">24h</span>!`, 'alert');
+                    } catch (e) { openModal("ERRO", "Falha ao processar."); }
+                });
+            };
+        }
         let sY = 0;
         const pullDiv = document.getElementById('pull-to-refresh');
-        const mainDiv = document.getElementById('main-content'); // IMPORTANTE: Voltei para o ID original
+        const mainDiv = document.getElementById('main-content');
         if(pullDiv && mainDiv) {
             window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
             window.addEventListener('touchmove', (e) => {
@@ -555,11 +574,11 @@ if (pullDiv && appScroll) {
                 if(window.scrollY === 0 && p > 0) {
                     const move = Math.min(p * 0.4, 70);
                     pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
+                    if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
                 }
             }, {passive:true});
             window.addEventListener('touchend', () => {
-                const m = new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42;
-                if (m >= 60) location.reload();
+                if (new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42 >= 60) location.reload();
                 else { pullDiv.style.transform = 'translateY(0)'; mainDiv.style.transform = 'translateY(0)'; }
             });
         }
