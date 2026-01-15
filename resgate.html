@@ -514,7 +514,6 @@
     const centerH = window.innerHeight / 2;
 
     if (tipoRecompensa === "moeda") {
-        // Valor alterado para 100 moedas
         up = { 
             saldo: increment(100), 
             videosAssistidos: increment(1), 
@@ -529,7 +528,6 @@
         showFloatingPDL("+500 PDL", "#28a745", centerW, centerH);
 
     } else if (tipoRecompensa === "livre") {
-        // Agora o 'livre' também incrementa totalVideosHoje para o limite 0/35
         up = { 
             saldo: increment(10), 
             xp: increment(100), 
