@@ -672,55 +672,26 @@ if (pullDiv && appScroll) {
 } // Fecha o if do userRef ou JogoInicializado
 
 // --- AGORA SIM ENTRA O CÓDIGO DO PULL TO REFRESH ---
-let startY = 0;
-const pullDiv = document.getElementById('pull-to-refresh');
-const appScroll = document.getElementById('app-scroll');
-const badge = pullDiv?.querySelector('.refresh-badge');
-
-if (pullDiv && appScroll) {
-    appScroll.addEventListener('touchstart', (e) => {
-        if (appScroll.scrollTop === 0) {
-            startY = e.touches[0].pageY;
+let sY = 0;
+        const pullDiv = document.getElementById('pull-to-refresh');
+        const mainDiv = document.getElementById('main-content');
+        if(pullDiv && mainDiv) {
+            window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
+            window.addEventListener('touchmove', (e) => {
+                const p = e.touches[0].pageY - sY;
+                if(window.scrollY === 0 && p > 0) {
+                    const move = Math.min(p * 0.4, 70);
+                    pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
+                    if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
+                }
+            }, {passive:true});
+            window.addEventListener('touchend', () => {
+                if (new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42 >= 60) location.reload();
+                else { pullDiv.style.transform = 'translateY(0)'; mainDiv.style.transform = 'translateY(0)'; }
+            });
         }
-    }, { passive: true });
-
-    appScroll.addEventListener('touchmove', (e) => {
-        if (appScroll.scrollTop !== 0) return;
-        const distance = e.touches[0].pageY - startY;
-        if (distance > 0) {
-            const move = Math.min(distance * 0.4, 70);
-            pullDiv.style.transform = `translateY(${move}px)`;
-            appScroll.style.transform = `translateY(${move}px)`;
-            if (badge) {
-                badge.innerText = move >= 60 ? "Solte para Recarregar" : "Puxe para Recarregar";
-            }
-        }
-    }, { passive: true });
-
-    appScroll.addEventListener('touchend', () => {
-        const style = window.getComputedStyle(pullDiv);
-        const matrix = new WebKitCSSMatrix(style.transform);
-        const currentMove = matrix.m42;
-        if (currentMove >= 60) {
-            location.reload();
-        } else {
-            pullDiv.style.transition = "transform 0.3s ease";
-            appScroll.style.transition = "transform 0.3s ease";
-            pullDiv.style.transform = 'translateY(0)';
-            appScroll.style.transform = 'translateY(0)';
-            if (badge) badge.innerText = "Puxe para Recarregar";
-            setTimeout(() => {
-                pullDiv.style.transition = "";
-                appScroll.style.transition = "";
-            }, 300);
-        }
-    });
-}
-// --- FIM DO JAVASCRIPT ---
-</script>
-
-<div id="footer-ad-container" style="all: initial !important; position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; height: 65px !important; background: #000000 !important; display: flex !important; justify-content: center !important; align-items: center !important; z-index: 2147483647 !important; border-top: 2px solid #c89b3c !important; box-shadow: 0 -2px 10px rgba(0,0,0,0.5) !important; pointer-events: auto !important; transform: none !important; -webkit-transform: none !important; contain: layout !important;">
-    <div style="all: initial; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+    </script>
+    <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
         <div id="adsterra-banner">
             <script type="text/javascript">
                 atOptions = { 'key' : '48065e37c41fa1904ce5bbacf7c25eb4', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -728,6 +699,5 @@ if (pullDiv && appScroll) {
             <script type="text/javascript" src="https://www.highperformanceformat.com/48065e37c41fa1904ce5bbacf7c25eb4/invoke.js"></script>
         </div>
     </div>
-</div>
 </body>
 </html>
