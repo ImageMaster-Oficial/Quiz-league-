@@ -383,15 +383,27 @@
             };
         }
 
+        // Variável de controle local para o cronômetro
+        let tempoCooldownLivre = 0;
+
         function atualizarInterface() {
             if(!document.getElementById('goldAmount')) return;
             document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
+            
+            // Atualiza o contador geral (se você ainda usar o ID limitDiario)
             document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
+            
+            // Atualiza o contador específico do Bônus Livre (0/35)
+            const displayLivre = document.getElementById('contLivreIndividual');
+            if(displayLivre) displayLivre.innerText = `${resgatesLivreHoje || 0}/35`;
+
             document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
+            
             const info = getEloInfo(pdlInterno);
             const eloBadge = document.getElementById('txtElo');
             eloBadge.innerText = info.nome; eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
+            
             const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
             document.getElementById('xpMiniFill').style.width = Math.min(percXP, 100) + "%";
             document.getElementById('xpMiniFill').style.backgroundColor = info.bar;
@@ -402,13 +414,16 @@
             const btnVLivre = document.getElementById('btnVideoLivre');
             const aviso = document.getElementById('avisoStatusQuiz');
             
+            // Regra: Bloqueia botão de moedas se atingir 35 no total hoje
             btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
             btnVXP.disabled = (acertosNoCiclo < 10);
-            btnVLivre.disabled = false;
+            
+            // Regra: Botão Livre bloqueia se atingir 35 OU se estiver no cooldown de 60s
+            btnVLivre.disabled = (tempoCooldownLivre > 0 || (resgatesLivreHoje || 0) >= 35);
 
             btnV.classList.toggle('active', !btnV.disabled);
             btnVXP.classList.toggle('active', !btnVXP.disabled);
-            btnVLivre.classList.add('active');
+            btnVLivre.classList.toggle('active', !btnVLivre.disabled);
             
             if (acertosNoCiclo < 10) {
                 aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
@@ -418,6 +433,7 @@
                 aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
             }
         }
+
         function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
@@ -428,6 +444,16 @@
         if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
         function iniciarFluxoAnuncio(tipo) {
+            // Verificação extra de segurança de limites antes de abrir o anúncio
+            if (tipo === 'moeda' && totalVideosHoje >= 35) {
+                openModal("LIMITE DIÁRIO", "Você já atingiu o limite de 35 resgates de moedas hoje.");
+                return;
+            }
+            if (tipo === 'livre' && (resgatesLivreHoje || 0) >= 35) {
+                openModal("LIMITE DIÁRIO", "Você já atingiu o limite de 35 bônus livres hoje.");
+                return;
+            }
+
             chaveSeguranca = false;
             tipoRecompensa = tipo; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
             if(intervaloAnuncio) clearInterval(intervaloAnuncio);
@@ -475,17 +501,22 @@
             const centerH = window.innerHeight / 2;
 
             if (tipoRecompensa === "moeda") {
-                up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-                msg = "Você ganhou 500 moedas!";
-                showFloatingPDL("+500 Gold", "#c89b3c", centerW, centerH);
+                // Atualizado para +100 moedas e contador totalVideosHoje
+                up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+                msg = "Você ganhou 100 moedas!";
+                showFloatingPDL("+100 Gold", "#c89b3c", centerW, centerH);
             } else if (tipoRecompensa === "pdl") {
                 up = { xp: increment(500), videosAssistidos: increment(1) };
                 msg = "Você ganhou 500 PDL!";
                 showFloatingPDL("+500 PDL", "#28a745", centerW, centerH);
             } else if (tipoRecompensa === "livre") {
-                up = { saldo: increment(10), xp: increment(100) };
+                // Adicionado contador individual de bônus livre
+                up = { saldo: increment(10), xp: increment(100), resgatesLivreHoje: increment(1) };
                 msg = "Bônus Livre: +10 Moedas e +100 PDL!";
                 showFloatingPDL("+100 PDL", "#28a745", centerW, centerH);
+                
+                // Inicia o Cooldown de 60 segundos
+                iniciarCooldownLivre();
             }
 
             if (tipoRecompensa !== "livre") {
@@ -501,6 +532,28 @@
                     exibirAnimacaoElo(infoNovo, true);
                 }
             });
+        }
+
+        // Função de contagem regressiva para o botão livre
+        function iniciarCooldownLivre() {
+            const btn = document.getElementById('btnVideoLivre');
+            tempoCooldownLivre = 60;
+            btn.disabled = true;
+            btn.classList.remove('active');
+            
+            const intervalo = setInterval(() => {
+                btn.innerText = `AGUARDE ${tempoCooldownLivre}s`;
+                tempoCooldownLivre--;
+                
+                if (tempoCooldownLivre < 0) {
+                    clearInterval(intervalo);
+                    tempoCooldownLivre = 0;
+                    btn.disabled = false;
+                    btn.classList.add('active');
+                    btn.innerText = "+10 MOEDAS / +100 PDL";
+                    atualizarInterface(); // Atualiza para checar se ainda tem limite diário
+                }
+            }, 1000);
         }
 
         function carregarQuestao() {
