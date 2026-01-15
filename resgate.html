@@ -618,25 +618,54 @@
                 });
             };
         }
-        let sY = 0;
-        const pullDiv = document.getElementById('pull-to-refresh');
-        const mainDiv = document.getElementById('main-content');
-        if(pullDiv && mainDiv) {
-            window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
-            window.addEventListener('touchmove', (e) => {
-                const p = e.touches[0].pageY - sY;
-                if(window.scrollY === 0 && p > 0) {
-                    const move = Math.min(p * 0.4, 70);
-                    pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
-                    if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
-                }
-            }, {passive:true});
-            window.addEventListener('touchend', () => {
-                if (new WebKitCSSMatrix(window.getComputedStyle(pullDiv).transform).m42 >= 60) location.reload();
-                else { pullDiv.style.transform = 'translateY(0)'; mainDiv.style.transform = 'translateY(0)'; }
-            });
+        <script>
+let startY = 0;
+
+const pullDiv = document.getElementById('pull-to-refresh');
+const appScroll = document.getElementById('app-scroll');
+const badge = pullDiv?.querySelector('.refresh-badge');
+
+if (pullDiv && appScroll) {
+
+    window.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) {
+            startY = e.touches[0].pageY;
         }
-    </script> 
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+        if (window.scrollY !== 0) return;
+
+        const distance = e.touches[0].pageY - startY;
+
+        if (distance > 0) {
+            const move = Math.min(distance * 0.4, 70);
+
+            pullDiv.style.transform = `translateY(${move}px)`;
+            appScroll.style.transform = `translateY(${move}px)`;
+
+            if (badge) {
+                badge.innerText = move >= 60
+                    ? "Solte para Recarregar"
+                    : "Puxe para Recarregar";
+            }
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+        const currentMove =
+            new WebKitCSSMatrix(getComputedStyle(pullDiv).transform).m42;
+
+        if (currentMove >= 60) {
+            location.reload();
+        } else {
+            pullDiv.style.transform = 'translateY(0)';
+            appScroll.style.transform = 'translateY(0)';
+            if (badge) badge.innerText = "Puxe para Recarregar";
+        }
+    });
+}
+</script>
     
     <div id="footer-ad-container" style="
     all: initial !important;
