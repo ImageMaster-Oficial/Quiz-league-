@@ -158,70 +158,60 @@
     <div id="pull-to-refresh"><div class="refresh-badge">Solte para Recarregar</div></div>
 
     <div class="app-container" id="main-content">
-    <div class="header-section">
-        <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
-        <a href="ranking.html" class="btn-ranking-top">🏆 VER RANKING GLOBAL</a>
-        <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
+        <div class="header-section">
+            <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
+            
+            <a href="ranking.html" class="btn-ranking-top">🏆 VER RANKING GLOBAL</a>
+            
+            <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
 
-        <div class="elo-container" id="btnVerElos" style="cursor:pointer;">
-            <span class="elo-badge" id="txtElo">...</span>
-            <div class="xp-mini-bar-bg">
-                <div id="xpMiniFill" class="xp-mini-bar-fill"></div>
+            <div class="elo-container" id="btnVerElos" style="cursor:pointer;">
+                <span class="elo-badge" id="txtElo">...</span>
+                <div class="xp-mini-bar-bg">
+                    <div id="xpMiniFill" class="xp-mini-bar-fill"></div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="hex-frame">
-        <div id="quizContent">
-            <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Autenticando...</p>
-            <div id="opcoes"></div>
-            <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
-        </div>
-        
-        <div class="video-buttons-container" style="width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
-            <button id="btnVideo" class="video-btn">
-                📺 +100 MOEDAS <br>
-                <span id="limitDiario" style="font-size: 0.6rem; color: var(--gold-bright);">0/35</span>
-            </button>
+ 
+       <div class="hex-frame">
+            <div id="quizContent">
+                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Autenticando...</p>
+                <div id="opcoes"></div>
+                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
+            </div>
             
-            <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
-                📺 +10 MOEDAS / +100 PDL <br>
-                <span id="contLivreIndividual" style="font-size: 0.6rem; color: #f0e6d2;">0/35</span>
-            </button>
+            <div style="text-align: center;">
+                <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário Moedas: <span id="limitDiario">0/35</span></span>
+                <div class="video-buttons-container">
+                    <button id="btnVideo" class="video-btn">📺 +500 MOEDAS <span>META 10 ACERTOS</span></button>
+                    
+                    <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
+                        📺 +10 MOEDAS <span>+100 PDL</span>
+                    </button>
+                    
+                    <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hex-frame">
+            <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;"><span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span></div>
             
-            <button id="btnVideoXP" class="video-btn">
-                📺 +500 PDL <br>
-                <span style="font-size: 0.6rem; opacity: 0.8;">META 10 ACERTOS</span>
-            </button>
+            <div class="resgate-selector">
+                <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
+                <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
+            </div>
+
+            <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
+            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
+            <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
         </div>
     </div>
-
-    <div class="hex-frame" style="margin-top: 20px;">
-        <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);">
-            <div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;">
-            <span id="txtMeta">Meta: 195k</span>
-            <span id="txtPorcentagem">0%</span>
-        </div>
-        
-        <div class="resgate-selector">
-            <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
-            <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
-            <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
-            <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
-            <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
-            <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
-        </div>
-
-        <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
-        <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
-        <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
-    </div>
-</div> <div id="banner-adsterra-fixo" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; justify-content: center; align-items: center;">
-    <div id="ad-placeholder" style="color: white; font-size: 10px;">ANÚNCIO AQUI</div>
-</div>
-    
       <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
@@ -393,82 +383,41 @@
             };
         }
 
-        let tempoCooldownLivre = 0; 
-        const LIMITE_DIARIO = 35;
-
         function atualizarInterface() {
-            // 1. PRIMEIRO O ELO E SALDO (Prioridade total para não sumir)
             if(!document.getElementById('goldAmount')) return;
-            
-            // Tratamento de erro para variáveis que podem vir vazias do banco
-            const vMoedasHoje = typeof totalVideosHoje !== 'undefined' ? totalVideosHoje : 0;
-            const vLivreHoje = typeof resgatesLivreHoje !== 'undefined' ? resgatesLivreHoje : 0;
-            const pAcertos = typeof acertosNoCiclo !== 'undefined' ? acertosNoCiclo : 0;
-            const vAssistidos = typeof videosAssistidos !== 'undefined' ? videosAssistidos : 0;
-
             document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            
-            // Lógica do Elo
-            const info = getEloInfo(pdlInterno);
-            const eloBadge = document.getElementById('txtElo');
-            if(eloBadge) {
-                eloBadge.innerText = info.nome; 
-                eloBadge.style.backgroundColor = info.bg; 
-                eloBadge.style.color = info.color;
-            }
-            
-            // Barras de Progresso
+            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
             document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
             document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
+            const info = getEloInfo(pdlInterno);
+            const eloBadge = document.getElementById('txtElo');
+            eloBadge.innerText = info.nome; eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
             const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
             document.getElementById('xpMiniFill').style.width = Math.min(percXP, 100) + "%";
             document.getElementById('xpMiniFill').style.backgroundColor = info.bar;
             document.getElementById('txtMeta').innerText = `Meta: ${metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k"}`;
-
-            // 2. DEPOIS OS CONTADORES DOS BOTÕES
-            const displayMoeda = document.getElementById('limitDiario');
-            if(displayMoeda) displayMoeda.innerText = `${vMoedasHoje}/35`;
             
-            const displayLivre = document.getElementById('contLivreIndividual');
-            if(displayLivre) displayLivre.innerText = `${vLivreHoje}/35`;
-
-            // 3. STATUS DOS BOTÕES E AVISOS
             const btnV = document.getElementById('btnVideo');
             const btnVXP = document.getElementById('btnVideoXP');
             const btnVLivre = document.getElementById('btnVideoLivre');
             const aviso = document.getElementById('avisoStatusQuiz');
             
-            if(btnV) {
-                btnV.disabled = (pAcertos < 10 || vMoedasHoje >= 35);
-                btnV.classList.toggle('active', !btnV.disabled);
-            }
+            btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
+            btnVXP.disabled = (acertosNoCiclo < 10);
+            btnVLivre.disabled = false;
+
+            btnV.classList.toggle('active', !btnV.disabled);
+            btnVXP.classList.toggle('active', !btnVXP.disabled);
+            btnVLivre.classList.add('active');
             
-            if(btnVXP) {
-                btnVXP.disabled = (pAcertos < 10);
-                btnVXP.classList.toggle('active', !btnVXP.disabled);
-            }
-            
-            if(btnVLivre) {
-                // Bloqueia por cooldown OU limite diário
-                btnVLivre.disabled = (tempoCooldownLivre > 0 || vLivreHoje >= 35);
-                btnVLivre.classList.toggle('active', !btnVLivre.disabled);
-                // Se estiver em cooldown, o texto é gerenciado pela função iniciarCooldownLivre
-                if(tempoCooldownLivre <= 0) {
-                    btnVLivre.innerHTML = `📺 +10 MOEDAS / +100 PDL <br><span id="contLivreIndividual" style="font-size: 0.6rem; color: #f0e6d2;">${vLivreHoje}/35</span>`;
-                }
-            }
-            
-            if(aviso) {
-                if (pAcertos < 10) {
-                    aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-pAcertos}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
-                } else if (vAssistidos < 3) {
-                    aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-vAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
-                } else {
-                    aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-                }
+            if (acertosNoCiclo < 10) {
+                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
+            } else if (videosAssistidos < 3) {
+                aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
+            } else {
+                aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
             }
         }
-
         function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
@@ -479,16 +428,6 @@
         if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
         function iniciarFluxoAnuncio(tipo) {
-            // Verificação extra de segurança de limites antes de abrir o anúncio
-            if (tipo === 'moeda' && totalVideosHoje >= 35) {
-                openModal("LIMITE DIÁRIO", "Você já atingiu o limite de 35 resgates de moedas hoje.");
-                return;
-            }
-            if (tipo === 'livre' && (resgatesLivreHoje || 0) >= 35) {
-                openModal("LIMITE DIÁRIO", "Você já atingiu o limite de 35 bônus livres hoje.");
-                return;
-            }
-
             chaveSeguranca = false;
             tipoRecompensa = tipo; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
             if(intervaloAnuncio) clearInterval(intervaloAnuncio);
@@ -536,22 +475,17 @@
             const centerH = window.innerHeight / 2;
 
             if (tipoRecompensa === "moeda") {
-                // Atualizado para +100 moedas e contador totalVideosHoje
-                up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-                msg = "Você ganhou 100 moedas!";
-                showFloatingPDL("+100 Gold", "#c89b3c", centerW, centerH);
+                up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+                msg = "Você ganhou 500 moedas!";
+                showFloatingPDL("+500 Gold", "#c89b3c", centerW, centerH);
             } else if (tipoRecompensa === "pdl") {
                 up = { xp: increment(500), videosAssistidos: increment(1) };
                 msg = "Você ganhou 500 PDL!";
                 showFloatingPDL("+500 PDL", "#28a745", centerW, centerH);
             } else if (tipoRecompensa === "livre") {
-                // Adicionado contador individual de bônus livre
-                up = { saldo: increment(10), xp: increment(100), resgatesLivreHoje: increment(1) };
+                up = { saldo: increment(10), xp: increment(100) };
                 msg = "Bônus Livre: +10 Moedas e +100 PDL!";
                 showFloatingPDL("+100 PDL", "#28a745", centerW, centerH);
-                
-                // Inicia o Cooldown de 60 segundos
-                iniciarCooldownLivre();
             }
 
             if (tipoRecompensa !== "livre") {
@@ -567,28 +501,6 @@
                     exibirAnimacaoElo(infoNovo, true);
                 }
             });
-        }
-
-        // Função de contagem regressiva para o botão livre
-        function iniciarCooldownLivre() {
-            const btn = document.getElementById('btnVideoLivre');
-            tempoCooldownLivre = 60;
-            btn.disabled = true;
-            btn.classList.remove('active');
-            
-            const intervalo = setInterval(() => {
-                btn.innerText = `AGUARDE ${tempoCooldownLivre}s`;
-                tempoCooldownLivre--;
-                
-                if (tempoCooldownLivre < 0) {
-                    clearInterval(intervalo);
-                    tempoCooldownLivre = 0;
-                    btn.disabled = false;
-                    btn.classList.add('active');
-                    btn.innerText = "+10 MOEDAS / +100 PDL";
-                    atualizarInterface(); // Atualiza para checar se ainda tem limite diário
-                }
-            }, 1000);
         }
 
         function carregarQuestao() {
