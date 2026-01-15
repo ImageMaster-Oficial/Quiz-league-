@@ -14,20 +14,9 @@
         
         html, body { 
             font-family: 'Segoe UI', sans-serif; 
-            /* Máscara negra (rgba 0,0,0,0.6) combinada com a imagem */
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                        url('admin-vertical.png') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--text); 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            min-height: 100vh; 
-            width: 100vw; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
+            background: radial-gradient(circle, #051421 0%, #010a13 100%);
+            color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; width: 100vw; overflow-y: auto; overflow-x: hidden; 
             overscroll-behavior-y: contain;
         }
 
@@ -180,121 +169,128 @@
                 <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
             </div>
             
-<div style="text-align: center;">
-    <div class="video-buttons-container">
-        <button id="btnVideo" class="video-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-            <span style="font-weight: bold;">📺 +100 MOEDAS</span>
-            <span id="contMoeda" style="font-size: 0.75rem; margin: 2px 0;">0/35</span>
-            <span style="font-size: 0.6rem; opacity: 0.8;">META 10 ACERTOS</span>
-        </button>
-        
-        <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-            <span style="font-weight: bold;">📺 +10 MOEDAS</span>
-            <span id="contLivre" style="font-size: 0.75rem; margin: 2px 0;">0/35</span>
-            <span id="timerLivre" style="font-size: 0.6rem; opacity: 0.8;">+100 PDL</span>
-        </button>
-        
-        <button id="btnVideoXP" class="video-btn" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-            <span style="font-weight: bold;">📺 +500 PDL</span>
-            <span style="font-size: 0.75rem; margin: 2px 0;">---</span>
-            <span style="font-size: 0.6rem; opacity: 0.8;">META 10 ACERTOS</span>
-        </button>
-    </div>
-</div>
+            <div style="text-align: center;">
+                <span style="font-size: 0.65rem; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 5px;">Limite Diário Moedas: <span id="limitDiario">0/35</span></span>
+                <div class="video-buttons-container">
+                    <button id="btnVideo" class="video-btn">📺 +500 MOEDAS <span>META 10 ACERTOS</span></button>
+                    
+                    <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
+                        📺 +10 MOEDAS <span>+100 PDL</span>
+                    </button>
+                    
+                    <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
+                </div>
+            </div>
+        </div>
 
-<div class="hex-frame">
-    <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);">
-        <div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div>
-    </div>
-    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;">
-        <span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span>
-    </div>
-    
-    <div class="resgate-selector">
-        <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
-        <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
-        <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
-        <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
-        <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
-        <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
-    </div>
-
-    <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
-    <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
-    <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-    let bancoPerguntas = [];
-    const firebaseConfig = { 
-        apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
-        authDomain: "quizlegends-f58fc.firebaseapp.com", 
-        projectId: "quizlegends-f58fc", 
-        storageBucket: "quizlegends-f58fc.firebasestorage.app", 
-        messagingSenderId: "1050463164018", 
-        appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const modal = document.getElementById('custom-modal');
-    const mTitle = document.getElementById('m-title');
-    const mContent = document.getElementById('modal-body-content');
-    const mFooter = document.getElementById('m-footer');
-
-    let tempoRestanteAnuncio = 15; 
-    let intervaloAnuncio = null;
-    let anuncioEmAndamento = false;
-    let cooldownLivre = false; // Controle da trava de 60s
-    let tipoRecompensa = "moeda"; 
-    let chaveSeguranca = false; 
-    const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
-
-    let metaAtual = 195000, valorReaisMeta = "0,50";
-    let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
-    let totalVideosLivreHoje = 0; // Novo contador para o botão livre
-    let pdlInterno = 0, userRef = null, carregadoPelaPrimeiraVez = false, ultimoEloNome = null;
-
-    // Configuração de Elos mantida para garantir funcionamento visual
-    const configElo = [];
-    const divisoes = ["V", "IV", "III", "II", "I"];
-    const coresElos = {
-        "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
-        "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
-        "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
-        "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
-        "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
-        "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
-    };
-
-    function gerarEloComDivisoes(nome, min, max) {
-        let passo = (max - min) / 5;
-        divisoes.forEach((div, i) => {
-            configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
-        });
-    }
-    gerarEloComDivisoes("FERRO", 0, 2500);
-    gerarEloComDivisoes("PRATA", 2500, 5000);
-    gerarEloComDivisoes("OURO", 5000, 15000);
-    gerarEloComDivisoes("PLATINA", 15000, 25000);
-    gerarEloComDivisoes("ESMERALDA", 25000, 40000);
-    gerarEloComDivisoes("DIAMANTE", 40000, 60000);
-    configElo.push({ nome: "MESTRE", min: 60000, max: 80000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
-    configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
-    configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
-
-    function getEloInfo(valorXP) { 
-        if (valorXP <= 0) return configElo[0];
-        return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
-    }
+        <div class="hex-frame">
+            <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;"><span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span></div>
             
-      // SEGUNDA PARTE: Lógica Completa, Quiz, Firebase e UX
+            <div class="resgate-selector">
+                <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
+                <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
+                <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
+            </div>
+
+            <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
+            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
+            <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
+        </div>
+    </div>
+      <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        let bancoPerguntas = [];
+        const firebaseConfig = { 
+            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
+            authDomain: "quizlegends-f58fc.firebaseapp.com", 
+            projectId: "quizlegends-f58fc", 
+            storageBucket: "quizlegends-f58fc.firebasestorage.app", 
+            messagingSenderId: "1050463164018", 
+            appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const modal = document.getElementById('custom-modal');
+        const mTitle = document.getElementById('m-title');
+        const mContent = document.getElementById('modal-body-content');
+        const mFooter = document.getElementById('m-footer');
+
+        let tempoRestanteAnuncio = 15; 
+        let intervaloAnuncio = null;
+        let anuncioEmAndamento = false;
+        let tipoRecompensa = "moeda"; 
+        let chaveSeguranca = false; // TRAVA DE SEGURANÇA
+        const linkAnuncioAdsterra = "https://www.effectivegatecpm.com/jt82yz19rk?key=427afd02462871777b7bf2742e74b44f";
+
+        let metaAtual = 195000, valorReaisMeta = "0,50";
+        let goldDB = 0, acertosNoCiclo, videosAssistidos, totalVideosHoje, jogoInicializado = false;
+        let pdlInterno = 0, userRef = null, carregadoPelaPrimeiraVez = false, ultimoEloNome = null, ultimoPdl = 0;
+
+        async function carregarBanco() {
+            const statusText = document.getElementById('perguntaTexto');
+            let tentativas = 0;
+            const maxTentativas = 8;
+            async function tentarImportar() {
+                try {
+                    const modulo = await import(`./pergunta.js?t=${Date.now()}`);
+                    bancoPerguntas = modulo.bancoPerguntas;
+                    if (carregadoPelaPrimeiraVez && bancoPerguntas.length > 0) carregarQuestao();
+                } catch (e) {
+                    tentativas++;
+                    if (tentativas < maxTentativas) {
+                        if(statusText) statusText.innerText = `Sincronizando sinal... (${tentativas})`;
+                        setTimeout(tentarImportar, 2500); 
+                    } else {
+                        if(statusText) statusText.innerText = "Erro: Wi-Fi instável. Tente usar Dados Móveis.";
+                    }
+                }
+            }
+            tentarImportar();
+        }
+        carregarBanco();
+
+        const configElo = [];
+        const divisoes = ["V", "IV", "III", "II", "I"];
+        const coresElos = {
+            "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
+            "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
+            "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
+            "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
+            "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
+            "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
+        };
+
+        function gerarEloComDivisoes(nome, min, max) {
+            let passo = (max - min) / 5;
+            divisoes.forEach((div, i) => {
+                configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
+            });
+        }
+        gerarEloComDivisoes("FERRO", 0, 2500);
+        gerarEloComDivisoes("PRATA", 2500, 5000);
+        gerarEloComDivisoes("OURO", 5000, 15000);
+        gerarEloComDivisoes("PLATINA", 15000, 25000);
+        gerarEloComDivisoes("ESMERALDA", 25000, 40000);
+        gerarEloComDivisoes("DIAMANTE", 40000, 60000);
+        configElo.push({ nome: "MESTRE", min: 60000, max: 80000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
+        configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
+        configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
+
+        function getEloInfo(valorXP) { 
+            if (valorXP <= 0) return configElo[0];
+            return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user) { 
                 userRef = doc(db, "usuarios", user.uid); 
@@ -314,63 +310,18 @@
         async function processarDadosUsuario(data) {
             const hoje = new Date().toLocaleDateString('pt-BR');
             if (data.ultimaDataAcesso !== hoje) { 
-                await updateDoc(userRef, { totalVideosHoje: 0, totalVideosLivreHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); 
+                await updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje }); 
                 return; 
             }
             goldDB = Number(data.saldo) || 0;
             acertosNoCiclo = data.acertos || 0;
             videosAssistidos = data.videosAssistidos || 0;
-            totalVideosHoje = data.totalVideosHoje || 0; 
-            totalVideosLivreHoje = data.totalVideosLivreHoje || 0; 
+            totalVideosHoje = data.totalVideosHoje || 0;
             pdlInterno = data.xp || 0;
             const infoNovoElo = getEloInfo(pdlInterno);
-            ultimoEloNome = infoNovoElo.nome;
+            
+            ultimoEloNome = infoNovoElo.nome; ultimoPdl = pdlInterno;
             atualizarInterface(); jogoInicializado = true;
-        }
-
-        function atualizarInterface() {
-            if(!document.getElementById('goldAmount')) return;
-            document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
-            document.getElementById('contMoeda').innerText = `${totalVideosHoje}/35`;
-            document.getElementById('contLivre').innerText = `${totalVideosLivreHoje}/35`;
-            document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
-            document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
-            
-            const info = getEloInfo(pdlInterno);
-            const eloBadge = document.getElementById('txtElo');
-            if(eloBadge){
-                eloBadge.innerText = info.nome; eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
-            }
-            
-            const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
-            const miniFill = document.getElementById('xpMiniFill');
-            if(miniFill) {
-                miniFill.style.width = Math.min(percXP, 100) + "%";
-                miniFill.style.backgroundColor = info.bar;
-            }
-
-            document.getElementById('txtMeta').innerText = `Meta: ${metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k"}`;
-            
-            const btnV = document.getElementById('btnVideo');
-            const btnVXP = document.getElementById('btnVideoXP');
-            const btnVLivre = document.getElementById('btnVideoLivre');
-            const aviso = document.getElementById('avisoStatusQuiz');
-            
-            btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
-            btnVXP.disabled = (acertosNoCiclo < 10);
-            btnVLivre.disabled = (totalVideosLivreHoje >= 35 || cooldownLivre);
-
-            btnV.classList.toggle('active', !btnV.disabled);
-            btnVXP.classList.toggle('active', !btnVXP.disabled);
-            btnVLivre.classList.toggle('active', !btnVLivre.disabled);
-            
-            if (acertosNoCiclo < 10) {
-                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
-            } else if (videosAssistidos < 3) {
-                aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
-            } else {
-                aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-            }
         }
 
         function exibirAnimacaoElo(infoElo, subiu) {
@@ -384,33 +335,94 @@
             setTimeout(() => { overlay.style.display = 'none'; }, 5000); 
         }
 
+        function openModal(title, text, type = 'alert', onConfirm = null) {
+            if(!modal) return;
+            mTitle.innerHTML = title; mContent.innerHTML = `<div class="modal-text">${text}</div>`;
+            mFooter.innerHTML = '';
+            if (type === 'confirm') {
+                const bC = document.createElement('button'); bC.className = 'modal-btn-confirm'; bC.innerText = 'CONFIRMAR'; bC.onclick = onConfirm;
+                const bX = document.createElement('button'); bX.className = 'option-btn'; bX.innerText = 'VOLTAR'; bX.onclick = () => modal.style.display = 'none';
+                mFooter.appendChild(bC); mFooter.appendChild(bX);
+            } else {
+                const bO = document.createElement('button'); bO.className = 'modal-btn-confirm'; bO.innerText = 'ENTENDI'; 
+                bO.onclick = () => { 
+                    if(!anuncioEmAndamento) {
+                        modal.style.display = 'none';
+                        if(onConfirm) onConfirm(); 
+                    } 
+                };
+                mFooter.appendChild(bO);
+            }
+            modal.style.display = 'flex';
+        }
+
+        if(document.getElementById('btnVerElos')) {
+            document.getElementById('btnVerElos').onclick = () => {
+                let htmlElos = `<div style="text-align:left; max-height:300px; overflow-y:auto; padding:5px;">`;
+                configElo.forEach(e => {
+                    const isAtual = ultimoEloNome === e.nome;
+                    htmlElos += `
+                        <div class="elo-list-item" style="background:${e.bg}; color:${e.color}; border: 2px solid ${isAtual ? '#fff' : 'transparent'}; margin-bottom:5px; padding:10px; border-radius:5px; display:flex; justify-content:space-between; font-weight:bold; font-size:0.8rem;">
+                            <span>${e.nome}</span>
+                            <span>${e.min.toLocaleString()} PDL</span>
+                        </div>`;
+                });
+                htmlElos += `</div>`;
+                openModal("TABELA DE ELOS", htmlElos);
+            };
+        }
+
+        function atualizarInterface() {
+            if(!document.getElementById('goldAmount')) return;
+            document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
+            document.getElementById('limitDiario').innerText = `${totalVideosHoje}/35`;
+            document.getElementById('progressBar').style.width = Math.min((goldDB/metaAtual)*100, 100) + "%";
+            document.getElementById('txtPorcentagem').innerText = Math.floor(Math.min((goldDB/metaAtual)*100, 100)) + "%";
+            const info = getEloInfo(pdlInterno);
+            const eloBadge = document.getElementById('txtElo');
+            eloBadge.innerText = info.nome; eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
+            const percXP = ((pdlInterno - info.min) / (info.max - info.min)) * 100;
+            document.getElementById('xpMiniFill').style.width = Math.min(percXP, 100) + "%";
+            document.getElementById('xpMiniFill').style.backgroundColor = info.bar;
+            document.getElementById('txtMeta').innerText = `Meta: ${metaAtual >= 1000000 ? (metaAtual/1000000).toFixed(1) + "M" : (metaAtual/1000).toFixed(0) + "k"}`;
+            
+            const btnV = document.getElementById('btnVideo');
+            const btnVXP = document.getElementById('btnVideoXP');
+            const btnVLivre = document.getElementById('btnVideoLivre');
+            const aviso = document.getElementById('avisoStatusQuiz');
+            
+            btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
+            btnVXP.disabled = (acertosNoCiclo < 10);
+            btnVLivre.disabled = false;
+
+            btnV.classList.toggle('active', !btnV.disabled);
+            btnVXP.classList.toggle('active', !btnVXP.disabled);
+            btnVLivre.classList.add('active');
+            
+            if (acertosNoCiclo < 10) {
+                aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
+            } else if (videosAssistidos < 3) {
+                aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS PARA LIBERAR O QUIZ</span>`;
+            } else {
+                aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
+            }
+        }
         function showFloatingPDL(text, color, x, y) {
             const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
-        function iniciarCooldownLivre() {
-            cooldownLivre = true;
-            let tempo = 60;
-            const timerLabel = document.getElementById('timerLivre');
-            const interval = setInterval(() => {
-                tempo--;
-                timerLabel.innerText = `AGUARDE ${tempo}s`;
-                if (tempo <= 0) {
-                    clearInterval(interval);
-                    cooldownLivre = false;
-                    timerLabel.innerText = "+100 PDL";
-                    atualizarInterface();
-                }
-            }, 1000);
-        }
+        if(document.getElementById('btnVideo')) document.getElementById('btnVideo').onclick = () => iniciarFluxoAnuncio('moeda');
+        if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
+        if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
         function iniciarFluxoAnuncio(tipo) {
-            if (tipo === 'livre' && cooldownLivre) return;
-            chaveSeguranca = false; tipoRecompensa = tipo; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
+            chaveSeguranca = false;
+            tipoRecompensa = tipo; anuncioEmAndamento = true; tempoRestanteAnuncio = 15;
             if(intervaloAnuncio) clearInterval(intervaloAnuncio);
             window.open(linkAnuncioAdsterra, '_blank');
-            openModal("VALIDANDO RECOMPENSA", `Permaneça no anúncio por 15s.<br><div class="contador-video" id="modalContador">15</div>`);
+            openModal("VALIDANDO RECOMPENSA", `Permaneça na página do anúncio.<br><div class="contador-video" id="modalContador">15</div>`, 'alert');
+            mFooter.innerHTML = '<span style="font-size:0.7rem; color:var(--gold-dark); font-weight:900;">CONTANDO...</span>';
             intervaloAnuncio = setInterval(() => {
                 if (document.visibilityState === 'hidden') {
                     tempoRestanteAnuncio--;
@@ -418,38 +430,74 @@
                     if(display) display.innerText = tempoRestanteAnuncio;
                 }
                 if (tempoRestanteAnuncio <= 0) { 
-                    clearInterval(intervaloAnuncio); anuncioEmAndamento = false; chaveSeguranca = true; finalizarRecompensa(); 
+                    clearInterval(intervaloAnuncio); 
+                    anuncioEmAndamento = false; 
+                    chaveSeguranca = true; 
+                    finalizarRecompensa(); 
                 }
             }, 1000);
         }
 
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
+                clearInterval(intervaloAnuncio); anuncioEmAndamento = false;
+                mTitle.innerText = "VALIDAÇÃO FALHOU!";
+                mContent.innerHTML = `<div class="modal-text" style="color:var(--wrong)">Você voltou muito cedo! Aguarde os 15 segundos no anúncio.</div>`;
+                mFooter.innerHTML = '';
+                const btnRetry = document.createElement('button'); btnRetry.className = 'modal-btn-confirm'; btnRetry.innerText = 'TENTAR NOVAMENTE';
+                btnRetry.onclick = () => { modal.style.display='none'; iniciarFluxoAnuncio(tipoRecompensa); };
+                mFooter.appendChild(btnRetry);
+            }
+        });
+
         async function finalizarRecompensa() {
-            if (!chaveSeguranca) return;
-            chaveSeguranca = false; modal.style.display = 'none';
-            let up = {};
+            if (!chaveSeguranca) {
+                modal.style.display = 'none';
+                openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada. Assista o anúncio até o fim.");
+                return;
+            }
+            chaveSeguranca = false;
+            modal.style.display = 'none';
+            let up = {}; let msg = "";
             const eloAntes = getEloInfo(pdlInterno).nome;
+            const centerW = window.innerWidth / 2;
+            const centerH = window.innerHeight / 2;
+
             if (tipoRecompensa === "moeda") {
-                up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+                up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+                msg = "Você ganhou 500 moedas!";
+                showFloatingPDL("+500 Gold", "#c89b3c", centerW, centerH);
             } else if (tipoRecompensa === "pdl") {
                 up = { xp: increment(500), videosAssistidos: increment(1) };
+                msg = "Você ganhou 500 PDL!";
+                showFloatingPDL("+500 PDL", "#28a745", centerW, centerH);
             } else if (tipoRecompensa === "livre") {
-                up = { saldo: increment(10), xp: increment(100), totalVideosLivreHoje: increment(1) };
-                iniciarCooldownLivre();
+                up = { saldo: increment(10), xp: increment(100) };
+                msg = "Bônus Livre: +10 Moedas e +100 PDL!";
+                showFloatingPDL("+100 PDL", "#28a745", centerW, centerH);
             }
+
             if (tipoRecompensa !== "livre") {
-                const prox = (videosAssistidos || 0) + 1;
-                if (prox >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
+                const proxVideo = (videosAssistidos || 0) + 1;
+                if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
             }
+            
             await updateDoc(userRef, up);
-            const infoNovo = getEloInfo(pdlInterno);
-            if (infoNovo.nome !== eloAntes) exibirAnimacaoElo(infoNovo, true);
+            
+            openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
+                const infoNovo = getEloInfo(pdlInterno);
+                if (infoNovo.nome !== eloAntes) {
+                    exibirAnimacaoElo(infoNovo, true);
+                }
+            });
         }
 
         function carregarQuestao() {
             const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
             if(!c || !t) return;
             if (videosAssistidos < 3 && acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
-            if (bancoPerguntas.length === 0) { t.innerText = "Sincronizando questões..."; return; }
+            if (bancoPerguntas.length === 0) { t.innerText = "A sincronizar questões..."; return; }
+            if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
             if (acertosNoCiclo >= 10) { t.innerText = ""; c.innerHTML = ""; return; }
             const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
             let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
@@ -457,16 +505,26 @@
             opts.forEach(o => {
                 const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
                 b.onclick = async () => {
+                    const eloAntesDoQuiz = getEloInfo(pdlInterno).nome;
                     const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
                     const rect = b.getBoundingClientRect();
-                    if (o.correta) {
-                        b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
-                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
-                    } else {
-                        b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
-                        await updateDoc(userRef, { xp: Math.max(0, pdlInterno - 2) });
+                    try {
+                        if (o.correta) {
+                            b.classList.add('btn-correct'); showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                            await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10) });
+                        } else {
+                            b.classList.add('btn-wrong'); showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                            let novoXP = Math.max(0, pdlInterno - 2); 
+                            await updateDoc(userRef, { xp: novoXP });
+                        }
+                    } catch (e) { console.log("Erro ao atualizar dados."); }
+                    finally { 
+                        setTimeout(() => {
+                            const infoNovo = getEloInfo(pdlInterno);
+                            if (infoNovo.nome !== eloAntesDoQuiz) exibirAnimacaoElo(infoNovo, (infoNovo.min > getEloInfo(pdlInterno).min));
+                            carregarQuestao();
+                        }, 1200); 
                     }
-                    setTimeout(() => carregarQuestao(), 1200);
                 };
                 c.appendChild(b);
             });
@@ -474,22 +532,30 @@
 
         window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
 
-        if(document.getElementById('btnResgate')) {
-            document.getElementById('btnResgate').onclick = async () => {
+        const btnResgate = document.getElementById('btnResgate');
+        if(btnResgate) {
+            btnResgate.onclick = async () => {
                 const chave = document.getElementById('chavePix').value.trim();
-                if (goldDB < metaAtual || chave.length < 5) { openModal("ERRO", "Saldo insuficiente ou chave inválida."); return; }
-                openModal("CONFIRMAR", `Resgatar R$ ${valorReaisMeta}?`, 'confirm', async () => {
+                const saldoAtualNum = Number(goldDB);
+                if (saldoAtualNum < metaAtual || chave.length < 5) { openModal("ERRO", "Saldo insuficiente ou chave Pix inválida."); return; }
+                openModal("CONFIRMAR", `Deseja resgatar R$ ${valorReaisMeta} para: ${chave}?`, 'confirm', async () => {
                     modal.style.display = 'none';
-                    await addDoc(collection(db, "resgates"), { usuarioId: auth.currentUser.uid, chavePix: chave, valorGold: metaAtual, valorReais: valorReaisMeta, status: "Pendente", data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() });
-                    await updateDoc(userRef, { saldo: increment(-metaAtual) });
-                    openModal("SUCESSO", "Solicitação enviada!");
+                    try {
+                        const custoNum = Number(metaAtual);
+                        await addDoc(collection(db, "resgates"), {
+                            usuarioId: auth.currentUser.uid, chavePix: chave, valorGold: custoNum, goldAnterior: saldoAtualNum, 
+                            goldPosResgate: (saldoAtualNum - custoNum), valorReais: valorReaisMeta, status: "Pendente",
+                            data: new Date().toLocaleString('pt-BR'), timestamp: Date.now()
+                        });
+                        await updateDoc(userRef, { saldo: increment(-custoNum) });
+                        openModal(`<span style="color:var(--gold)">SOLICITAÇÃO ENVIADA!</span>`, `O envio pode demorar até <span style="color:var(--gold); font-weight:bold;">24h</span>!`, 'alert');
+                    } catch (e) { openModal("ERRO", "Falha ao processar."); }
                 });
             };
         }
-
-        // Pull to Refresh
         let sY = 0;
-        const pullDiv = document.getElementById('pull-to-refresh'), mainDiv = document.getElementById('main-content');
+        const pullDiv = document.getElementById('pull-to-refresh');
+        const mainDiv = document.getElementById('main-content');
         if(pullDiv && mainDiv) {
             window.addEventListener('touchstart', (e) => { if(window.scrollY === 0) sY = e.touches[0].pageY; }, {passive:true});
             window.addEventListener('touchmove', (e) => {
@@ -497,6 +563,7 @@
                 if(window.scrollY === 0 && p > 0) {
                     const move = Math.min(p * 0.4, 70);
                     pullDiv.style.transform = `translateY(${move}px)`; mainDiv.style.transform = `translateY(${move}px)`;
+                    if(move >= 60) pullDiv.querySelector('.refresh-badge').innerText = "Solte para Recarregar";
                 }
             }, {passive:true});
             window.addEventListener('touchend', () => {
@@ -505,9 +572,11 @@
             });
         }
     </script>
-    <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
+    <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
         <div id="adsterra-banner">
-            <script type="text/javascript">atOptions = { 'key' : '48065e37c41fa1904ce5bbacf7c25eb4', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };</script>
+            <script type="text/javascript">
+                atOptions = { 'key' : '48065e37c41fa1904ce5bbacf7c25eb4', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            </script>
             <script type="text/javascript" src="https://www.highperformanceformat.com/48065e37c41fa1904ce5bbacf7c25eb4/invoke.js"></script>
         </div>
     </div>
