@@ -233,6 +233,53 @@
             appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
         };
 
+          // --- COLOQUE ISSO DENTRO DO SEU BLOCO DE SCRIPT EXISTENTE ---
+let startY = 0;
+const pullDiv = document.getElementById('pull-to-refresh');
+const appScroll = document.getElementById('app-scroll');
+const badge = pullDiv?.querySelector('.refresh-badge');
+
+if (pullDiv && appScroll) {
+    appScroll.addEventListener('touchstart', (e) => {
+        if (appScroll.scrollTop === 0) {
+            startY = e.touches[0].pageY;
+        }
+    }, { passive: true });
+
+    appScroll.addEventListener('touchmove', (e) => {
+        if (appScroll.scrollTop !== 0) return;
+        const distance = e.touches[0].pageY - startY;
+        if (distance > 0) {
+            const move = Math.min(distance * 0.4, 70);
+            pullDiv.style.transform = `translateY(${move}px)`;
+            appScroll.style.transform = `translateY(${move}px)`;
+            if (badge) {
+                badge.innerText = move >= 60 ? "Solte para Recarregar" : "Puxe para Recarregar";
+            }
+        }
+    }, { passive: true });
+
+    appScroll.addEventListener('touchend', () => {
+        const style = window.getComputedStyle(pullDiv);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        const currentMove = matrix.m42;
+        if (currentMove >= 60) {
+            location.reload();
+        } else {
+            pullDiv.style.transition = "transform 0.3s ease";
+            appScroll.style.transition = "transform 0.3s ease";
+            pullDiv.style.transform = 'translateY(0)';
+            appScroll.style.transform = 'translateY(0)';
+            if (badge) badge.innerText = "Puxe para Recarregar";
+            setTimeout(() => {
+                pullDiv.style.transition = "";
+                appScroll.style.transition = "";
+            }, 300);
+        }
+    });
+}
+// -----------------------------------------------------------
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -682,6 +729,8 @@ if (pullDiv && appScroll) {
         }
     });
 }
+
+</script>
 
 <div id="footer-ad-container" style="
     all: initial !important;
