@@ -374,33 +374,50 @@
         return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
     }
 
-    // --- 4. FLUXO DE RECOMPENSAS E ANÚNCIOS ---
-
-    function iniciarCooldownLivre(segundos) {
-        const tempoDesbloqueio = Date.now() + (segundos * 1000);
-        localStorage.setItem('proximoVideoLivre', tempoDesbloqueio);
-        executarCronometroVisual(segundos);
+function verificarCooldownLivre() {
+    const salvo = localStorage.getItem('proximoVideoLivre');
+    if (salvo) {
+        const agora = Date.now();
+        const tempoDesbloqueio = parseInt(salvo);
+        
+        if (tempoDesbloqueio > agora) {
+            const restante = Math.floor((tempoDesbloqueio - agora) / 1000);
+            executarCronometroVisual(restante);
+        } else {
+            localStorage.removeItem('proximoVideoLivre');
+        }
     }
+}
 
-    function executarCronometroVisual(segundos) {
-        const btn = document.getElementById('btnVideoLivre');
-        if (!btn) return;
-        cooldownLivreAtivo = true;
-        btn.disabled = true;
-        let restante = segundos;
-        const intervalo = setInterval(() => {
-            restante--;
-            btn.innerHTML = `AGUARDE <span style="color:#28a745; font-size: 0.7rem;">${restante}s</span>`;
-            if (restante <= 0) {
-                clearInterval(intervalo);
-                cooldownLivreAtivo = false;
-                localStorage.removeItem('proximoVideoLivre');
-                btn.disabled = false;
-                btn.classList.add('active');
-                btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
-            }
-        }, 1000);
-    }
+// Inicia o cooldown e salva o momento exato do desbloqueio
+function iniciarCooldownLivre(segundos) {
+    const tempoDesbloqueio = Date.now() + (segundos * 1000);
+    localStorage.setItem('proximoVideoLivre', tempoDesbloqueio);
+    executarCronometroVisual(segundos);
+}
+
+function executarCronometroVisual(segundos) {
+    const btn = document.getElementById('btnVideoLivre');
+    if (!btn) return;
+
+    cooldownLivreAtivo = true;
+    btn.disabled = true;
+    let restante = segundos;
+
+    const intervalo = setInterval(() => {
+        restante--;
+        btn.innerHTML = `AGUARDE <span style="color:#28a745">${restante}s</span>`;
+
+        if (restante <= 0) {
+            clearInterval(intervalo);
+            cooldownLivreAtivo = false;
+            localStorage.removeItem('proximoVideoLivre');
+            btn.disabled = false;
+            btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
+            if(typeof atualizarInterface === 'function') atualizarInterface();
+        }
+    }, 1000);
+}
 
     function iniciarFluxoAnuncio(tipo) {
         if (tipo === 'livre' && cooldownLivreAtivo) return;
