@@ -4,131 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ranking Semanal - Quiz Legends</title>
+    <link href="https://fonts.googleapis.com/css2?family=Beaufort+for+LoL:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #c89b3c;
-            --silver: #a5a9b4;
-            --bronze: #cd7f32;
-            --dark-bg: #09090b;
-            --card-bg: #121214;
-            --text: #f0f0f0;
+            --hextech-gold: #c89b3c;
+            --hextech-gold-light: #f0e6d2;
+            --hextech-blue: #0ac8b9;
+            --deep-blue: #091428;
+            --card-bg: rgba(1, 10, 19, 0.95);
+            --border-color: #1e2328;
         }
 
         body {
-            background-color: var(--dark-bg);
-            color: var(--text);
+            background-color: #010a13;
+            background-image: radial-gradient(circle at center, #051e3e 0%, #010a13 100%);
+            color: #f0e6d2;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
+        /* Moldura Externa Hextech */
         .ranking-container {
             width: 100%;
             max-width: 600px;
             background: var(--card-bg);
-            border: 1px solid #2a2a2e;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
+            border: 2px solid var(--hextech-gold);
+            border-image: linear-gradient(to bottom, #c89b3c, #785a28) 1;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(10, 200, 185, 0.1);
+            position: relative;
         }
 
         .ranking-header {
-            background: linear-gradient(180deg, #1a1a1c 0%, #121214 100%);
-            padding: 20px;
+            background: rgba(30, 35, 40, 0.8);
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 2px solid var(--gold);
+            border-bottom: 2px solid var(--hextech-gold);
+            position: relative;
+        }
+
+        .ranking-header h2 {
+            font-family: 'Beaufort for LoL', serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            color: var(--hextech-gold-light);
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
         }
 
         .ranking-item {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid #2a2a2e;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
             gap: 15px;
+            transition: background 0.3s;
         }
 
-        /* Espaço do Ícone */
+        .ranking-item:hover {
+            background: rgba(30, 35, 40, 0.6);
+        }
+
+        /* Estilo do Ícone com Borda Hextech */
+        .icon-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
         .user-icon {
-            width: 45px;
-            height: 45px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            border: 2px solid #3e3e42;
+            border: 2px solid var(--hextech-gold);
             object-fit: cover;
-            background: #252529;
+            box-shadow: 0 0 10px rgba(10, 200, 185, 0.3);
         }
 
         .pos-num {
-            width: 30px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #71717a;
+            width: 35px;
+            font-family: 'Beaufort for LoL', serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--hextech-blue);
         }
 
         .user-info {
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
         }
 
         .user-name {
-            font-weight: 600;
-            font-size: 1rem;
+            display: block;
+            font-weight: bold;
+            color: var(--hextech-gold-light);
+            font-size: 1.05rem;
+            text-transform: uppercase;
         }
 
         .user-pdl {
-            font-size: 0.85rem;
-            color: #28a745;
-            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--hextech-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Recompensas */
+        /* Recompensas Estilizadas */
         .reward-box {
             text-align: right;
-            min-width: 80px;
+            border-left: 1px solid var(--border-color);
+            padding-left: 15px;
         }
 
         .reward-gold {
-            color: var(--gold);
+            color: var(--hextech-gold);
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 4px;
+            gap: 6px;
         }
 
-        /* Destaques Top 3 */
-        .top-1 { background: rgba(200, 155, 60, 0.08); }
-        .top-1 .pos-num { color: var(--gold); font-size: 1.4rem; }
-        .top-1 .user-icon { border-color: var(--gold); }
-
-        .top-2 .pos-num { color: var(--silver); }
-        .top-3 .pos-num { color: var(--bronze); }
+        /* Destaques Especiais */
+        .top-1 { background: rgba(200, 155, 60, 0.1); }
+        .top-1 .pos-num { color: var(--hextech-gold); font-size: 1.6rem; }
+        .top-1 .user-name { color: #fff; }
 
         .btn-voltar {
-            margin-top: 25px;
+            margin-top: 30px;
             text-decoration: none;
-            color: #71717a;
-            font-size: 0.9rem;
-            transition: 0.3s;
+            color: var(--hextech-gold);
+            border: 1px solid var(--hextech-gold);
+            padding: 10px 25px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            background: rgba(200, 155, 60, 0.05);
         }
-        .btn-voltar:hover { color: var(--gold); }
+
+        .btn-voltar:hover {
+            background: var(--hextech-gold);
+            color: var(--deep-blue);
+            box-shadow: 0 0 15px var(--hextech-gold);
+        }
     </style>
 </head>
 <body>
 
-    <div class="ranking-header">
-        <h2 style="margin:0; color:var(--gold);">TOP LENDAS DA SEMANA</h2>
-        <p style="margin:5px 0 0; font-size:0.8rem; color:#71717a;">Reinicia em: <span id="timer-semanal">Domingo, 23:59</span></p>
-    </div>
-
-    <div class="ranking-container" id="ranking-lista">
+    <div class="ranking-container">
+        <div class="ranking-header">
+            <h2>Lendas do Quiz</h2>
+            <p style="margin:5px 0 0; font-size:0.75rem; color:var(--hextech-blue); letter-spacing: 1px;">TEMPORADA SEMANAL</p>
         </div>
 
-    <a href="index.html" class="btn-voltar">← Voltar para a Arena</a>
+        <div id="ranking-lista">
+            </div>
+    </div>
+
+    <a href="index.html" class="btn-voltar">Retornar à Base</a>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -146,12 +184,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Função para definir o prêmio em moedas baseado na posição
+        const ICONE_PADRAO = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+        const MOEDA_IMG = 'https://cdn-icons-png.flaticon.com/512/272/272525.png';
+
         function calcularPremio(pos) {
             if (pos === 1) return 5000;
             if (pos === 2) return 2500;
             if (pos === 3) return 1250;
-            if (pos <= 10) return 500;
             return 100;
         }
 
@@ -167,22 +206,23 @@
                 snapshot.forEach(doc => {
                     const user = doc.data();
                     const premio = calcularPremio(i);
-                    const foto = user.photoURL || 'https://via.placeholder.com/45?text=L'; // Placeholder se não tiver foto
+                    const foto = (user.photoURL && user.photoURL !== "") ? user.photoURL : ICONE_PADRAO;
 
                     html += `
                         <div class="ranking-item top-${i <= 3 ? i : 'out'}">
-                            <div class="pos-num">${i}º</div>
-                            <img src="${foto}" class="user-icon" alt="Avatar">
+                            <div class="pos-num">${i < 10 ? '0' + i : i}</div>
+                            <div class="icon-wrapper">
+                                <img src="${foto}" class="user-icon" onerror="this.src='${ICONE_PADRAO}'">
+                            </div>
                             <div class="user-info">
                                 <span class="user-name">${user.nome || 'Invocador'}</span>
-                                <span class="user-pdl">${user.xp || 0} PDL na Semana</span>
+                                <span class="user-pdl">${(user.xp || 0).toLocaleString()} PDL</span>
                             </div>
                             <div class="reward-box">
                                 <div class="reward-gold">
-                                    <span>+${premio}</span>
-                                    <img src="https://cdn-icons-png.flaticon.com/512/272/272525.png" width="14" alt="gold">
+                                    <span>${premio}</span>
+                                    <img src="${MOEDA_IMG}" width="16" alt="ouro">
                                 </div>
-                                <div style="font-size:0.7rem; color:#71717a;">Prêmio Est.</div>
                             </div>
                         </div>
                     `;
@@ -190,7 +230,7 @@
                 });
                 container.innerHTML = html;
             } catch (e) {
-                container.innerHTML = "<p style='padding:20px;'>Erro ao carregar ranking.</p>";
+                container.innerHTML = "<p style='padding:20px; text-align:center;'>Conexão com a rede interrompida.</p>";
             }
         }
 
