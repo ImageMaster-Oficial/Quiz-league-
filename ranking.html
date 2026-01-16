@@ -182,56 +182,43 @@
     function getEloInfo(xp) {
         let elo = { nome: "", arquivo: "" };
         
-        // Mantendo sua lógica de faixas de PDL
-        function getEloInfo(xp) {
-    let elo = { nome: "", arquivo: "" };
-    
-    // FERRO (0 a 2500)
-    if (xp < 2500) {
-        elo.nome = xp < 500 ? "Ferro V" : xp < 1000 ? "Ferro IV" : xp < 1500 ? "Ferro III" : xp < 2000 ? "Ferro II" : "Ferro I";
-        elo.arquivo = "ferro.png";
-    } 
-    // BRONZE (2500 a 5000)
-    else if (xp < 5000) {
-        elo.nome = xp < 3000 ? "Bronze V" : xp < 3500 ? "Bronze IV" : xp < 4000 ? "Bronze III" : xp < 4500 ? "Bronze II" : "Bronze I";
-        elo.arquivo = "bronze.png";
+        if (xp < 2500) {
+            elo.nome = xp < 500 ? "Ferro V" : xp < 1000 ? "Ferro IV" : xp < 1500 ? "Ferro III" : xp < 2000 ? "Ferro II" : "Ferro I";
+            elo.arquivo = "ferro.png";
+        } 
+        else if (xp < 5000) {
+            elo.nome = xp < 3000 ? "Bronze V" : xp < 3500 ? "Bronze IV" : xp < 4000 ? "Bronze III" : xp < 4500 ? "Bronze II" : "Bronze I";
+            elo.arquivo = "bronze.png";
+        }
+        else if (xp < 10000) {
+            elo.nome = xp < 6000 ? "Prata V" : xp < 7000 ? "Prata IV" : xp < 8000 ? "Prata III" : xp < 9000 ? "Prata II" : "Prata I";
+            elo.arquivo = "prata.png";
+        }
+        else if (xp < 20000) {
+            elo.nome = xp < 12000 ? "Ouro V" : xp < 14000 ? "Ouro IV" : xp < 16000 ? "Ouro III" : xp < 18000 ? "Ouro II" : "Ouro I";
+            elo.arquivo = "ouro.png";
+        }
+        else if (xp < 35000) {
+            elo.nome = xp < 23000 ? "Platina V" : xp < 26000 ? "Platina IV" : xp < 29000 ? "Platina III" : xp < 32000 ? "Platina II" : "Platina I";
+            elo.arquivo = "platina.png";
+        }
+        else if (xp < 50000) {
+            elo.nome = xp < 38000 ? "Esmeralda V" : xp < 41000 ? "Esmeralda IV" : xp < 44000 ? "Esmeralda III" : xp < 47000 ? "Esmeralda II" : "Esmeralda I";
+            elo.arquivo = "esmeralda.png";
+        }
+        else if (xp < 70000) {
+            elo.nome = xp < 54000 ? "Diamante V" : xp < 58000 ? "Diamante IV" : xp < 62000 ? "Diamante III" : xp < 66000 ? "Diamante II" : "Diamante I";
+            elo.arquivo = "diamante.png";
+        }
+        else if (xp < 90000) {
+            elo.nome = "Mestre"; elo.arquivo = "mestre.png";
+        } else if (xp < 120000) {
+            elo.nome = "Grão-Mestre"; elo.arquivo = "graomestre.png";
+        } else {
+            elo.nome = "Desafiante"; elo.arquivo = "desafiante.png";
+        }
+        return elo;
     }
-    // PRATA (5000 a 10000)
-    else if (xp < 10000) {
-        elo.nome = xp < 6000 ? "Prata V" : xp < 7000 ? "Prata IV" : xp < 8000 ? "Prata III" : xp < 9000 ? "Prata II" : "Prata I";
-        elo.arquivo = "prata.png";
-    }
-    // OURO (10000 a 20000)
-    else if (xp < 20000) {
-        elo.nome = xp < 12000 ? "Ouro V" : xp < 14000 ? "Ouro IV" : xp < 16000 ? "Ouro III" : xp < 18000 ? "Ouro II" : "Ouro I";
-        elo.arquivo = "ouro.png";
-    }
-    // PLATINA (20000 a 35000)
-    else if (xp < 35000) {
-        elo.nome = xp < 23000 ? "Platina V" : xp < 26000 ? "Platina IV" : xp < 29000 ? "Platina III" : xp < 32000 ? "Platina II" : "Platina I";
-        elo.arquivo = "platina.png";
-    }
-    // ESMERALDA (35000 a 50000)
-    else if (xp < 50000) {
-        elo.nome = xp < 38000 ? "Esmeralda V" : xp < 41000 ? "Esmeralda IV" : xp < 44000 ? "Esmeralda III" : xp < 47000 ? "Esmeralda II" : "Esmeralda I";
-        elo.arquivo = "esmeralda.png";
-    }
-    // DIAMANTE (50000 a 70000)
-    else if (xp < 70000) {
-        elo.nome = xp < 54000 ? "Diamante V" : xp < 58000 ? "Diamante IV" : xp < 62000 ? "Diamante III" : xp < 66000 ? "Diamante II" : "Diamante I";
-        elo.arquivo = "diamante.png";
-    }
-    // ELOS LENDÁRIOS
-    else if (xp < 90000) {
-        elo.nome = "Mestre"; elo.arquivo = "mestre.png";
-    } else if (xp < 120000) {
-        elo.nome = "Grão-Mestre"; elo.arquivo = "graomestre.png";
-    } else {
-        elo.nome = "Desafiante"; elo.arquivo = "desafiante.png";
-    }
-    
-    return elo;
-}
 
     async function carregarRanking() {
         try {
@@ -239,6 +226,7 @@
             const querySnapshot = await getDocs(q);
             const container = document.getElementById('lista-ranking');
             container.innerHTML = "";
+
             let posicao = 1;
 
             querySnapshot.forEach((doc) => {
@@ -266,10 +254,16 @@
                 container.appendChild(item);
                 posicao++;
             });
+
+            if (querySnapshot.empty) {
+                container.innerHTML = "<div class='loading'>Nenhum guerreiro encontrado.</div>";
+            }
         } catch (error) {
-            console.error(error);
+            console.error("Erro detalhado:", error);
+            document.getElementById('lista-ranking').innerHTML = "<div class='loading'>Erro ao carregar dados.</div>";
         }
     }
+
     carregarRanking();
 </script>
 </body>
