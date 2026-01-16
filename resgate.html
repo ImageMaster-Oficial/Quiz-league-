@@ -346,6 +346,32 @@
             setTimeout(() => { overlay.style.display = 'none'; }, 5000); 
         }
 
+        function iniciarCooldownLivre(segundos) {
+    const btn = document.getElementById('btnVideoLivre');
+    cooldownLivreAtivo = true;
+    btn.disabled = true;
+    btn.classList.remove('active');
+    btn.style.borderColor = "#555"; // Cor de desativado
+
+    let restante = segundos;
+    
+    const intervalo = setInterval(() => {
+        restante--;
+        // Atualiza o texto interno do botão com o contador verde
+        btn.innerHTML = `AGUARDE <span style="color:#28a745; font-size: 0.7rem;">${restante}s</span>`;
+
+        if (restante <= 0) {
+            clearInterval(intervalo);
+            cooldownLivreAtivo = false;
+            btn.disabled = false;
+            btn.classList.add('active');
+            btn.style.borderColor = "#28a745";
+            // Restaura o texto original
+            btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
+        }
+    }, 1000);
+}
+          
         function openModal(title, text, type = 'alert', onConfirm = null) {
             if(!modal) return;
             mTitle.innerHTML = title; mContent.innerHTML = `<div class="modal-text">${text}</div>`;
@@ -404,7 +430,13 @@
             
             btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
             btnVXP.disabled = (acertosNoCiclo < 10);
+            if (!cooldownLivreAtivo) {
             btnVLivre.disabled = false;
+            btnVLivre.classList.add('active');
+          } else {
+            btnVLivre.disabled = true;
+            btnVLivre.classList.remove('active');
+    }
 
             btnV.classList.toggle('active', !btnV.disabled);
             btnVXP.classList.toggle('active', !btnVXP.disabled);
