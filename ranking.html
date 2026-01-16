@@ -11,6 +11,7 @@
             --fundo-profundo: #010a13;
             --card-azul: #091428;
             --borda-item: rgba(200, 155, 60, 0.3);
+            --hextech-blue: #0ac8b9;
         }
 
         body {
@@ -23,7 +24,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
         }
 
@@ -46,7 +47,7 @@
         #lista-ranking {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .ranking-item {
@@ -54,29 +55,40 @@
             align-items: center;
             background: linear-gradient(90deg, var(--card-azul) 0%, rgba(1, 10, 19, 0.9) 100%);
             border: 1px solid var(--borda-item);
-            padding: 12px 15px;
+            padding: 8px 15px;
             border-radius: 4px;
-            transition: transform 0.2s;
+            transition: 0.2s;
             animation: slideIn 0.4s ease-out;
         }
 
         .ranking-item:hover {
             border-color: var(--ouro);
-            transform: scale(1.02);
-            background: var(--card-azul);
+            background: rgba(9, 20, 40, 0.8);
         }
 
         .posicao {
             font-weight: 900;
-            font-size: 1.1rem;
-            width: 45px;
+            width: 40px;
             color: var(--ouro-brilhante);
+            font-size: 1.1rem;
         }
 
-        .top-3 {
-            color: var(--ouro);
-            font-size: 1.3rem;
-            text-shadow: 0 0 5px var(--ouro);
+        /* Estilo do Emblema do Elo */
+        .elo-emblema {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+
+        /* Ícone do Usuário */
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1.5px solid var(--ouro);
+            margin-right: 12px;
+            object-fit: cover;
         }
 
         .nome {
@@ -85,30 +97,27 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 0.9rem;
-            margin: 0 10px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            color: #fff;
         }
 
-        .elo-badge {
-            font-size: 0.65rem;
-            font-weight: 900;
-            padding: 4px 8px;
-            border-radius: 3px;
-            text-transform: uppercase;
-            min-width: 90px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+        .info-pdl {
+            text-align: right;
+            min-width: 100px;
         }
 
         .pdl-valor {
-            font-size: 0.85rem;
-            color: var(--ouro-brilhante);
+            font-size: 0.9rem;
+            color: var(--hextech-blue);
             font-weight: bold;
-            margin-left: 15px;
-            min-width: 80px;
-            text-align: right;
+            display: block;
+        }
+
+        .elo-nome {
+            font-size: 0.6rem;
+            color: var(--ouro);
+            text-transform: uppercase;
+            display: block;
+            letter-spacing: 1px;
         }
 
         .btn-voltar {
@@ -122,7 +131,6 @@
             text-decoration: none;
             font-weight: bold;
             text-transform: uppercase;
-            cursor: pointer;
             transition: 0.3s;
         }
 
@@ -132,11 +140,11 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
+            from { opacity: 0; transform: translateX(-15px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        .loading { text-align: center; color: var(--ouro); margin-top: 50px; font-weight: bold; }
+        .loading { text-align: center; color: var(--ouro); margin-top: 50px; }
     </style>
 </head>
 <body>
@@ -169,41 +177,31 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const configElo = [];
-        const divisoes = ["V", "IV", "III", "II", "I"];
-        const coresElos = {
-            "FERRO": { bg: "#2a2a2a", color: "#8a8a8a" },
-            "PRATA": { bg: "#4a5d6e", color: "#e2e2e2" },
-            "OURO": { bg: "#7a5c12", color: "#f1d37e" },
-            "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7" },
-            "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc" },
-            "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7" }
-        };
+        const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
+        
+        // Base de URLs dos Emblemas Oficiais
+        const ELO_IMG_BASE = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblems/emblem-";
 
-        function gerarEloComDivisoes(nome, min, max) {
-            let passo = (max - min) / 5;
-            divisoes.forEach((div, i) => {
-                configElo.push({ nome: `${nome} ${div}`, min: min + (passo * i), max: min + (passo * (i + 1)), ...coresElos[nome] });
-            });
-        }
-        gerarEloComDivisoes("FERRO", 0, 2500);
-        gerarEloComDivisoes("PRATA", 2500, 5000);
-        gerarEloComDivisoes("OURO", 5000, 15000);
-        gerarEloComDivisoes("PLATINA", 15000, 25000);
-        gerarEloComDivisoes("ESMERALDA", 25000, 40000);
-        gerarEloComDivisoes("DIAMANTE", 40000, 60000);
-        configElo.push({ nome: "MESTRE", min: 60000, max: 80000, bg: "#5a1f7a", color: "#dfb3f7" });
-        configElo.push({ nome: "GRÃO-MESTRE", min: 80000, max: 100000, bg: "#7a1f1f", color: "#f7b3b3" });
-        configElo.push({ nome: "DESAFIANTE", min: 100000, max: 9999999, bg: "#1a4a5a", color: "#b3e7f7" });
+        const configElo = [
+            { nome: "Ferro", min: 0, img: ELO_IMG_BASE + "iron.png" },
+            { nome: "Bronze", min: 2500, img: ELO_IMG_BASE + "bronze.png" },
+            { nome: "Prata", min: 5000, img: ELO_IMG_BASE + "silver.png" },
+            { nome: "Ouro", min: 15000, img: ELO_IMG_BASE + "gold.png" },
+            { nome: "Platina", min: 25000, img: ELO_IMG_BASE + "platinum.png" },
+            { nome: "Esmeralda", min: 40000, img: ELO_IMG_BASE + "emerald.png" },
+            { nome: "Diamante", min: 60000, img: ELO_IMG_BASE + "diamond.png" },
+            { nome: "Mestre", min: 80000, img: ELO_IMG_BASE + "master.png" },
+            { nome: "Grão-Mestre", min: 100000, img: ELO_IMG_BASE + "grandmaster.png" },
+            { nome: "Desafiante", min: 150000, img: ELO_IMG_BASE + "challenger.png" }
+        ];
 
-        function getEloInfo(valorXP) { 
-            if (valorXP <= 0) return configElo[0];
-            return configElo.find(e => valorXP >= e.min && valorXP < e.max) || configElo[configElo.length - 1]; 
+        function getEloInfo(valorXP) {
+            // Encontra o elo mais alto que o jogador atingiu o mínimo de XP
+            return [...configElo].reverse().find(elo => valorXP >= elo.min) || configElo[0];
         }
 
         async function carregarRanking() {
             try {
-                // VOLTAMOS PARA A CONSULTA REAL: Ordenando por xp
                 const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
                 const querySnapshot = await getDocs(q);
                 
@@ -216,17 +214,19 @@
                     const usuario = doc.data();
                     const xpAtual = usuario.xp || 0;
                     const eloInfo = getEloInfo(xpAtual);
-                    const isTop3 = posicao <= 3 ? 'top-3' : '';
+                    const foto = (usuario.photoURL && usuario.photoURL !== "") ? usuario.photoURL : ICONE_PADRAO;
 
                     const item = document.createElement('div');
                     item.className = 'ranking-item';
                     item.innerHTML = `
-                        <div class="posicao ${isTop3}">${posicao}°</div>
-                        <div class="elo-badge" style="background:${eloInfo.bg}; color:${eloInfo.color}">
-                            ${eloInfo.nome}
-                        </div>
+                        <div class="posicao">${posicao}°</div>
+                        <img src="${eloInfo.img}" class="elo-emblema" title="${eloInfo.nome}">
+                        <img src="${foto}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
                         <div class="nome">${usuario.nome || "Invocador"}</div>
-                        <div class="pdl-valor">${Math.floor(xpAtual).toLocaleString()} <small>PDL</small></div>
+                        <div class="info-pdl">
+                            <span class="pdl-valor">${Math.floor(xpAtual).toLocaleString()} PDL</span>
+                            <span class="elo-nome">${eloInfo.nome}</span>
+                        </div>
                     `;
                     container.appendChild(item);
                     posicao++;
@@ -237,10 +237,9 @@
                 }
 
             } catch (error) {
-                console.error("Erro completo:", error);
-                // ESTA LINHA VAI TE DIZER O MOTIVO REAL NA TELA
+                console.error("Erro:", error);
                 document.getElementById('lista-ranking').innerHTML = 
-                    "<div style='color:orange; padding:20px;'>MOTIVO DO ERRO: <br><b>" + error.code + "</b></div>";
+                    "<div style='color:orange; padding:20px; text-align:center;'>Erro ao carregar o Reino.<br>Verifique sua conexão.</div>";
             }
         }
 
