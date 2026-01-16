@@ -7,96 +7,91 @@
     <style>
         :root {
             --ouro: #c89b3c;
-            --ouro-brilhante: #f0e6d2;
             --fundo-profundo: #010a13;
-            --card-azul: #091428;
-            --borda-item: rgba(200, 155, 60, 0.3);
             --hextech-blue: #0ac8b9;
         }
 
         body {
             background: radial-gradient(circle at center, #091428 0%, var(--fundo-profundo) 100%);
             color: white;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 850px;
+            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
         }
 
         .header-ranking {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--ouro);
-            padding-bottom: 10px;
         }
 
         .header-ranking h1 {
             color: var(--ouro);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            margin: 10px 0;
         }
 
         #lista-ranking {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .ranking-item {
             display: flex;
             align-items: center;
-            background: rgba(9, 20, 40, 0.9);
-            border: 1px solid var(--borda-item);
-            padding: 0 15px;
+            background: rgba(9, 20, 40, 0.95);
+            border: 1px solid rgba(200, 155, 60, 0.3);
+            padding: 0 10px;
             border-radius: 4px;
-            height: 75px;
-            overflow: hidden;
+            height: 65px;
+            justify-content: space-between; /* Garante que os PDL fiquem no canto */
         }
 
         .posicao {
             font-weight: 900;
-            color: var(--ouro-brilhante);
-            width: 40px;
+            color: #f0e6d2;
+            width: 25px;
             flex-shrink: 0;
-            text-align: left;
+            font-size: 0.9rem;
         }
 
         .coluna-elo {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            width: 90px;
+            width: 65px;
             flex-shrink: 0;
         }
 
         .elo-emblema {
-            width: 44px;
-            height: 44px;
+            width: 35px;
+            height: 35px;
             object-fit: contain;
         }
 
         .elo-nome-abaixo {
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             color: var(--ouro);
             text-transform: uppercase;
             font-weight: bold;
-            margin-top: -2px;
+            text-align: center;
         }
 
         .user-avatar {
-            width: 42px;
-            height: 42px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            border: 1.5px solid var(--ouro);
-            margin: 0 15px;
+            border: 1px solid var(--ouro);
+            margin: 0 8px;
             flex-shrink: 0;
         }
 
@@ -104,39 +99,36 @@
             flex-grow: 1;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            min-width: 100px; /* Garante espaço para o nome */
+            padding-right: 5px;
         }
 
-        /* COLUNA DOS PDL TRAVADA À DIREITA */
         .info-pdl {
-            width: 130px; 
             text-align: right;
-            flex-shrink: 0; 
-            display: block !important; /* Força a exibição */
+            flex-shrink: 0;
+            min-width: 85px; /* Tamanho fixo para os PDLs sempre aparecerem */
         }
 
         .pdl-valor {
-            font-size: 1.1rem;
+            font-size: 0.85rem;
             color: var(--hextech-blue);
             font-weight: bold;
-            display: inline-block;
         }
 
         .btn-voltar {
             display: block;
             width: fit-content;
-            margin: 30px auto;
-            border: 2px solid var(--ouro);
+            margin: 20px auto;
+            border: 1px solid var(--ouro);
             color: var(--ouro);
-            padding: 10px 30px;
+            padding: 8px 20px;
             text-decoration: none;
-            font-weight: bold;
             text-transform: uppercase;
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -146,9 +138,7 @@
         <div class="header-ranking">
             <h1>Ranking Global</h1>
         </div>
-
         <div id="lista-ranking"></div>
-
         <a href="resgate.html" class="btn-voltar">Voltar</a>
     </div>
 
