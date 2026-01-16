@@ -162,88 +162,120 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
-            authDomain: "quizlegends-f58fc.firebaseapp.com", 
-            projectId: "quizlegends-f58fc", 
-            storageBucket: "quizlegends-f58fc.firebasestorage.app", 
-            messagingSenderId: "1050463164018", 
-            appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
-        };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E", 
+        authDomain: "quizlegends-f58fc.firebaseapp.com", 
+        projectId: "quizlegends-f58fc", 
+        storageBucket: "quizlegends-f58fc.firebasestorage.app", 
+        messagingSenderId: "1050463164018", 
+        appId: "1:1050463164018:web:91de002b8afc8e678f54eb" 
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
-        
-        // Base de URLs dos Emblemas Oficiais
-        const ELO_IMG_BASE = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblems/emblem-";
+    const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
+    const ELO_IMG_BASE = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblems/emblem-";
 
-        const configElo = [
-            { nome: "Ferro", min: 0, img: ELO_IMG_BASE + "iron.png" },
-            { nome: "Bronze", min: 2500, img: ELO_IMG_BASE + "bronze.png" },
-            { nome: "Prata", min: 5000, img: ELO_IMG_BASE + "silver.png" },
-            { nome: "Ouro", min: 15000, img: ELO_IMG_BASE + "gold.png" },
-            { nome: "Platina", min: 25000, img: ELO_IMG_BASE + "platinum.png" },
-            { nome: "Esmeralda", min: 40000, img: ELO_IMG_BASE + "emerald.png" },
-            { nome: "Diamante", min: 60000, img: ELO_IMG_BASE + "diamond.png" },
-            { nome: "Mestre", min: 80000, img: ELO_IMG_BASE + "master.png" },
-            { nome: "Grão-Mestre", min: 100000, img: ELO_IMG_BASE + "grandmaster.png" },
-            { nome: "Desafiante", min: 150000, img: ELO_IMG_BASE + "challenger.png" }
-        ];
+    // FUNÇÃO QUE DEFINE ELO E DIVISÃO BASEADO NO XP (PDL)
+    function getEloInfo(xp) {
+        // FERRO (0 a 2500)
+        if (xp < 500) return { nome: "Ferro V", img: "iron" };
+        if (xp < 1000) return { nome: "Ferro IV", img: "iron" };
+        if (xp < 1500) return { nome: "Ferro III", img: "iron" };
+        if (xp < 2000) return { nome: "Ferro II", img: "iron" };
+        if (xp < 2500) return { nome: "Ferro I", img: "iron" };
 
-        function getEloInfo(valorXP) {
-            // Encontra o elo mais alto que o jogador atingiu o mínimo de XP
-            return [...configElo].reverse().find(elo => valorXP >= elo.min) || configElo[0];
-        }
+        // PRATA (2500 a 5000)
+        if (xp < 3000) return { nome: "Prata V", img: "silver" };
+        if (xp < 3500) return { nome: "Prata IV", img: "silver" };
+        if (xp < 4000) return { nome: "Prata III", img: "silver" };
+        if (xp < 4500) return { nome: "Prata II", img: "silver" };
+        if (xp < 5000) return { nome: "Prata I", img: "silver" };
 
-        async function carregarRanking() {
-            try {
-                const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
-                const querySnapshot = await getDocs(q);
+        // OURO (5000 a 15000)
+        if (xp < 7000) return { nome: "Ouro V", img: "gold" };
+        if (xp < 9000) return { nome: "Ouro IV", img: "gold" };
+        if (xp < 11000) return { nome: "Ouro III", img: "gold" };
+        if (xp < 13000) return { nome: "Ouro II", img: "gold" };
+        if (xp < 15000) return { nome: "Ouro I", img: "gold" };
+
+        // PLATINA (15000 a 25000)
+        if (xp < 17000) return { nome: "Platina V", img: "platinum" };
+        if (xp < 19000) return { nome: "Platina IV", img: "platinum" };
+        if (xp < 21000) return { nome: "Platina III", img: "platinum" };
+        if (xp < 23000) return { nome: "Platina II", img: "platinum" };
+        if (xp < 25000) return { nome: "Platina I", img: "platinum" };
+
+        // ESMERALDA (25000 a 40000)
+        if (xp < 28000) return { nome: "Esmeralda V", img: "emerald" };
+        if (xp < 31000) return { nome: "Esmeralda IV", img: "emerald" };
+        if (xp < 34000) return { nome: "Esmeralda III", img: "emerald" };
+        if (xp < 37000) return { nome: "Esmeralda II", img: "emerald" };
+        if (xp < 40000) return { nome: "Esmeralda I", img: "emerald" };
+
+        // DIAMANTE (40000 a 60000)
+        if (xp < 44000) return { nome: "Diamante V", img: "diamond" };
+        if (xp < 48000) return { nome: "Diamante IV", img: "diamond" };
+        if (xp < 52000) return { nome: "Diamante III", img: "diamond" };
+        if (xp < 56000) return { nome: "Diamante II", img: "diamond" };
+        if (xp < 60000) return { nome: "Diamante I", img: "diamond" };
+
+        // ELOS SUPERIORES
+        if (xp < 80000) return { nome: "Mestre", img: "master" };
+        if (xp < 100000) return { nome: "Grão-Mestre", img: "grandmaster" };
+        return { nome: "Desafiante", img: "challenger" };
+    }
+
+    async function carregarRanking() {
+        try {
+            const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
+            const querySnapshot = await getDocs(q);
+            
+            const container = document.getElementById('lista-ranking');
+            container.innerHTML = "";
+
+            let posicao = 1;
+
+            querySnapshot.forEach((doc) => {
+                const usuario = doc.data();
+                const xpAtual = usuario.xp || 0;
                 
-                const container = document.getElementById('lista-ranking');
-                container.innerHTML = "";
+                // Pega a info do elo (nome da divisão e slug da imagem)
+                const elo = getEloInfo(xpAtual);
+                const foto = (usuario.photoURL && usuario.photoURL !== "") ? usuario.photoURL : ICONE_PADRAO;
 
-                let posicao = 1;
+                const item = document.createElement('div');
+                item.className = 'ranking-item';
+                item.innerHTML = `
+                    <div class="posicao">${posicao}°</div>
+                    <img src="${ELO_IMG_BASE}${elo.img}.png" class="elo-emblema" title="${elo.nome}">
+                    <img src="${foto}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
+                    <div class="nome">${usuario.nome || "Invocador"}</div>
+                    <div class="info-pdl">
+                        <span class="pdl-valor">${Math.floor(xpAtual).toLocaleString()} PDL</span>
+                        <span class="elo-nome">${elo.nome}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+                posicao++;
+            });
 
-                querySnapshot.forEach((doc) => {
-                    const usuario = doc.data();
-                    const xpAtual = usuario.xp || 0;
-                    const eloInfo = getEloInfo(xpAtual);
-                    const foto = (usuario.photoURL && usuario.photoURL !== "") ? usuario.photoURL : ICONE_PADRAO;
-
-                    const item = document.createElement('div');
-                    item.className = 'ranking-item';
-                    item.innerHTML = `
-                        <div class="posicao">${posicao}°</div>
-                        <img src="${eloInfo.img}" class="elo-emblema" title="${eloInfo.nome}">
-                        <img src="${foto}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
-                        <div class="nome">${usuario.nome || "Invocador"}</div>
-                        <div class="info-pdl">
-                            <span class="pdl-valor">${Math.floor(xpAtual).toLocaleString()} PDL</span>
-                            <span class="elo-nome">${eloInfo.nome}</span>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                    posicao++;
-                });
-
-                if (querySnapshot.empty) {
-                    container.innerHTML = "<div class='loading'>Nenhum guerreiro encontrado.</div>";
-                }
-
-            } catch (error) {
-                console.error("Erro:", error);
-                document.getElementById('lista-ranking').innerHTML = 
-                    "<div style='color:orange; padding:20px; text-align:center;'>Erro ao carregar o Reino.<br>Verifique sua conexão.</div>";
+            if (querySnapshot.empty) {
+                container.innerHTML = "<div class='loading'>Nenhum guerreiro encontrado.</div>";
             }
-        }
 
-        carregarRanking();
+        } catch (error) {
+            console.error("Erro:", error);
+            document.getElementById('lista-ranking').innerHTML = 
+                "<div style='color:orange; padding:20px; text-align:center;'>Erro ao carregar o Reino.</div>";
+        }
+    }
+
+    carregarRanking();
     </script>
 </body>
 </html>
