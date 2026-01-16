@@ -178,73 +178,53 @@
     const db = getFirestore(app);
 
     const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
-    const ELO_IMG_BASE = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblems/emblem-";
 
-    // FUNÇÃO QUE DEFINE ELO E DIVISÃO BASEADO NO XP (PDL)
+    // Função com links diretos testados
     function getEloInfo(xp) {
-        // FERRO (0 a 2500)
-        if (xp < 500) return { nome: "Ferro V", img: "iron" };
-        if (xp < 1000) return { nome: "Ferro IV", img: "iron" };
-        if (xp < 1500) return { nome: "Ferro III", img: "iron" };
-        if (xp < 2000) return { nome: "Ferro II", img: "iron" };
-        if (xp < 2500) return { nome: "Ferro I", img: "iron" };
-
-        // PRATA (2500 a 5000)
-        if (xp < 3000) return { nome: "Prata V", img: "silver" };
-        if (xp < 3500) return { nome: "Prata IV", img: "silver" };
-        if (xp < 4000) return { nome: "Prata III", img: "silver" };
-        if (xp < 4500) return { nome: "Prata II", img: "silver" };
-        if (xp < 5000) return { nome: "Prata I", img: "silver" };
-
-        // OURO (5000 a 15000)
-        if (xp < 7000) return { nome: "Ouro V", img: "gold" };
-        if (xp < 9000) return { nome: "Ouro IV", img: "gold" };
-        if (xp < 11000) return { nome: "Ouro III", img: "gold" };
-        if (xp < 13000) return { nome: "Ouro II", img: "gold" };
-        if (xp < 15000) return { nome: "Ouro I", img: "gold" };
-
-        // PLATINA (15000 a 25000)
-        if (xp < 17000) return { nome: "Platina V", img: "platinum" };
-        if (xp < 19000) return { nome: "Platina IV", img: "platinum" };
-        if (xp < 21000) return { nome: "Platina III", img: "platinum" };
-        if (xp < 23000) return { nome: "Platina II", img: "platinum" };
-        if (xp < 25000) return { nome: "Platina I", img: "platinum" };
-
-        // ESMERALDA (25000 a 40000)
-        if (xp < 28000) return { nome: "Esmeralda V", img: "emerald" };
-        if (xp < 31000) return { nome: "Esmeralda IV", img: "emerald" };
-        if (xp < 34000) return { nome: "Esmeralda III", img: "emerald" };
-        if (xp < 37000) return { nome: "Esmeralda II", img: "emerald" };
-        if (xp < 40000) return { nome: "Esmeralda I", img: "emerald" };
-
-        // DIAMANTE (40000 a 60000)
-        if (xp < 44000) return { nome: "Diamante V", img: "diamond" };
-        if (xp < 48000) return { nome: "Diamante IV", img: "diamond" };
-        if (xp < 52000) return { nome: "Diamante III", img: "diamond" };
-        if (xp < 56000) return { nome: "Diamante II", img: "diamond" };
-        if (xp < 60000) return { nome: "Diamante I", img: "diamond" };
-
-        // ELOS SUPERIORES
-        if (xp < 80000) return { nome: "Mestre", img: "master" };
-        if (xp < 100000) return { nome: "Grão-Mestre", img: "grandmaster" };
-        return { nome: "Desafiante", img: "challenger" };
+        let elo = { nome: "", img: "" };
+        
+        if (xp < 2500) {
+            elo.nome = xp < 500 ? "Ferro V" : xp < 1000 ? "Ferro IV" : xp < 1500 ? "Ferro III" : xp < 2000 ? "Ferro II" : "Ferro I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/0/03/Season_2022_-_Iron.png";
+        } else if (xp < 5000) {
+            elo.nome = xp < 3000 ? "Prata V" : xp < 3500 ? "Prata IV" : xp < 4000 ? "Prata III" : xp < 4500 ? "Prata II" : "Prata I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/7/70/Season_2022_-_Silver.png";
+        } else if (xp < 15000) {
+            elo.nome = xp < 7000 ? "Ouro V" : xp < 9000 ? "Ouro IV" : xp < 11000 ? "Ouro III" : xp < 13000 ? "Ouro II" : "Ouro I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/c/c0/Season_2022_-_Gold.png";
+        } else if (xp < 25000) {
+            elo.nome = xp < 17000 ? "Platina V" : xp < 19000 ? "Platina IV" : xp < 21000 ? "Platina III" : xp < 23000 ? "Platina II" : "Platina I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/a/a2/Season_2022_-_Platinum.png";
+        } else if (xp < 40000) {
+            elo.nome = xp < 28000 ? "Esmeralda V" : xp < 31000 ? "Esmeralda IV" : xp < 34000 ? "Esmeralda III" : xp < 37000 ? "Esmeralda II" : "Esmeralda I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/5/5b/Season_2023_-_Emerald.png";
+        } else if (xp < 60000) {
+            elo.nome = xp < 44000 ? "Diamante V" : xp < 48000 ? "Diamante IV" : xp < 52000 ? "Diamante III" : xp < 56000 ? "Diamante II" : "Diamante I";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/9/96/Season_2022_-_Diamond.png";
+        } else if (xp < 80000) {
+            elo.nome = "Mestre";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/1/11/Season_2022_-_Master.png";
+        } else if (xp < 100000) {
+            elo.nome = "Grão-Mestre";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/7/7e/Season_2022_-_Grandmaster.png";
+        } else {
+            elo.nome = "Desafiante";
+            elo.img = "https://static.wikia.nocookie.net/leagueoflegends/images/5/5f/Season_2022_-_Challenger.png";
+        }
+        return elo;
     }
 
     async function carregarRanking() {
         try {
             const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
             const querySnapshot = await getDocs(q);
-            
             const container = document.getElementById('lista-ranking');
             container.innerHTML = "";
-
             let posicao = 1;
 
             querySnapshot.forEach((doc) => {
                 const usuario = doc.data();
                 const xpAtual = usuario.xp || 0;
-                
-                // Pega a info do elo (nome da divisão e slug da imagem)
                 const elo = getEloInfo(xpAtual);
                 const foto = (usuario.photoURL && usuario.photoURL !== "") ? usuario.photoURL : ICONE_PADRAO;
 
@@ -252,7 +232,7 @@
                 item.className = 'ranking-item';
                 item.innerHTML = `
                     <div class="posicao">${posicao}°</div>
-                    <img src="${ELO_IMG_BASE}${elo.img}.png" class="elo-emblema" title="${elo.nome}">
+                    <img src="${elo.img}" class="elo-emblema" alt="${elo.nome}">
                     <img src="${foto}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
                     <div class="nome">${usuario.nome || "Invocador"}</div>
                     <div class="info-pdl">
@@ -263,19 +243,11 @@
                 container.appendChild(item);
                 posicao++;
             });
-
-            if (querySnapshot.empty) {
-                container.innerHTML = "<div class='loading'>Nenhum guerreiro encontrado.</div>";
-            }
-
         } catch (error) {
-            console.error("Erro:", error);
-            document.getElementById('lista-ranking').innerHTML = 
-                "<div style='color:orange; padding:20px; text-align:center;'>Erro ao carregar o Reino.</div>";
+            console.error(error);
         }
     }
-
     carregarRanking();
-    </script>
+</script>
 </body>
 </html>
