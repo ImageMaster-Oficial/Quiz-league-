@@ -632,7 +632,7 @@ function executarCronometroVisual(segundos) {
         else if (videosAssistidos < 3) aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS</span>`;
         else aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
     }
-
+    
     function showFloatingPDL(text, color, x, y) {
         const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
         document.body.appendChild(el); setTimeout(() => el.remove(), 1000);
@@ -730,10 +730,8 @@ function executarCronometroVisual(segundos) {
 
                     if (!carregadoPelaPrimeiraVez) {
                         carregadoPelaPrimeiraVez = true;
-                        carregarBanco(); // Carrega as perguntas
-                        atualizarPodioSemanal(); // Carrega o ranking
-                        
-                        // --- AQUI ESTÁ A CHAMADA QUE VOCÊ PRECISAVA ---
+                        carregarBanco(); 
+                        atualizarPodioSemanal(); 
                         verificarCooldownLivre(); 
                     }
                 }
