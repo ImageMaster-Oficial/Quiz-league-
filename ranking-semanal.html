@@ -132,7 +132,9 @@
     <div class="ranking-container">
         <div class="ranking-header">
             <h2>Lendas do Quiz</h2>
-            <p style="margin:5px 0 0; font-size:0.75rem; color:var(--hextech-blue);">TEMPORADA SEMANAL</p>
+            <p style="margin:5px 0 0; font-size:0.75rem; color:var(--hextech-blue);">
+                REINICIA EM: <span id="timer-semanal" style="color: #fff; font-weight: bold;">0d 00h 00m 00s</span>
+            </p>
         </div>
         <div id="ranking-lista"></div>
     </div>
@@ -157,6 +159,35 @@
 
         const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
         const MOEDA_IMG = 'https://cdn-icons-png.flaticon.com/512/272/272525.png';
+
+        // Lógica do Timer
+        function atualizarTimer() {
+            const timerElement = document.getElementById('timer-semanal');
+            
+            function calcular() {
+                const agora = new Date();
+                const proximoDomingo = new Date();
+                
+                // Define para o próximo domingo (0) às 23:59:59
+                proximoDomingo.setDate(agora.getDate() + (7 - agora.getDay()) % 7);
+                proximoDomingo.setHours(23, 59, 59, 999);
+
+                // Se já passou de domingo 23:59, pula para o próximo domingo
+                if (agora > proximoDomingo) {
+                    proximoDomingo.setDate(proximoDomingo.getDate() + 7);
+                }
+
+                const diff = proximoDomingo - agora;
+                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutos = Math.floor((diff / 1000 / 60) % 60);
+                const segundos = Math.floor((diff / 1000) % 60);
+
+                timerElement.innerText = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
+            }
+            setInterval(calcular, 1000);
+            calcular();
+        }
 
         function calcularPremio(pos) {
             if (pos === 1) return 5000;
@@ -206,7 +237,9 @@
             }
         }
 
+        // Inicia tudo
         carregarRanking();
+        atualizarTimer();
     </script>
 </body>
 </html>
