@@ -158,63 +158,90 @@
     <div id="pull-to-refresh"><div class="refresh-badge">Solte para Recarregar</div></div>
 
     <div class="app-container" id="main-content">
-        <div class="header-section">
-            <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
-            
-            <a href="ranking.html" class="btn-ranking-top">🏆 VER RANKING GLOBAL</a>
-            
-            <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
+    <div class="header-section">
+        <div class="title-legends"><h1>QUIZ LEGENDS</h1></div>
+        
+        <a href="ranking.html" class="btn-ranking-top">🏆 VER RANKING GLOBAL</a>
+        
+        <div class="coin-badge">🟡 <span id="goldAmount">...</span></div>
 
-            <div class="elo-container" id="btnVerElos" style="cursor:pointer;">
-                <span class="elo-badge" id="txtElo">...</span>
-                <div class="xp-mini-bar-bg">
-                    <div id="xpMiniFill" class="xp-mini-bar-fill"></div>
-                </div>
+        <div class="elo-container" id="btnVerElos" style="cursor:pointer;">
+            <span class="elo-badge" id="txtElo">...</span>
+            <div class="xp-mini-bar-bg">
+                <div id="xpMiniFill" class="xp-mini-bar-fill"></div>
             </div>
-        </div>
- 
-       <div class="hex-frame">
-            <div id="quizContent">
-                <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Autenticando...</p>
-                <div id="opcoes"></div>
-                <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
-            </div>
-            
-            <div style="text-align: center;">
-                <div class="video-buttons-container">
-                    <button id="btnVideo" class="video-btn">
-                       📺 +100 MOEDAS 
-              <span id="txtMetaAcertos">META 10 ACERTOS</span>
-              <span id="txtLimiteBotao" style="font-size: 0.65rem; display: block; opacity: 0.8;">LIMITE DIÁRIO: 0/35</span>
-                    </button>
-                    
-                    <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
-                        📺 +10 MOEDAS <span>+100 PDL</span>
-                    </button>
-                    
-                    <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="hex-frame">
-            <div class="progress-bg" style="background: #000; height: 10px; border: 1px solid var(--gold-dark);"><div id="progressBar" style="background: var(--gold); height: 100%; width: 0%;"></div></div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gold); margin: 5px 0; font-weight: bold;"><span id="txtMeta">Meta: 195k</span><span id="txtPorcentagem">0%</span></div>
-            
-            <div class="resgate-selector">
-                <div class="resgate-opt active" onclick="setResgate(this, 195000, '0,50')">R$ 0,50</div>
-                <div class="resgate-opt" onclick="setResgate(this, 390000, '1,00')">R$ 1,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 1950000, '5,00')">R$ 5,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 39000000, '100,00')">R$ 100,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 78000000, '200,00')">R$ 200,00</div>
-                <div class="resgate-opt" onclick="setResgate(this, 117000000, '300,00')">R$ 300,00</div>
-            </div>
-
-            <input type="text" id="chavePix" placeholder="SUA CHAVE PIX">
-            <button class="option-btn" id="btnResgate" style="margin: 0; background: #091428; border-color: var(--gold); padding: 15px;">SOLICITAR RESGATE PIX</button>
-            <a href="politica.html" class="link-politica-quadro">Política de Privacidade</a>
         </div>
     </div>
+
+    <div class="hex-frame">
+        <div id="quizContent">
+            <p id="perguntaTexto" style="text-align: center; font-size: 1rem; color: var(--gold-bright); font-weight: bold; margin-bottom: 10px;">Autenticando...</p>
+            <div id="opcoes"></div>
+            <p id="avisoStatusQuiz" style="text-align: center; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 15px; text-transform: uppercase; line-height: 1.4;"></p>
+        </div>
+        
+        <div style="text-align: center;">
+            <div class="video-buttons-container">
+                <button id="btnVideo" class="video-btn">
+                   📺 +100 MOEDAS 
+                   <span id="txtMetaAcertos">META 10 ACERTOS</span>
+                   <span id="txtLimiteBotao" style="font-size: 0.65rem; display: block; opacity: 0.8;">LIMITE DIÁRIO: 0/35</span>
+                </button>
+                
+                <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
+                    📺 +10 MOEDAS <span>+100 PDL</span>
+                </button>
+                
+                <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="hex-frame">
+        <div id="containerRankingResumo" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid #c89b3c33; margin-bottom: 15px; text-align: center;">
+            <h4 style="color: var(--gold); font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase;">TOP 3 DA SEMANA</h4>
+            
+            <div style="display: flex; justify-content: space-around; align-items: flex-end; height: 75px; padding-bottom: 5px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 0.6rem; color: #C0C0C0; font-weight: bold;">2º</div>
+                    <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #C0C0C0; background: url('https://ddragon.leagueoflegends.com/cdn/13.24.1/img/profileicon/1.png'); background-size: cover;"></div>
+                    <small style="font-size: 0.6rem; color: #eee; margin-top: 3px;">Player B</small>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 1rem; margin-bottom: -5px;">👑</div>
+                    <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); background: url('https://ddragon.leagueoflegends.com/cdn/13.24.1/img/profileicon/0.png'); background-size: cover; box-shadow: 0 0 12px rgba(200, 155, 60, 0.5);"></div>
+                    <small style="font-size: 0.65rem; font-weight: bold; color: var(--gold); margin-top: 3px;">Lenda Atual</small>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 0.6rem; color: #cd7f32; font-weight: bold;">3º</div>
+                    <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #cd7f32; background: url('https://ddragon.leagueoflegends.com/cdn/13.24.1/img/profileicon/2.png'); background-size: cover;"></div>
+                    <small style="font-size: 0.6rem; color: #eee; margin-top: 3px;">Player C</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="resgate-selector" style="margin-bottom: 15px;">
+            <div class="resgate-opt active" onclick="abrirLoja()">🛒 LOJA</div>
+            <div class="resgate-opt" onclick="abrirInventario()">🎒 ITENS</div>
+            <div class="resgate-opt" onclick="abrirStatus()">🛡️ STATUS</div>
+            <div class="resgate-opt" onclick="abrirRanking()">🏆 RANKING</div>
+            <div class="resgate-opt" onclick="abrirPerfil()">👤 PERFIL</div>
+            <div class="resgate-opt" onclick="abrirConquistas()">🎁 BAÚS</div>
+        </div>
+
+        <button class="option-btn" onclick="abrirLoja()" style="margin: 0; background: linear-gradient(to bottom, #091428, #0a323c); border-color: var(--gold); padding: 12px; font-size: 0.8rem;">
+            ACESSAR LOJA HEXTECH
+        </button>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <a href="regras.html" class="link-politica-quadro" style="font-size: 0.6rem;">Como subir no Ranking?</a>
+            <a href="politica.html" class="link-politica-quadro" style="font-size: 0.6rem;">Privacidade</a>
+        </div>
+    </div>
+</div>
+    
       <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
