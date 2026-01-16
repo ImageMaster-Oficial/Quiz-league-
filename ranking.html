@@ -24,7 +24,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
         }
 
@@ -41,7 +41,6 @@
             letter-spacing: 2px;
             margin: 0;
             font-size: 1.5rem;
-            text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
         }
 
         #lista-ranking {
@@ -55,19 +54,18 @@
             align-items: center;
             background: rgba(9, 20, 40, 0.9);
             border: 1px solid var(--borda-item);
-            padding: 5px 15px;
+            padding: 0 15px;
             border-radius: 4px;
             height: 75px;
-            transition: 0.3s;
+            overflow: hidden;
         }
 
         .posicao {
             font-weight: 900;
             color: var(--ouro-brilhante);
-            width: 45px;
+            width: 40px;
             flex-shrink: 0;
-            font-size: 1.2rem;
-            text-align: center;
+            text-align: left;
         }
 
         .coluna-elo {
@@ -75,23 +73,22 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100px;
+            width: 90px;
             flex-shrink: 0;
         }
 
         .elo-emblema {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             object-fit: contain;
         }
 
         .elo-nome-abaixo {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--ouro);
             text-transform: uppercase;
             font-weight: bold;
             margin-top: -2px;
-            text-align: center;
         }
 
         .user-avatar {
@@ -101,32 +98,33 @@
             border: 1.5px solid var(--ouro);
             margin: 0 15px;
             flex-shrink: 0;
-            object-fit: cover;
         }
 
         .nome {
             flex-grow: 1;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            min-width: 150px; /* Garante que o nome tenha espaço */
+            min-width: 100px; /* Garante espaço para o nome */
         }
 
+        /* COLUNA DOS PDL TRAVADA À DIREITA */
         .info-pdl {
-            width: 140px; /* Espaço suficiente para "1.000.000 PDL" */
+            width: 130px; 
             text-align: right;
-            flex-shrink: 0;
+            flex-shrink: 0; 
+            display: block !important; /* Força a exibição */
         }
 
         .pdl-valor {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--hextech-blue);
             font-weight: bold;
-            white-space: nowrap;
+            display: inline-block;
         }
 
         .btn-voltar {
@@ -140,8 +138,6 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-
-        .loading { text-align: center; color: var(--ouro); padding: 50px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -151,9 +147,7 @@
             <h1>Ranking Global</h1>
         </div>
 
-        <div id="lista-ranking">
-            <div class="loading">Invocando Dados do Nexus...</div>
-        </div>
+        <div id="lista-ranking"></div>
 
         <a href="resgate.html" class="btn-voltar">Voltar</a>
     </div>
@@ -177,11 +171,9 @@
 
         function getEloInfo(xp) {
             let elo = { nome: "", arquivo: "" };
-
             if (xp >= 1000000) { elo.nome = "Desafiante"; elo.arquivo = "desafiante.png"; }
             else if (xp >= 600000) { elo.nome = "Grão-Mestre"; elo.arquivo = "graomestre.png"; }
             else if (xp >= 300000) { elo.nome = "Mestre"; elo.arquivo = "mestre.png"; }
-            
             else if (xp >= 150000) {
                 elo.arquivo = "diamante.png";
                 if (xp >= 270000) elo.nome = "Diamante I";
@@ -260,7 +252,7 @@
                     item.innerHTML = `
                         <div class="posicao">${posicao}°</div>
                         <div class="coluna-elo">
-                            <img src="${elo.arquivo}" class="elo-emblema" alt="${elo.nome}" onerror="this.src='${ICONE_PADRAO}'; this.style.borderRadius='50%';">
+                            <img src="${elo.arquivo}" class="elo-emblema" onerror="this.src='${ICONE_PADRAO}'">
                             <span class="elo-nome-abaixo">${elo.nome}</span>
                         </div>
                         <img src="${foto}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
@@ -272,9 +264,7 @@
                     container.appendChild(item);
                     posicao++;
                 });
-            } catch (error) {
-                console.error(error);
-            }
+            } catch (e) { console.error(e); }
         }
         carregarRanking();
     </script>
