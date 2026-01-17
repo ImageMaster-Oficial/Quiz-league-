@@ -11,7 +11,6 @@
             --card: #091428;
             --verde: #28a745;
             --erro: #ff4444;
-            --azul-escuro: #0a1428;
         }
 
         body { background: var(--fundo); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
@@ -25,8 +24,8 @@
         button.primary { background: var(--ouro); color: black; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
         /* Estilo do Painel de Reset */
-        .admin-card-header { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 12px; margin-bottom: 30px; }
-        .btn-reset { background: none; border: 1px solid var(--erro); color: var(--erro); padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%; margin-top: 10px; }
+        .admin-card-header { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
+        .btn-reset { background: none; border: 1px solid var(--erro); color: var(--erro); padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.3s; }
         .btn-reset:hover { background: var(--erro); color: white; }
 
         .pedido-card { background: var(--card); border: 1px solid var(--ouro); padding: 20px; border-radius: 12px; margin-bottom: 25px; animation: slideIn 0.3s ease-out; }
@@ -61,11 +60,11 @@
     </div>
 
     <div id="painel_conteudo">
-        <h2>Painel Admin <button id="btn_sair" style="background:none; border:none; color:#888; cursor:pointer; font-size: 14px;">Sair</button></h2>
+        <h2>Painel Admin <button id="btn_sair" style="background:none; border:none; color:#888; cursor:pointer; font-size:14px;">Sair</button></h2>
 
         <div class="admin-card-header">
-            <strong style="color: var(--ouro); font-size: 14px;">🏆 TEMPORADA SEMANAL</strong>
-            <p style="font-size: 12px; color: #aaa; margin: 5px 0;">Zere o ranking semanal para todos os jogadores para iniciar uma nova semana de competição.</p>
+            <strong style="color: var(--ouro); font-size: 14px;">🏆 GERENCIAR TEMPORADA</strong>
+            <p style="font-size: 12px; color: #aaa; margin: 5px 0;">Isso zerará o PDL Semanal de todos os jogadores.</p>
             <button class="btn-reset" onclick="resetarRankingSemanal()">ZERAR RANKING SEMANAL</button>
         </div>
 
@@ -76,7 +75,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, getDoc, deleteDoc, query, orderBy, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, deleteDoc, query, orderBy, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
@@ -110,24 +109,27 @@
 
         document.getElementById('btn_sair').onclick = () => signOut(auth).then(() => location.reload());
 
-        // FUNÇÃO PARA ZERAR RANKING SEMANAL
+        // FUNÇÃO DE RESET ATUALIZADA (SEM ERROS)
         window.resetarRankingSemanal = async () => {
-            if (!confirm("⚠️ ATENÇÃO: Isso vai zerar o ranking semanal de TODOS os jogadores. Deseja continuar?")) return;
+            if (!confirm("⚠️ ATENÇÃO: Deseja zerar o ranking semanal de TODOS?")) return;
 
             try {
                 const querySnapshot = await getDocs(collection(db, "usuarios"));
-                const batch = writeBatch(db);
+                let contador = 0;
 
-                querySnapshot.forEach((doc) => {
-                    batch.update(doc.ref, { pdlSemanal: 0 });
+                // Cria um array de promessas para atualizar todos ao mesmo tempo
+                const promessas = querySnapshot.docs.map(async (usuario) => {
+                    const userRef = doc(db, "usuarios", usuario.id);
+                    await updateDoc(userRef, { pdlSemanal: 0 });
+                    contador++;
                 });
 
-                await batch.commit();
-                alert("Temporada resetada! Todos os jogadores agora têm 0 PDL Semanal.");
+                await Promise.all(promessas);
+                alert("Sucesso! " + contador + " jogadores voltaram para 0 PDL.");
                 location.reload();
             } catch (e) {
                 console.error(e);
-                alert("Erro ao resetar ranking.");
+                alert("Erro ao zerar: " + e.message);
             }
         };
 
@@ -146,48 +148,23 @@
                 snapshot.forEach(async (pedido) => {
                     const data = pedido.data();
                     const id = pedido.id;
-                    const saldoAntigo = Number(data.goldAnterior) || 0;
-                    const custo = Number(data.valorGold) || 0;
-                    const saldoFinal = Number(data.goldPosResgate) || (saldoAntigo - custo);
-                    const isSuspeito = saldoAntigo < custo;
-
                     const card = document.createElement('div');
-                    card.className = `pedido-card ${isSuspeito ? 'blink-alerta' : ''}`;
+                    card.className = `pedido-card`;
                     card.innerHTML = `
                         <span class="timestamp">📅 ${data.data || 'Agora'}</span>
                         <div class="info">
-                            <b style="color:var(--ouro)">USUÁRIO:</b> <span id="nome_${id}">Carregando nome...</span><br>
-                            <small style="color:#666">ID: ${data.usuarioId}</small>
-                            
+                            <b style="color:var(--ouro)">USUÁRIO:</b> <span id="nome_${id}">Buscando...</span><br>
                             <div class="pix-container" onclick="navigator.clipboard.writeText('${data.chavePix}'); alert('PIX Copiado!')">
-                                <span class="copy-label">CLIQUE PARA COPIAR</span>
                                 <span class="pix-text">${data.chavePix}</span>
                             </div>
-
                             <span class="valor-txt">R$ ${data.valorReais}</span>
-                            
-                            <div class="status-box ${isSuspeito ? 'alerta-fraude' : ''}">
-                                <strong>📊 Auditoria de Saldo:</strong><br>
-                                • Saldo Inicial: ${saldoAntigo.toLocaleString()} moedas<br>
-                                • Custo Saque: -${custo.toLocaleString()} moedas<br>
-                                • Saldo Final: ${saldoFinal.toLocaleString()} moedas<br>
-                                ${isSuspeito ? '<br><strong style="color:var(--erro)">⚠️ ALERTA: SALDO INSUFICIENTE!</strong>' : ''}
-                            </div>
                         </div>
                         <button class="btn-pago" onclick="confirmarPagamento('${id}')">MARCAR COMO PAGO</button>
                     `;
                     container.appendChild(card);
 
-                    try {
-                        const userDoc = await getDoc(doc(db, "usuarios", data.usuarioId));
-                        if (userDoc.exists()) {
-                            document.getElementById(`nome_${id}`).innerText = userDoc.data().nome || "Sem Nome";
-                        } else {
-                            document.getElementById(`nome_${id}`).innerText = "Usuário não encontrado";
-                        }
-                    } catch (e) {
-                        document.getElementById(`nome_${id}`).innerText = "Erro ao buscar nome";
-                    }
+                    const userDoc = await getDoc(doc(db, "usuarios", data.usuarioId));
+                    if (userDoc.exists()) document.getElementById(`nome_${id}`).innerText = userDoc.data().nome;
                 });
             });
         }
