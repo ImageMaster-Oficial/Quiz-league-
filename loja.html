@@ -31,7 +31,7 @@
             align-items: center;
             border-bottom: 2px solid var(--ouro);
             padding-bottom: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .header-loja h1 {
@@ -55,6 +55,37 @@
             gap: 10px;
         }
 
+        /* MENU DE CATEGORIAS */
+        .menu-categorias {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover { color: var(--ouro-claro); }
+
+        .tab-btn.active {
+            color: var(--ouro);
+            border-bottom: 2px solid var(--ouro);
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
+        }
+
+        /* GRID E CARDS */
         .grid-loja {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -137,6 +168,7 @@
             cursor: not-allowed;
         }
 
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -202,6 +234,12 @@
         </div>
     </div>
 
+    <div class="menu-categorias">
+        <button class="tab-btn active" onclick="filtrarCategoria('icones', this)">Ícones</button>
+        <button class="tab-btn" onclick="filtrarCategoria('itens', this)">Itens</button>
+        <button class="tab-btn" onclick="filtrarCategoria('moedas', this)">Moedas</button>
+    </div>
+
     <div class="grid-loja" id="grid-itens"></div>
 
     <div class="modal-overlay" id="modal-compra">
@@ -232,20 +270,24 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Caminho atualizado com acento em "ícones"
         const BASE_URL_IMG = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
 
+        // Itens organizados por categoria
         const itens = [
-            { id: "aatrox_comum", nome: "Aatrox", preco: 5000, raridade: "comum", img: "aatrox-comum.png" },
-            { id: "aatrox_raro", nome: "Aatrox Caçador de Almas", preco: 25000, raridade: "raro", img: "aatrox-raro.png" },
-            { id: "aatrox_epico", nome: "Aatrox Vitorioso", preco: 50000, raridade: "epico", img: "aatrox-epico.png" },
-            { id: "ahri_comum", nome: "Ahri", preco: 5000, raridade: "comum", img: "ahri-comum.png" },
-            { id: "ahri_raro", nome: "Ahri Raposa Flamejante", preco: 25000, raridade: "raro", img: "ahri-raro.png" },
-            { id: "ahri_epico", nome: "Ahri K/DA", preco: 50000, raridade: "epico", img: "ahri-epico.png" }
+            { id: "aatrox_comum", cat: "icones", nome: "Aatrox", preco: 5000, raridade: "comum", img: "aatrox-comum.png" },
+            { id: "aatrox_raro", cat: "icones", nome: "Aatrox Caçador de Almas", preco: 25000, raridade: "raro", img: "aatrox-raro.png" },
+            { id: "aatrox_epico", cat: "icones", nome: "Aatrox Vitorioso", preco: 50000, raridade: "epico", img: "aatrox-epico.png" },
+            { id: "ahri_comum", cat: "icones", nome: "Ahri", preco: 5000, raridade: "comum", img: "ahri-comum.png" },
+            { id: "ahri_raro", cat: "icones", nome: "Ahri Raposa Flamejante", preco: 25000, raridade: "raro", img: "ahri-raro.png" },
+            { id: "ahri_epico", cat: "icones", nome: "Ahri K/DA", preco: 50000, raridade: "epico", img: "ahri-epico.png" },
+            
+            // Itens de exemplo para as outras categorias (vazio por enquanto se preferir)
+            { id: "multiplicador_xp", cat: "itens", nome: "Bônus de XP 2x", preco: 2000, raridade: "raro", img: "bonus-xp.png" }
         ];
 
         let saldoGlobal = 0;
         let meusItens = [];
+        let categoriaAtual = 'icones'; // Categoria padrão ao abrir
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -263,10 +305,30 @@
             }
         });
 
+        // Função global para trocar de aba
+        window.filtrarCategoria = (categoria, elemento) => {
+            categoriaAtual = categoria;
+            
+            // Atualiza botões
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            elemento.classList.add('active');
+            
+            renderLoja();
+        };
+
         function renderLoja() {
             const grid = document.getElementById('grid-itens');
             grid.innerHTML = "";
-            itens.forEach(item => {
+
+            // Filtra os itens antes de mostrar
+            const itensFiltrados = itens.filter(item => item.cat === categoriaAtual);
+
+            if (itensFiltrados.length === 0) {
+                grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5;'>Nenhum item disponível nesta categoria ainda.</p>";
+                return;
+            }
+
+            itensFiltrados.forEach(item => {
                 const jaPossui = meusItens.includes(item.id);
                 const podeComprar = saldoGlobal >= item.preco;
                 grid.innerHTML += `
