@@ -492,22 +492,22 @@
 
     // --- 4. RECOMPENSAS E ANÚNCIOS ---
 
-let processandoRecompensa = false; // Trava essencial adicionada aqui
+let processandoRecompensa = false; 
 
 async function finalizarRecompensa() {
-    // 1. Verificações de segurança imediatas
+    // Bloqueia múltiplas execuções simultâneas
     if (!chaveSeguranca || processandoRecompensa) return;
     
-    processandoRecompensa = true; // Ativa o cadeado
-    chaveSeguranca = false;      // Desliga a chave
-    
+    processandoRecompensa = true;
+    chaveSeguranca = false; 
+
     if(modal) modal.style.display = 'none';
     
     let up = {}; 
     let msg = "";
     const eloAntes = getEloInfo(pdlInterno).nome;
 
-    // 2. Definição dos valores (usando as variáveis do seu banco)
+    // Definição das recompensas
     if (tipoRecompensa === "moeda") { 
         up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) }; 
         msg = "Ganhou 100 moedas!"; 
@@ -522,8 +522,7 @@ async function finalizarRecompensa() {
         iniciarCooldownLivre(120); 
     }
 
-    // 3. Lógica de reset do ciclo (após 3 vídeos, volta pro quiz)
-    // Usamos videosAssistidos + 1 porque o incremento no banco ainda não foi processado localmente
+    // Reset do ciclo após 3 vídeos
     if (tipoRecompensa !== "livre" && (videosAssistidos + 1) >= 3) { 
         up.acertos = 0; 
         up.videosAssistidos = 0; 
@@ -532,17 +531,73 @@ async function finalizarRecompensa() {
 
     try {
         await updateDoc(userRef, up);
-        
         openModal("SUCESSO", msg, 'alert', () => {
             const infoNovo = getEloInfo(pdlInterno);
             if (infoNovo.nome !== eloAntes) exibirAnimacaoElo(infoNovo, true);
         });
     } catch (e) {
-        console.error("Erro ao salvar recompensa:", e);
+        console.error("Erro ao salvar:", e);
     } finally {
-        // 4. Libera a trava após um tempo para o próximo anúncio
+        // Libera para o próximo anúncio após 2 segundos
         setTimeout(() => { processandoRecompensa = false; }, 2000);
     }
+}
+
+function iniciarFluxoAnuncio(tipo) {
+    if (tipo !== 'livre' && acertosNoCiclo < 10) {
+        openModal("BLOQUEADO", "Você precisa de 10 acertos no quiz para liberar este anúncio.", "alert");
+        return;
+    }
+
+    if (tipo === 'livre' && cooldownLivreAtivo) return;
+    if (processandoRecompensa) return; 
+
+    tipoRecompensa = tipo;  
+    anuncioEmAndamento = true;  
+    tempoRestanteAnuncio = 15;
+    chaveSeguranca = false; 
+
+    window.open(linkAnuncioAdsterra, '_blank');
+    
+    // Modal com contador e instrução
+    openModal("VALIDANDO ANÚNCIO",  
+        `Fique no anúncio para validar:<br><br>
+        <div id="modalContador" style="font-size:30px; color:var(--gold); font-weight:bold;">15</div>`,  
+        'alert'
+    );
+
+    if (typeof intervaloAnuncio !== 'undefined') clearInterval(intervaloAnuncio);
+
+    intervaloAnuncio = setInterval(() => {
+        // Só conta se estiver fora da aba (no anúncio)
+        if (document.visibilityState === 'hidden') {
+            tempoRestanteAnuncio--;
+        } else {
+            // Se ele voltou pro app antes do tempo
+            if (tempoRestanteAnuncio > 0 && tempoRestanteAnuncio < 15) {
+                clearInterval(intervaloAnuncio);
+                anuncioEmAndamento = false;
+                
+                // MENSAGEM DE ERRO COM BOTÃO DE RE-TENTAR
+                openModal("AVISO", 
+                    `Você voltou muito rápido! Aguarde os 15 segundos no anúncio.<br><br>
+                    <button onclick="iniciarFluxoAnuncio('${tipo}')" class="modal-btn-confirm">ASSISTIR NOVO ANÚNCIO</button>`, 
+                    'alert'
+                );
+                return;
+            }
+        }
+        
+        const display = document.getElementById('modalContador');
+        if(display) display.innerText = tempoRestanteAnuncio;
+
+        if (tempoRestanteAnuncio <= 0) {
+            clearInterval(intervaloAnuncio);
+            anuncioEmAndamento = false;
+            chaveSeguranca = true; 
+            finalizarRecompensa();  
+        }
+    }, 1000);
 }
 
 function iniciarFluxoAnuncio(tipo) {
