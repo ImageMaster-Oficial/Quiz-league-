@@ -109,12 +109,12 @@
 
         document.getElementById('btn_sair').onclick = () => signOut(auth).then(() => location.reload());
 
-        // FUNÇÃO DE RESET COM PAGAMENTO AUTOMÁTICO
+        // FUNÇÃO DE RESET CORRIGIDA: Paga um por um em ordem para evitar erros de posição
         window.resetarRankingSemanal = async () => {
             if (!confirm("⚠️ ATENÇÃO: Deseja pagar as recompensas e zerar o ranking de todos os jogadores agora?")) return;
 
             try {
-                // 1. Puxa os jogadores ordenados por PDL Semanal (do maior para o menor)
+                // 1. Puxa os jogadores ordenados por PDL Semanal do maior para o menor
                 const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"));
                 const querySnapshot = await getDocs(q);
                 
@@ -123,38 +123,37 @@
                     return;
                 }
 
-                let posicao = 1;
+                let contadorPosicao = 1;
                 let premiadosCount = 0;
 
-                // 2. Mapeia as promessas de atualização
-                const promessas = querySnapshot.docs.map(async (usuarioDoc) => {
+                // 2. Loop Sequencial (for...of) para garantir que a posição mude corretamente
+                for (const usuarioDoc of querySnapshot.docs) {
                     const userRef = doc(db, "usuarios", usuarioDoc.id);
                     const dados = usuarioDoc.data();
-                    
-                    // Só processa se o jogador tiver pelo menos 1 PDL
-                    if ((dados.pdlSemanal || 0) > 0) {
-                        // Calcula o prêmio baseado na posição
-                        let premio = 100; // Valor para quem não é Top 3
-                        if (posicao === 1) premio = 5000;
-                        else if (posicao === 2) premio = 2500;
-                        else if (posicao === 3) premio = 1250;
+                    const pdlAtual = dados.pdlSemanal || 0;
 
-                        // 3. Atualiza: Dá as moedas E zera o PDL
+                    if (pdlAtual > 0) {
+                        // Calcula o prêmio baseado na posição exata atual do contador
+                        let premio = 100; // Valor padrão
+                        if (contadorPosicao === 1) premio = 5000;
+                        else if (contadorPosicao === 2) premio = 2500;
+                        else if (contadorPosicao === 3) premio = 1250;
+
+                        // 3. Atualiza o banco de dados: Incrementa saldo e Zera o PDL
                         await updateDoc(userRef, {
                             saldo: increment(premio),
                             pdlSemanal: 0
                         });
                         
                         premiadosCount++;
-                        posicao++;
+                        contadorPosicao++; // Só aumenta a posição após confirmar o pagamento do atual
                     } else {
-                        // Se o jogador tem 0 PDL, apenas garante que o campo está resetado
+                        // Se o jogador não pontuou, apenas garante que o campo está em 0
                         await updateDoc(userRef, { pdlSemanal: 0 });
                     }
-                });
+                }
 
-                await Promise.all(promessas);
-                alert(`Sucesso! ${premiadosCount} jogadores foram premiados e o ranking foi reiniciado.`);
+                alert(`Sucesso! ${premiadosCount} jogadores foram premiados corretamente e o ranking foi reiniciado.`);
                 location.reload();
             } catch (e) {
                 console.error("Erro no processamento:", e);
