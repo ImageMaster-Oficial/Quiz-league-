@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Hextech - Quiz Legends</title>
+    <style>
+        :root {
+            --ouro: #c89b3c;
+            --ouro-claro: #f0e6d2;
+            --fundo: #010a13;
+            --card-bg: rgba(9, 20, 40, 0.9);
+            --comum: #808080;
+            --raro: #00cfbc;
+            --epico: #a335ee;
+            --lendario: #ff8000;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0a323c 0%, #010a13 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header-loja {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--ouro);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .header-loja h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            background: linear-gradient(to bottom, var(--ouro-claro), var(--ouro));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .saldo-box {
+            background: #091428;
+            padding: 8px 15px;
+            border: 1px solid var(--ouro);
+            border-radius: 4px;
+            color: var(--ouro);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: inset 0 0 10px rgba(200,155,60,0.2);
+        }
+
+        .grid-loja {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* CARD DO ITEM */
+        .item-card {
+            background: var(--card-bg);
+            border: 1px solid #1e2328;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+        }
+
+        .item-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--ouro);
+            background: rgba(10, 50, 60, 0.8);
+        }
+
+        /* SISTEMA DE BORDAS VIA CSS */
+        .icon-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .img-campeao {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* A "Moldura" gerada por CSS */
+        .moldura {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            z-index: 2;
+            box-sizing: border-box;
+        }
+
+        /* RARIDADES ESTILIZADAS */
+        .raro .moldura { 
+            border-color: var(--raro); 
+            box-shadow: 0 0 15px var(--raro), inset 0 0 10px var(--raro);
+        }
+        .epico .moldura { 
+            border-color: var(--epico); 
+            box-shadow: 0 0 20px var(--epico), inset 0 0 15px var(--epico);
+            animation: pulse-epico 2s infinite;
+        }
+        .comum .moldura { 
+            border-color: var(--comum);
+            opacity: 0.6;
+        }
+
+        @keyframes pulse-epico {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .item-nome {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .raridade-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .comum .raridade-label { color: var(--comum); }
+        .raro .raridade-label { color: var(--raro); }
+        .epico .raridade-label { color: var(--epico); }
+
+        .btn-comprar {
+            background: linear-gradient(to bottom, #c89b3c, #785a28);
+            border: 1px solid var(--ouro-claro);
+            color: black;
+            padding: 10px;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            clip-path: polygon(15% 0, 85% 0, 100% 50%, 85% 100%, 15% 100%, 0 50%);
+            transition: 0.2s;
+        }
+
+        .btn-comprar:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+        }
+
+        .btn-comprar:disabled {
+            background: #1e2328;
+            color: #555;
+            border-color: #333;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-loja">
+        <h1>Loja Hextech</h1>
+        <div class="saldo-box">
+            <span>🟡</span>
+            <span id="saldo-valor">...</span>
+        </div>
+    </div>
+
+    <div class="grid-loja" id="grid-itens">
+        </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4dm0KoyJswhyCY7tgbF4D2nmuZl84X8E",
+            authDomain: "quizlegends-f58fc.firebaseapp.com",
+            projectId: "quizlegends-f58fc",
+            storageBucket: "quizlegends-f58fc.firebasestorage.app",
+            messagingSenderId: "1050463164018",
+            appId: "1:1050463164018:web:91de002b8afc8e678f54eb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // LINKS REAIS DAS SUAS IMAGENS (RAW)
+        const itens = [
+            { id: "aatrox_comum", nome: "Aatrox", preco: 1000, raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-comum.png" },
+            { id: "aatrox_raro", nome: "Aatrox vitorioso", preco: 5000, raridade: "raro", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-raro.png" },
+            { id: "aatrox_epico", nome: "Aatrox Lua Sangrenta", preco: 15000, raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-epico.png" }
+        ];
+
+        let saldoGlobal = 0;
+        let meusItens = [];
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                onSnapshot(doc(db, "usuarios", user.uid), (snap) => {
+                    const d = snap.data();
+                    saldoGlobal = d.saldo || 0;
+                    meusItens = d.iconesAdquiridos || [];
+                    document.getElementById('saldo-valor').innerText = saldoGlobal.toLocaleString();
+                    renderLoja();
+                });
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function renderLoja() {
+            const grid = document.getElementById('grid-itens');
+            grid.innerHTML = "";
+
+            itens.forEach(item => {
+                const jaPossui = meusItens.includes(item.id);
+                const podeComprar = saldoGlobal >= item.preco;
+
+                grid.innerHTML += `
+                    <div class="item-card ${item.raridade}">
+                        <div class="icon-container">
+                            <div class="moldura"></div>
+                            <img src="${item.img}" class="img-campeao">
+                        </div>
+                        <div class="item-nome">${item.nome}</div>
+                        <div class="raridade-label">${item.raridade}</div>
+                        <button class="btn-comprar" 
+                            ${(jaPossui || !podeComprar) ? 'disabled' : ''} 
+                            onclick="processarCompra('${item.id}', ${item.preco})">
+                            ${jaPossui ? 'Adquirido' : '💰 ' + item.preco}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        window.processarCompra = async (id, valor) => {
+            if (confirm(`Deseja adquirir este item por ${valor} moedas?`)) {
+                try {
+                    const userRef = doc(db, "usuarios", auth.currentUser.uid);
+                    await updateDoc(userRef, {
+                        saldo: increment(-valor),
+                        iconesAdquiridos: arrayUnion(id)
+                    });
+                    alert("Compra realizada com sucesso! Ícone enviado para o seu inventário.");
+                } catch (e) {
+                    alert("Erro ao processar compra.");
+                }
+            }
+        };
+    </script>
+</body>
+</html>
