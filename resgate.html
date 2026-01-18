@@ -600,47 +600,6 @@ function iniciarFluxoAnuncio(tipo) {
     }, 1000);
 }
 
-function iniciarFluxoAnuncio(tipo) {
-    if (tipo !== 'livre' && acertosNoCiclo < 10) {
-        openModal("BLOQUEADO", "Você precisa de 10 acertos no quiz para liberar este anúncio.", "alert");
-        return;
-    }
-
-    if (tipo === 'livre' && cooldownLivreAtivo) return;
-    if (processandoRecompensa) return; 
-
-    tipoRecompensa = tipo;  
-    anuncioEmAndamento = true;  
-    tempoRestanteAnuncio = 15;
-    chaveSeguranca = false; 
-
-    window.open(linkAnuncioAdsterra, '_blank');
-    
-    openModal("VALIDANDO ANÚNCIO",  
-        `Fique no anúncio para validar:<br><br>
-        <div id="modalContador" style="font-size:30px; color:var(--gold); font-weight:bold;">15</div>`,  
-        'alert'
-    );
-
-    if (typeof intervaloAnuncio !== 'undefined') clearInterval(intervaloAnuncio);
-
-    intervaloAnuncio = setInterval(() => {
-        // Reduz o tempo apenas se o usuário estiver "fora" da página (no anúncio)
-        if (document.visibilityState === 'hidden') {
-            tempoRestanteAnuncio--;
-        }
-        
-        const display = document.getElementById('modalContador');
-        if(display) display.innerText = tempoRestanteAnuncio;
-
-        if (tempoRestanteAnuncio <= 0) {
-            clearInterval(intervaloAnuncio);
-            anuncioEmAndamento = false;
-            chaveSeguranca = true; 
-            finalizarRecompensa();  
-        }
-    }, 1000);
-}
 
 function finalizarRecompensa() {
     if (!chaveSeguranca || processandoRecompensa) return;
