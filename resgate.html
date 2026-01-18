@@ -706,9 +706,8 @@ function executarCronometroVisual(segundos) {
     if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
     if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
-// --- LÓGICA DO INVENTÁRIO (CATÁLOGO + FUNÇÕES) ---
+// --- LÓGICA DO INVENTÁRIO (PROTEGIDA PARA NÃO TRAVAR O LOGIN) ---
 
-// Definição do catálogo (Obrigatório para o inventário saber o que mostrar)
 const URL_BASE_ICON = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
 const CATALOGO_ITENS = [
     { id: "aatrox_comum", nome: "Aatrox", img: "aatrox-comum.png" },
@@ -722,53 +721,69 @@ const CATALOGO_ITENS = [
 
 window.abrirInventario = async () => {
     try {
-        const user = auth.currentUser;
-        if(!user) return;
+        // Verifica se o Firebase e os dados estão prontos
+        if (typeof auth === 'undefined' || !auth.currentUser) {
+            alert("Aguarde o carregamento do jogo...");
+            return;
+        }
 
-        // Pega os IDs que o usuário comprou no Firebase
-        // IMPORTANTE: Aqui usamos a variável que você já tem no seu script
-        const meusItensIDs = dadosUserLocais.iconesAdquiridos || [];
-        const fotoAtual = dadosUserLocais.fotoPerfil || "0.jpg";
+        // Tenta pegar os dados da sua variável global (dadosUserLocais ou similar)
+        // Se ela não existir, o código não trava, ele apenas avisa
+        const dados = (typeof dadosUserLocais !== 'undefined') ? dadosUserLocais : {};
+        const meusItensIDs = dados.iconesAdquiridos || [];
+        const fotoAtual = dados.fotoPerfil || "0.jpg";
 
         let html = `<div class="grid-inventario-modal" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px;">`;
         
-        // Filtra o catálogo para mostrar apenas o que o usuário comprou
         const itensPossuidos = CATALOGO_ITENS.filter(i => meusItensIDs.includes(i.id));
 
         if(itensPossuidos.length === 0) {
-            html = `<p style="color:#c89b3c; text-align:center; grid-column: 1/-1;">Sua coleção está vazia. Visite a Loja!</p>`;
+            html = `<p style="color:#c89b3c; text-align:center; grid-column: 1/-1; font-size:12px;">Sua coleção está vazia. Visite a Loja Hextech!</p>`;
         } else {
             itensPossuidos.forEach(item => {
                 const estaEquipado = (fotoAtual === item.img);
                 html += `
                     <div class="item-inventario" 
                          onclick="window.equiparIcone('${item.img}')"
-                         style="border: 1px solid ${estaEquipado ? '#c89b3c' : '#1e2328'}; padding:8px; text-align:center; cursor:pointer; background: rgba(9,20,40,0.9);">
-                        <img src="${URL_BASE_ICON + item.img}" style="width:100%; border-radius:4px; margin-bottom:5px;">
-                        <span style="font-size:10px; display:block; color:white;">${item.nome}</span>
-                        ${estaEquipado ? '<b style="color:#28a745; font-size:9px;">EQUIPADO</b>' : ''}
+                         style="border: 1px solid ${estaEquipado ? '#c89b3c' : '#1e2328'}; padding:8px; text-align:center; cursor:pointer; background: rgba(9,20,40,0.9); border-radius: 5px;">
+                        <img src="${URL_BASE_ICON + item.img}" style="width:100%; border-radius:4px; margin-bottom:5px; display:block;">
+                        <span style="font-size:10px; display:block; color:white; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nome}</span>
+                        ${estaEquipado ? '<b style="color:#28a745; font-size:9px; display:block; margin-top:3px;">EQUIPADO</b>' : ''}
                     </div>
                 `;
             });
         }
         html += `</div>`;
-        openModal("MEUS ITENS", html);
+        
+        // Verifica se a função openModal existe antes de chamar
+        if (typeof openModal === 'function') {
+            openModal("MEUS ITENS", html);
+        } else {
+            alert("Erro: Função de modal não encontrada.");
+        }
+
     } catch (e) {
-        console.error(e);
-        alert("Erro ao carregar inventário.");
+        console.error("Erro no Inventário:", e);
     }
 };
 
 window.equiparIcone = async (nomeImg) => {
-    const user = auth.currentUser;
-    if(!user) return;
     try {
+        const user = auth.currentUser;
+        if(!user) return;
+        
+        // Importante: db deve estar disponível globalmente
         await updateDoc(doc(db, "usuarios", user.uid), { fotoPerfil: nomeImg });
-        // Fecha o modal após equipar (certifique-se que a variável modal existe no seu código)
+        
+        // Tenta fechar o modal
         const m = document.getElementById('modal-geral') || document.querySelector('.modal-overlay');
         if(m) m.style.display = 'none';
+        
+        alert("Ícone equipado com sucesso!");
+        location.reload(); // Recarrega para garantir que tudo atualize
     } catch(e) {
-        alert("Erro ao equipar item.");
+        console.error(e);
+        alert("Erro ao equipar: Verifique sua conexão.");
     }
 };
 
