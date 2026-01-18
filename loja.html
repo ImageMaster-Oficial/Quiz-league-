@@ -87,7 +87,6 @@
             border-bottom: 2px solid var(--ouro);
         }
 
-        /* BARRA DE FERRAMENTAS - CAMPO MÉDIO AJUSTADO */
         .barra-ferramentas {
             display: flex;
             justify-content: space-between;
@@ -101,7 +100,7 @@
 
         .busca-container {
             position: relative;
-            width: 250px; /* TAMANHO MÉDIO PARA DESKTOP */
+            width: 250px;
         }
 
         .busca-container input {
@@ -128,7 +127,7 @@
                 align-items: center;
             }
             .busca-container {
-                width: 100%; /* OCUPA A LARGURA DA CAIXA NO CELULAR, SEM SAIR DA TELA */
+                width: 100%;
             }
         }
 
@@ -224,7 +223,7 @@
 
         <div class="barra-ferramentas" id="barra-filtros">
             <div class="busca-container">
-                <input type="text" id="input-busca" placeholder="Pesquisar..." oninput="renderLoja()">
+                <input type="text" id="input-busca" placeholder="Pesquisar..." onkeyup="renderLoja()">
                 <span>🔍</span>
             </div>
             <div class="filtros-raridade">
@@ -313,27 +312,30 @@
             renderLoja();
         };
 
-        function renderLoja() {
+        // Torna a função acessível globalmente para o input
+        window.renderLoja = function() {
             const grid = document.getElementById('grid-itens');
-            const busca = document.getElementById('input-busca').value.toLowerCase();
+            const busca = document.getElementById('input-busca').value.toLowerCase().trim();
             grid.innerHTML = "";
 
             const itensFiltrados = itens.filter(item => {
                 const bateCategoria = item.cat === categoriaAtual;
                 const bateRaridade = raridadeFiltro === 'todos' || item.raridade === raridadeFiltro;
+                // Lógica de busca inteligente: verifica se o texto digitado existe em qualquer parte do nome
                 const bateBusca = item.nome.toLowerCase().includes(busca);
+                
                 return bateCategoria && bateRaridade && bateBusca;
             });
 
             if (itensFiltrados.length === 0) {
-                grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5; text-align:center;'>Nenhum item encontrado.</p>";
+                grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5; text-align:center;'>Nenhum campeão encontrado.</p>";
                 return;
             }
 
             itensFiltrados.forEach(item => {
                 const jaPossui = meusItens.includes(item.id);
                 const podeComprar = saldoGlobal >= item.preco;
-                const labelRaridade = item.raridade === 'epico' ? 'Épico' : item.raridade;
+                const labelRaridade = item.raridade === 'epico' ? 'Épico' : item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
 
                 grid.innerHTML += `
                     <div class="item-card ${item.raridade}">
