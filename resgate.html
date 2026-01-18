@@ -263,7 +263,6 @@
 
 <div class="footer-ad-space">
     </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
@@ -303,12 +302,16 @@
     let pdlInterno = 0, userRef = null, carregadoPelaPrimeiraVez = false, ultimoEloNome = null;
 
     // --- LISTA DE REFERÊNCIA PARA O INVENTÁRIO (Sincronizado com a Loja) ---
+    // Removida a duplicata lá de baixo para não travar o "Autenticando"
     const URL_BASE_ICON = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/%C3%ADcones/";
     const CATALOGO_ITENS = [
         { id: "aatrox_comum", nome: "Aatrox", img: "aatrox-comum.png" },
-        { id: "aatrox_raro", nome: "Aatrox Caçador", img: "aatrox-raro.png" },
-        { id: "ahri_epico", nome: "Ahri K/DA", img: "ahri-epico.png" }
-        // Adicione todos os seus IDs da loja aqui para eles aparecerem no inventário
+        { id: "aatrox_raro", nome: "Aatrox Caçador de Almas", img: "aatrox-raro.png" },
+        { id: "aatrox_epico", nome: "Aatrox Vitorioso", img: "aatrox-epico.png" },
+        { id: "ahri_comum", nome: "Ahri", img: "ahri-comum.png" },
+        { id: "ahri_raro", nome: "Ahri Raposa Flamejante", img: "ahri-raro.png" },
+        { id: "ahri_epico", nome: "Ahri K/DA", img: "ahri-epico.png" },
+        { id: "anjo_guardiao", nome: "Anjo Guardião", img: "anjo.png" }
     ];
 
     // --- 2. FUNÇÕES DE INTERFACE (MODAIS E PÓDIO) ---
@@ -341,149 +344,138 @@
     window.openModal = openModal;
 
     async function atualizarPodioSemanal() {
-    try {
-        const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(3));
-        const querySnapshot = await getDocs(q);
-        const vencedores = [];
-        querySnapshot.forEach((doc) => { vencedores.push(doc.data()); });        
+        try {
+            const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(3));
+            const querySnapshot = await getDocs(q);
+            const vencedores = [];
+            querySnapshot.forEach((doc) => { vencedores.push(doc.data()); });        
 
-        if(vencedores[0]) {
-            const foto0 = vencedores[0].photoURL || vencedores[0].fotoUrl;
-            atualizarVisualPodio(1, vencedores[0].nome, foto0);
-        }
-        if(vencedores[1]) {
-            const foto1 = vencedores[1].photoURL || vencedores[1].fotoUrl;
-            atualizarVisualPodio(2, vencedores[1].nome, foto1);
-        }
-        if(vencedores[2]) {
-            const foto2 = vencedores[2].photoURL || vencedores[2].fotoUrl;
-            atualizarVisualPodio(3, vencedores[2].nome, foto2);
-        }
-    } catch (error) {
-        console.error("Erro ao carregar pódio:", error);
-    }
-}
-    
-function atualizarVisualPodio(posicao, nome, foto) {
-    const containers = document.querySelectorAll("#containerRankingResumo div[style*='flex-direction: column']");
-    const fotoPadrao = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
-    const urlFinal = foto ? (foto.startsWith('http') ? foto : URL_BASE_ICON + foto) : fotoPadrao;
-
-    containers.forEach(box => {
-        const small = box.querySelector("small");
-        if (!small) return;
-
-        // Verifica qual player deve ser substituído
-        const textoAtual = small.innerText;
-        const ePrimeiro = (posicao === 1 && (textoAtual === "Lenda Atual" || textoAtual === nome.split(' ')[0]));
-        const eSegundo = (posicao === 2 && textoAtual === "Player B");
-        const eTerceiro = (posicao === 3 && textoAtual === "Player C");
-
-        if (ePrimeiro || eSegundo || eTerceiro) {
-            // Atualiza Nome
-            small.innerText = nome.split(' ')[0];
-            
-            // Atualiza Foto
-            const circulo = box.querySelector("div[style*='border-radius: 50%']");
-            if (circulo) {
-                circulo.style.backgroundImage = `url('${urlFinal}')`;
-                circulo.style.backgroundSize = "cover";
-                circulo.style.backgroundPosition = "center";
+            if(vencedores[0]) {
+                const foto0 = vencedores[0].fotoPerfil ? vencedores[0].fotoPerfil : (vencedores[0].photoURL || vencedores[0].fotoUrl);
+                atualizarVisualPodio(1, vencedores[0].nome, foto0);
             }
+            if(vencedores[1]) {
+                const foto1 = vencedores[1].fotoPerfil ? vencedores[1].fotoPerfil : (vencedores[1].photoURL || vencedores[1].fotoUrl);
+                atualizarVisualPodio(2, vencedores[1].nome, foto1);
+            }
+            if(vencedores[2]) {
+                const foto2 = vencedores[2].fotoPerfil ? vencedores[2].fotoPerfil : (vencedores[2].photoURL || vencedores[2].fotoUrl);
+                atualizarVisualPodio(3, vencedores[2].nome, foto2);
+            }
+        } catch (error) {
+            console.error("Erro ao carregar pódio:", error);
         }
-    });
-}
+    }
+    
+    function atualizarVisualPodio(posicao, nome, foto) {
+        const containers = document.querySelectorAll("#containerRankingResumo div[style*='flex-direction: column']");
+        const fotoPadrao = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
+        const urlFinal = foto ? (foto.startsWith('http') ? foto : URL_BASE_ICON + foto) : fotoPadrao;
+
+        containers.forEach(box => {
+            const small = box.querySelector("small");
+            if (!small) return;
+
+            const textoAtual = small.innerText;
+            const ePrimeiro = (posicao === 1 && (textoAtual === "Lenda Atual" || textoAtual === nome.split(' ')[0]));
+            const eSegundo = (posicao === 2 && textoAtual === "Player B");
+            const eTerceiro = (posicao === 3 && textoAtual === "Player C");
+
+            if (ePrimeiro || eSegundo || eTerceiro) {
+                small.innerText = nome.split(' ')[0];
+                const circulo = box.querySelector("div[style*='border-radius: 50%']");
+                if (circulo) {
+                    circulo.style.backgroundImage = `url('${urlFinal}')`;
+                    circulo.style.backgroundSize = "cover";
+                    circulo.style.backgroundPosition = "center";
+                }
+            }
+        });
+    }
 
     // --- 3. CONFIGURAÇÃO DE ELOS E CORES ---
 
-const configElo = [];
-const divisoes = ["V", "IV", "III", "II", "I"];
-const coresElos = {
-    "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
-    "BRONZE": { bg: "#4e3629", color: "#cd7f32", bar: "#8b4513" },
-    "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
-    "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
-    "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
-    "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
-    "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
-};
+    const configElo = [];
+    const divisoes = ["V", "IV", "III", "II", "I"];
+    const coresElos = {
+        "FERRO": { bg: "#2a2a2a", color: "#8a8a8a", bar: "#555" },
+        "BRONZE": { bg: "#4e3629", color: "#cd7f32", bar: "#8b4513" },
+        "PRATA": { bg: "#4a5d6e", color: "#e2e2e2", bar: "#a9b9c9" },
+        "OURO": { bg: "#7a5c12", color: "#f1d37e", bar: "#c89b3c" },
+        "PLATINA": { bg: "#1d5c5c", color: "#a3e7e7", bar: "#46abb0" },
+        "ESMERALDA": { bg: "#0d5c2e", color: "#a3e7bc", bar: "#28a745" },
+        "DIAMANTE": { bg: "#1f3a7a", color: "#b3c7f7", bar: "#5c85d6" }
+    };
 
-function gerarEloComDivisoes(nome, min, max) {
-    let passo = (max - min) / 5;
-    divisoes.forEach((div, i) => {
-        configElo.push({ 
-            nome: `${nome} ${div}`, 
-            min: min + (passo * i), 
-            max: min + (passo * (i + 1)), 
-            ...coresElos[nome] 
+    function gerarEloComDivisoes(nome, min, max) {
+        let passo = (max - min) / 5;
+        divisoes.forEach((div, i) => {
+            configElo.push({ 
+                nome: `${nome} ${div}`, 
+                min: min + (passo * i), 
+                max: min + (passo * (i + 1)), 
+                ...coresElos[nome] 
+            });
         });
-    });
-}
+    }
 
-// Limpa e Gera as faixas
-gerarEloComDivisoes("FERRO", 0, 5000);
-gerarEloComDivisoes("BRONZE", 5000, 10000);
-gerarEloComDivisoes("PRATA", 10000, 30000);
-gerarEloComDivisoes("OURO", 30000, 60000);
-gerarEloComDivisoes("PLATINA", 60000, 100000);
-gerarEloComDivisoes("ESMERALDA", 100000, 150000);
-gerarEloComDivisoes("DIAMANTE", 150000, 300000);
+    gerarEloComDivisoes("FERRO", 0, 5000);
+    gerarEloComDivisoes("BRONZE", 5000, 10000);
+    gerarEloComDivisoes("PRATA", 10000, 30000);
+    gerarEloComDivisoes("OURO", 30000, 60000);
+    gerarEloComDivisoes("PLATINA", 60000, 100000);
+    gerarEloComDivisoes("ESMERALDA", 100000, 150000);
+    gerarEloComDivisoes("DIAMANTE", 150000, 300000);
 
-// ELOS DE ELITE (Definidos um a um para evitar erro de autenticação)
-configElo.push({ nome: "MESTRE", min: 300000, max: 600000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
-configElo.push({ nome: "GRÃO-MESTRE", min: 600000, max: 1000000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
-configElo.push({ nome: "DESAFIANTE", min: 1000000, max: 99999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
+    configElo.push({ nome: "MESTRE", min: 300000, max: 600000, bg: "#5a1f7a", color: "#dfb3f7", bar: "#9b59b6" });
+    configElo.push({ nome: "GRÃO-MESTRE", min: 600000, max: 1000000, bg: "#7a1f1f", color: "#f7b3b3", bar: "#e74c3c" });
+    configElo.push({ nome: "DESAFIANTE", min: 1000000, max: 99999999, bg: "#1a4a5a", color: "#b3e7f7", bar: "#3498db" });
 
-function getEloInfo(valorXP) { 
-    if (valorXP <= 0) return configElo[0];
-    const eloEncontrado = configElo.find(e => valorXP >= e.min && valorXP < e.max);
-    return eloEncontrado || configElo[configElo.length - 1]; 
-}
+    function getEloInfo(valorXP) { 
+        if (valorXP <= 0) return configElo[0];
+        const eloEncontrado = configElo.find(e => valorXP >= e.min && valorXP < e.max);
+        return eloEncontrado || configElo[configElo.length - 1]; 
+    }
 
-function verificarCooldownLivre() {
-    const salvo = localStorage.getItem('proximoVideoLivre');
-    if (salvo) {
-        const agora = Date.now();
-        const tempoDesbloqueio = parseInt(salvo);
-        
-        if (tempoDesbloqueio > agora) {
-            const restante = Math.floor((tempoDesbloqueio - agora) / 1000);
-            executarCronometroVisual(restante);
-        } else {
-            localStorage.removeItem('proximoVideoLivre');
+    function verificarCooldownLivre() {
+        const salvo = localStorage.getItem('proximoVideoLivre');
+        if (salvo) {
+            const agora = Date.now();
+            const tempoDesbloqueio = parseInt(salvo);
+            if (tempoDesbloqueio > agora) {
+                const restante = Math.floor((tempoDesbloqueio - agora) / 1000);
+                executarCronometroVisual(restante);
+            } else {
+                localStorage.removeItem('proximoVideoLivre');
+            }
         }
     }
-}
 
-// Inicia o cooldown e salva o momento exato do desbloqueio
-function iniciarCooldownLivre(segundos) {
-    const tempoDesbloqueio = Date.now() + (segundos * 1000);
-    localStorage.setItem('proximoVideoLivre', tempoDesbloqueio);
-    executarCronometroVisual(segundos);
-}
+    function iniciarCooldownLivre(segundos) {
+        const tempoDesbloqueio = Date.now() + (segundos * 1000);
+        localStorage.setItem('proximoVideoLivre', tempoDesbloqueio);
+        executarCronometroVisual(segundos);
+    }
 
-function executarCronometroVisual(segundos) {
-    const btn = document.getElementById('btnVideoLivre');
-    if (!btn) return;
-
-    cooldownLivreAtivo = true;
-    btn.disabled = true;
-    let restante = segundos;
-
-    const intervalo = setInterval(() => {
-        restante--;
-        btn.innerHTML = `AGUARDE <span style="color:#28a745">${restante}s</span>`;
-
-        if (restante <= 0) {
-            clearInterval(intervalo);
-            cooldownLivreAtivo = false;
-            localStorage.removeItem('proximoVideoLivre');
-            btn.disabled = false;
-            btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
-            if(typeof atualizarInterface === 'function') atualizarInterface();
-        }
-    }, 1000);
-}
+    function executarCronometroVisual(segundos) {
+        const btn = document.getElementById('btnVideoLivre');
+        if (!btn) return;
+        cooldownLivreAtivo = true;
+        btn.disabled = true;
+        let restante = segundos;
+        const intervalo = setInterval(() => {
+            restante--;
+            btn.innerHTML = `AGUARDE <span style="color:#28a745">${restante}s</span>`;
+            if (restante <= 0) {
+                clearInterval(intervalo);
+                cooldownLivreAtivo = false;
+                localStorage.removeItem('proximoVideoLivre');
+                btn.disabled = false;
+                btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
+                if(typeof atualizarInterface === 'function') atualizarInterface();
+            }
+        }, 1000);
+    }
 
     function iniciarFluxoAnuncio(tipo) {
         if (tipo === 'livre' && cooldownLivreAtivo) return;
@@ -508,71 +500,56 @@ function executarCronometroVisual(segundos) {
         }, 1000);
     }
 
-     document.addEventListener('visibilitychange', () => {
-    // Se o usuário voltar para a página, o anúncio estava rolando e o tempo não acabou
-    if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
-        clearInterval(intervaloAnuncio);
-        anuncioEmAndamento = false;
-        
-        mTitle.innerText = "VALIDAÇÃO FALHOU!";
-        mContent.innerHTML = `
-            <div class="modal-text" style="color:#dc3545; font-weight:bold;">
-                Você voltou muito cedo!<br>
-                Aguarde os 15 segundos no anúncio para receber sua recompensa.
-            </div>`;
-        mFooter.innerHTML = '';
-
-        const btnRetry = document.createElement('button');
-        btnRetry.className = 'modal-btn-confirm';
-        btnRetry.style.width = "100%";
-        btnRetry.innerText = 'VER ANÚNCIO NOVAMENTE';
-        btnRetry.onclick = () => { 
-            modal.style.display = 'none'; 
-            iniciarFluxoAnuncio(tipoRecompensa); 
-        };
-        
-        mFooter.appendChild(btnRetry);
-    }
-});
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && anuncioEmAndamento && tempoRestanteAnuncio > 0) {
+            clearInterval(intervaloAnuncio);
+            anuncioEmAndamento = false;
+            mTitle.innerText = "VALIDAÇÃO FALHOU!";
+            mContent.innerHTML = `<div class="modal-text" style="color:#dc3545; font-weight:bold;">Você voltou muito cedo!<br>Aguarde os 15 segundos no anúncio para receber sua recompensa.</div>`;
+            mFooter.innerHTML = '';
+            const btnRetry = document.createElement('button');
+            btnRetry.className = 'modal-btn-confirm';
+            btnRetry.style.width = "100%";
+            btnRetry.innerText = 'VER ANÚNCIO NOVAMENTE';
+            btnRetry.onclick = () => { modal.style.display = 'none'; iniciarFluxoAnuncio(tipoRecompensa); };
+            mFooter.appendChild(btnRetry);
+        }
+    });
     
     async function finalizarRecompensa() {
-    if (!chaveSeguranca) {
+        if (!chaveSeguranca) {
+            modal.style.display = 'none';
+            openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada.");
+            return;
+        }
+        chaveSeguranca = false;
         modal.style.display = 'none';
-        openModal("SISTEMA DE SEGURANÇA", "Tentativa de fraude detectada.");
-        return;
-    }
-    chaveSeguranca = false;
-    modal.style.display = 'none';
-    let up = {}; let msg = "";
-    const eloAntes = getEloInfo(pdlInterno).nome;
+        let up = {}; let msg = "";
+        const eloAntes = getEloInfo(pdlInterno).nome;
 
-    if (tipoRecompensa === "moeda") {
-        up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-        msg = "Você ganhou 100 moedas!";
-    } else if (tipoRecompensa === "pdl") {
-        // AQUI: Adicionamos o pdlSemanal acompanhando o XP
-        up = { xp: increment(500), pdlSemanal: increment(500), videosAssistidos: increment(1) };
-        msg = "Você ganhou 500 PDL!";
-    } else if (tipoRecompensa === "livre") {
-        // AQUI TAMBÉM: Bônus livre agora conta para o semanal
-        up = { saldo: increment(10), xp: increment(100), pdlSemanal: increment(100) };
-        msg = "Bônus Livre: +10 Moedas e +100 PDL!";
-        iniciarCooldownLivre(120);
-    }
+        if (tipoRecompensa === "moeda") {
+            up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+            msg = "Você ganhou 100 moedas!";
+        } else if (tipoRecompensa === "pdl") {
+            up = { xp: increment(500), pdlSemanal: increment(500), videosAssistidos: increment(1) };
+            msg = "Você ganhou 500 PDL!";
+        } else if (tipoRecompensa === "livre") {
+            up = { saldo: increment(10), xp: increment(100), pdlSemanal: increment(100) };
+            msg = "Bônus Livre: +10 Moedas e +100 PDL!";
+            iniciarCooldownLivre(120);
+        }
 
-    if (tipoRecompensa !== "livre") {
-        const proxVideo = (videosAssistidos || 0) + 1;
-        if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
+        if (tipoRecompensa !== "livre") {
+            const proxVideo = (videosAssistidos || 0) + 1;
+            if (proxVideo >= 3) { up.acertos = 0; up.videosAssistidos = 0; setTimeout(() => carregarQuestao(), 500); }
+        }
+        
+        await updateDoc(userRef, up);
+        openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
+            const infoNovo = getEloInfo(pdlInterno);
+            if (infoNovo.nome !== eloAntes) exibirAnimacaoElo(infoNovo, true);
+        });
     }
-    
-    await updateDoc(userRef, up);
-    openModal("RECOMPENSA LIBERADA", msg, 'alert', () => {
-        const infoNovo = getEloInfo(pdlInterno);
-        if (infoNovo.nome !== eloAntes) exibirAnimacaoElo(infoNovo, true);
-    });
-}
-
-    // --- 5. LÓGICA DO QUIZ E QUESTÕES ---
 
     async function carregarBanco() {
         const statusText = document.getElementById('perguntaTexto');
@@ -595,7 +572,6 @@ function executarCronometroVisual(segundos) {
         const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
         if(!c || !t) return;
         
-        // LOGICA DE TRAVA DE 10 QUESTÕES
         if (acertosNoCiclo >= 10 && videosAssistidos < 3) { 
             t.innerText = "META DE ACERTOS ATINGIDA!"; 
             c.innerHTML = "<p style='color:var(--gold); font-weight:bold; text-align:center;'>Assista aos anúncios para liberar o quiz novamente!</p>"; 
@@ -670,7 +646,7 @@ function executarCronometroVisual(segundos) {
         if (acertosNoCiclo < 10) aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
         else if (videosAssistidos < 3) aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS</span>`;
         else aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-        // Parte final da função atualizarInterface
+
         const btnLivre = document.getElementById('btnVideoLivre');
         const salvoLivre = localStorage.getItem('proximoVideoLivre');
         const agoraLivre = Date.now();
@@ -706,7 +682,7 @@ function executarCronometroVisual(segundos) {
     if(document.getElementById('btnVideoXP')) document.getElementById('btnVideoXP').onclick = () => iniciarFluxoAnuncio('pdl');
     if(document.getElementById('btnVideoLivre')) document.getElementById('btnVideoLivre').onclick = () => iniciarFluxoAnuncio('livre');
 
-        window.abrirStatus = () => openModal("STATUS ATIVO", "Nenhum buff ativo.");
+    window.abrirStatus = () => openModal("STATUS ATIVO", "Nenhum buff ativo.");
     window.abrirRanking = () => { window.location.href = 'ranking.html'; };
     window.abrirPerfil = () => openModal("PERFIL", "Página de perfil em desenvolvimento.");
     window.abrirConquistas = () => openModal("BAÚS HEXTECH", "Ganhe chaves acertando 50 questões seguidas!");
@@ -721,45 +697,41 @@ function executarCronometroVisual(segundos) {
         };
     }
 
-    // Resgate Pix
     window.setResgate = (el, v, r) => { metaAtual = v; valorReaisMeta = r; document.querySelectorAll('.resgate-opt').forEach(o => o.classList.remove('active')); el.classList.add('active'); atualizarInterface(); }
     
-    // Variável de controle para o snapshot
     let dadosUserLocais = {};
 
     onAuthStateChanged(auth, (user) => {
-    if (user) { 
-        userRef = doc(db, "usuarios", user.uid); 
-        onSnapshot(userRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                dadosUserLocais = data; // Armazena para o inventário
-                const hoje = new Date().toLocaleDateString('pt-BR');
+        if (user) { 
+            userRef = doc(db, "usuarios", user.uid); 
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    dadosUserLocais = data; 
+                    const hoje = new Date().toLocaleDateString('pt-BR');
 
-                if (data.ultimaDataAcesso !== hoje) {
-                    updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje });
-                } else {
-                    goldDB = Number(data.saldo) || 0;
-                    acertosNoCiclo = data.acertos || 0;
-                    videosAssistidos = data.videosAssistidos || 0;
-                    totalVideosHoje = data.totalVideosHoje || 0;
-                    pdlInterno = data.xp || 0;
-
-                    atualizarInterface();
-
-                    if (!carregadoPelaPrimeiraVez) {
-                        carregadoPelaPrimeiraVez = true;
-                        carregarBanco(); 
-                        atualizarPodioSemanal(); 
-                        verificarCooldownLivre(); 
+                    if (data.ultimaDataAcesso !== hoje) {
+                        updateDoc(userRef, { totalVideosHoje: 0, videosAssistidos: 0, acertos: 0, ultimaDataAcesso: hoje });
+                    } else {
+                        goldDB = Number(data.saldo) || 0;
+                        acertosNoCiclo = data.acertos || 0;
+                        videosAssistidos = data.videosAssistidos || 0;
+                        totalVideosHoje = data.totalVideosHoje || 0;
+                        pdlInterno = data.xp || 0;
+                        atualizarInterface();
+                        if (!carregadoPelaPrimeiraVez) {
+                            carregadoPelaPrimeiraVez = true;
+                            carregarBanco(); 
+                            atualizarPodioSemanal(); 
+                            verificarCooldownLivre(); 
+                        }
                     }
                 }
-            }
-        });
-    } else { 
-        if (!window.location.href.includes("index.html")) window.location.href = "index.html"; 
-    }
-});
+            });
+        } else { 
+            if (!window.location.href.includes("index.html")) window.location.href = "index.html"; 
+        }
+    });
 
     // Pull to Refresh
     let sY = 0;
@@ -780,87 +752,50 @@ function executarCronometroVisual(segundos) {
         });
     }
 
-// --- LÓGICA DO INVENTÁRIO (PROTEGIDA PARA NÃO TRAVAR O LOGIN) ---
+    // --- LÓGICA DO INVENTÁRIO (Sincronizada com dadosUserLocais) ---
 
-const URL_BASE_ICON = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
-const CATALOGO_ITENS = [
-    { id: "aatrox_comum", nome: "Aatrox", img: "aatrox-comum.png" },
-    { id: "aatrox_raro", nome: "Aatrox Caçador de Almas", img: "aatrox-raro.png" },
-    { id: "aatrox_epico", nome: "Aatrox Vitorioso", img: "aatrox-epico.png" },
-    { id: "ahri_comum", nome: "Ahri", img: "ahri-comum.png" },
-    { id: "ahri_raro", nome: "Ahri Raposa Flamejante", img: "ahri-raro.png" },
-    { id: "ahri_epico", nome: "Ahri K/DA", img: "ahri-epico.png" },
-    { id: "anjo_guardiao", nome: "Anjo Guardião", img: "anjo.png" }
-];
+    window.abrirInventario = async () => {
+        try {
+            if (!auth.currentUser) return;
+            const meusItensIDs = dadosUserLocais.iconesAdquiridos || [];
+            const fotoAtual = dadosUserLocais.fotoPerfil || "0.jpg";
 
-window.abrirInventario = async () => {
-    try {
-        // Verifica se o Firebase e os dados estão prontos
-        if (typeof auth === 'undefined' || !auth.currentUser) {
-            alert("Aguarde o carregamento do jogo...");
-            return;
-        }
+            let html = `<div class="grid-inventario-modal" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px;">`;
+            const itensPossuidos = CATALOGO_ITENS.filter(i => meusItensIDs.includes(i.id));
 
-        // Tenta pegar os dados da sua variável global (dadosUserLocais ou similar)
-        // Se ela não existir, o código não trava, ele apenas avisa
-        const dados = (typeof dadosUserLocais !== 'undefined') ? dadosUserLocais : {};
-        const meusItensIDs = dados.iconesAdquiridos || [];
-        const fotoAtual = dados.fotoPerfil || "0.jpg";
-
-        let html = `<div class="grid-inventario-modal" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px;">`;
-        
-        const itensPossuidos = CATALOGO_ITENS.filter(i => meusItensIDs.includes(i.id));
-
-        if(itensPossuidos.length === 0) {
-            html = `<p style="color:#c89b3c; text-align:center; grid-column: 1/-1; font-size:12px;">Sua coleção está vazia. Visite a Loja Hextech!</p>`;
-        } else {
-            itensPossuidos.forEach(item => {
-                const estaEquipado = (fotoAtual === item.img);
-                html += `
-                    <div class="item-inventario" 
-                         onclick="window.equiparIcone('${item.img}')"
-                         style="border: 1px solid ${estaEquipado ? '#c89b3c' : '#1e2328'}; padding:8px; text-align:center; cursor:pointer; background: rgba(9,20,40,0.9); border-radius: 5px;">
-                        <img src="${URL_BASE_ICON + item.img}" style="width:100%; border-radius:4px; margin-bottom:5px; display:block;">
-                        <span style="font-size:10px; display:block; color:white; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nome}</span>
-                        ${estaEquipado ? '<b style="color:#28a745; font-size:9px; display:block; margin-top:3px;">EQUIPADO</b>' : ''}
-                    </div>
-                `;
-            });
-        }
-        html += `</div>`;
-        
-        // Verifica se a função openModal existe antes de chamar
-        if (typeof openModal === 'function') {
+            if(itensPossuidos.length === 0) {
+                html = `<p style="color:#c89b3c; text-align:center; grid-column: 1/-1; font-size:12px;">Sua coleção está vazia. Visite a Loja Hextech!</p>`;
+            } else {
+                itensPossuidos.forEach(item => {
+                    const estaEquipado = (fotoAtual === item.img);
+                    html += `
+                        <div class="item-inventario" 
+                             onclick="window.equiparIcone('${item.img}')"
+                             style="border: 1px solid ${estaEquipado ? '#c89b3c' : '#1e2328'}; padding:8px; text-align:center; cursor:pointer; background: rgba(9,20,40,0.9); border-radius: 5px;">
+                            <img src="${URL_BASE_ICON + item.img}" style="width:100%; border-radius:4px; margin-bottom:5px; display:block;">
+                            <span style="font-size:10px; display:block; color:white; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nome}</span>
+                            ${estaEquipado ? '<b style="color:#28a745; font-size:9px; display:block; margin-top:3px;">EQUIPADO</b>' : ''}
+                        </div>`;
+                });
+            }
+            html += `</div>`;
             openModal("MEUS ITENS", html);
-        } else {
-            alert("Erro: Função de modal não encontrada.");
+        } catch (e) {
+            console.error("Erro no Inventário:", e);
         }
+    };
 
-    } catch (e) {
-        console.error("Erro no Inventário:", e);
-    }
-};
-
-window.equiparIcone = async (nomeImg) => {
-    try {
-        const user = auth.currentUser;
-        if(!user) return;
-        
-        // Importante: db deve estar disponível globalmente
-        await updateDoc(doc(db, "usuarios", user.uid), { fotoPerfil: nomeImg });
-        
-        // Tenta fechar o modal
-        const m = document.getElementById('modal-geral') || document.querySelector('.modal-overlay');
-        if(m) m.style.display = 'none';
-        
-        alert("Ícone equipado com sucesso!");
-        location.reload(); // Recarrega para garantir que tudo atualize
-    } catch(e) {
-        console.error(e);
-        alert("Erro ao equipar: Verifique sua conexão.");
-    }
-};
-
+    window.equiparIcone = async (nomeImg) => {
+        try {
+            const user = auth.currentUser;
+            if(!user) return;
+            await updateDoc(doc(db, "usuarios", user.uid), { fotoPerfil: nomeImg });
+            if(modal) modal.style.display = 'none';
+            alert("Ícone equipado com sucesso!");
+        } catch(e) {
+            alert("Erro ao equipar: Verifique sua conexão.");
+        }
+    };
 </script>
 
     <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
