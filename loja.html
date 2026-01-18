@@ -66,7 +66,6 @@
             margin: 0 auto;
         }
 
-        /* CARD DO ITEM */
         .item-card {
             background: var(--card-bg);
             border: 1px solid #1e2328;
@@ -83,7 +82,6 @@
             background: rgba(10, 50, 60, 0.8);
         }
 
-        /* SISTEMA DE BORDAS VIA CSS */
         .icon-container {
             position: relative;
             width: 100px;
@@ -95,27 +93,25 @@
         }
 
         .img-campeao {
-            width: 80px;
-            height: 80px;
+            width: 82px;
+            height: 82px;
             border-radius: 50%;
             object-fit: cover;
             z-index: 1;
+            display: block;
         }
 
-        /* A "Moldura" gerada por CSS */
         .moldura {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 4px solid transparent;
+            border: 5px solid transparent;
             z-index: 2;
             box-sizing: border-box;
+            pointer-events: none;
         }
 
-        /* RARIDADES ESTILIZADAS */
         .raro .moldura { 
             border-color: var(--raro); 
             box-shadow: 0 0 15px var(--raro), inset 0 0 10px var(--raro);
@@ -132,7 +128,7 @@
 
         @keyframes pulse-epico {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.7; }
+            50% { transform: scale(1.02); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -193,8 +189,7 @@
         </div>
     </div>
 
-    <div class="grid-loja" id="grid-itens">
-        </div>
+    <div class="grid-loja" id="grid-itens"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -214,13 +209,11 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // LINKS REAIS DAS SUAS IMAGENS (RAW)
         const itens = [
-            { id: "aatrox_comum", nome: "Aatrox", preco: 5000, raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-comum.png" },            
+            { id: "aatrox_comum", nome: "Aatrox", preco: 5000, raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-comum.png" },
             { id: "aatrox_raro", nome: "Aatrox Lua Sangrenta", preco: 25000, raridade: "raro", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-epico.png" },
-            { id: "aatrox_epico", nome: "Aatrox vitorioso", preco: 50000, raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-raro.png" }
+            { id: "aatrox_epico", nome: "Aatrox Vitorioso", preco: 50000, raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/aatrox-raro.png" }
         ];
-        
 
         let saldoGlobal = 0;
         let meusItens = [];
@@ -228,11 +221,13 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 onSnapshot(doc(db, "usuarios", user.uid), (snap) => {
-                    const d = snap.data();
-                    saldoGlobal = d.saldo || 0;
-                    meusItens = d.iconesAdquiridos || [];
-                    document.getElementById('saldo-valor').innerText = saldoGlobal.toLocaleString();
-                    renderLoja();
+                    if (snap.exists()) {
+                        const d = snap.data();
+                        saldoGlobal = d.saldo || 0;
+                        meusItens = d.iconesAdquiridos || [];
+                        document.getElementById('saldo-valor').innerText = saldoGlobal.toLocaleString();
+                        renderLoja();
+                    }
                 });
             } else {
                 window.location.href = "index.html";
@@ -258,7 +253,7 @@
                         <button class="btn-comprar" 
                             ${(jaPossui || !podeComprar) ? 'disabled' : ''} 
                             onclick="processarCompra('${item.id}', ${item.preco})">
-                            ${jaPossui ? 'Adquirido' : '💰 ' + item.preco}
+                            ${jaPossui ? 'Adquirido' : '💰 ' + item.preco.toLocaleString()}
                         </button>
                     </div>
                 `;
@@ -266,14 +261,14 @@
         }
 
         window.processarCompra = async (id, valor) => {
-            if (confirm(`Deseja adquirir este item por ${valor} moedas?`)) {
+            if (confirm(`Deseja adquirir este item por ${valor.toLocaleString()} moedas?`)) {
                 try {
                     const userRef = doc(db, "usuarios", auth.currentUser.uid);
                     await updateDoc(userRef, {
                         saldo: increment(-valor),
                         iconesAdquiridos: arrayUnion(id)
                     });
-                    alert("Compra realizada com sucesso! Ícone enviado para o seu inventário.");
+                    alert("Compra realizada com sucesso!");
                 } catch (e) {
                     alert("Erro ao processar compra.");
                 }
