@@ -265,7 +265,9 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const BASE_URL_IMG = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
+        // --- DEFINIÇÃO DOS CAMINHOS ---
+        const URL_ICONES = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
+        const URL_ITENS = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/";
 
         const itens = [
             { id: "aatrox_comum", cat: "icones", nome: "Aatrox", preco: 5000, raridade: "comum", img: "aatrox-comum.png" },
@@ -273,7 +275,9 @@
             { id: "aatrox_epico", cat: "icones", nome: "Aatrox Vitorioso", preco: 50000, raridade: "epico", img: "aatrox-epico.png" },
             { id: "ahri_comum", cat: "icones", nome: "Ahri", preco: 5000, raridade: "comum", img: "ahri-comum.png" },
             { id: "ahri_raro", cat: "icones", nome: "Ahri Raposa Flamejante", preco: 25000, raridade: "raro", img: "ahri-raro.png" },
-            { id: "ahri_epico", cat: "icones", nome: "Ahri K/DA", preco: 50000, raridade: "epico", img: "ahri-epico.png" }
+            { id: "ahri_epico", cat: "icones", nome: "Ahri K/DA", preco: 50000, raridade: "epico", img: "ahri-epico.png" },
+            // NOVO ITEM ADICIONADO ABAIXO
+            { id: "anjo_guardiao", cat: "itens", nome: "Anjo Guardião (7 Dias)", preco: 15000, raridade: "raro", img: "anjo.png" }
         ];
 
         let saldoGlobal = 0;
@@ -301,7 +305,9 @@
             categoriaAtual = categoria;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             elemento.classList.add('active');
-            document.getElementById('barra-filtros').style.display = categoria === 'icones' ? 'flex' : 'none';
+            
+            // Mostra a barra de filtros apenas se houver necessidade (Ícones ou Itens)
+            document.getElementById('barra-filtros').style.display = (categoria === 'moedas') ? 'none' : 'flex';
             renderLoja();
         };
 
@@ -312,7 +318,6 @@
             renderLoja();
         };
 
-        // Torna a função acessível globalmente para o input
         window.renderLoja = function() {
             const grid = document.getElementById('grid-itens');
             const busca = document.getElementById('input-busca').value.toLowerCase().trim();
@@ -321,14 +326,12 @@
             const itensFiltrados = itens.filter(item => {
                 const bateCategoria = item.cat === categoriaAtual;
                 const bateRaridade = raridadeFiltro === 'todos' || item.raridade === raridadeFiltro;
-                // Lógica de busca inteligente: verifica se o texto digitado existe em qualquer parte do nome
                 const bateBusca = item.nome.toLowerCase().includes(busca);
-                
                 return bateCategoria && bateRaridade && bateBusca;
             });
 
             if (itensFiltrados.length === 0) {
-                grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5; text-align:center;'>Nenhum campeão encontrado.</p>";
+                grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5; text-align:center;'>Nenhum item encontrado.</p>";
                 return;
             }
 
@@ -337,10 +340,13 @@
                 const podeComprar = saldoGlobal >= item.preco;
                 const labelRaridade = item.raridade === 'epico' ? 'Épico' : item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
 
+                // --- LÓGICA DE IMAGEM POR PASTA ---
+                const urlImagem = (item.cat === "itens") ? URL_ITENS + item.img : URL_ICONES + item.img;
+
                 grid.innerHTML += `
                     <div class="item-card ${item.raridade}">
                         <div class="icon-container">
-                            <img src="${BASE_URL_IMG + item.img}" class="img-campeao">
+                            <img src="${urlImagem}" class="img-campeao">
                         </div>
                         <div class="item-nome">${item.nome}</div>
                         <div class="raridade-label">${labelRaridade}</div>
