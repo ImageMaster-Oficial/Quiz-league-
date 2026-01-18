@@ -791,16 +791,28 @@
     };
 
     window.equiparIcone = async (nomeImg) => {
-        try {
-            const user = auth.currentUser;
-            if(!user) return;
-            await updateDoc(doc(db, "usuarios", user.uid), { fotoPerfil: nomeImg });
-            if(modal) modal.style.display = 'none';
-            alert("Ícone equipado com sucesso!");
-        } catch(e) {
-            alert("Erro ao equipar: Verifique sua conexão.");
+    try {
+        const user = auth.currentUser;
+        if(!user) {
+            alert("Usuário não autenticado!");
+            return;
         }
-    };
+
+        const userRef = doc(db, "usuarios", user.uid);
+        
+        // Usamos { merge: true } implicitamente no updateDoc para garantir que o campo seja criado se não existir
+        await updateDoc(userRef, { 
+            fotoPerfil: nomeImg 
+        });
+
+        if(modal) modal.style.display = 'none';
+        openModal("SUCESSO", "Ícone equipado! A alteração aparecerá em instantes.");
+        
+    } catch(e) {
+        console.error("Erro detalhado do Firebase:", e); // Olhe o F12 do navegador para ver o erro real
+        alert("Erro ao equipar: " + e.message);
+    }
+};
 </script>
 
     <div id="footer-ad-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; border-top: 2px solid #c89b3c;">
