@@ -153,10 +153,17 @@
                 try {
                     const userRef = doc(db, "usuarios", usuarioAtual.uid);
                     
-                    // ATUALIZAÇÃO: Incrementamos pdlSemanal E saldo simultaneamente
+                    // Capturamos os dados atuais para garantir a soma correta
+                    const userSnap = await getDoc(userRef);
+                    const dadosAtuais = userSnap.data() || {};
+                    
+                    const saldoAntigo = dadosAtuais.saldo || 0;
+                    const pdlAntigo = dadosAtuais.pdlSemanal || 0;
+
+                    // Gravamos os novos valores calculados
                     await setDoc(userRef, {
-                        pdlSemanal: increment(recompensa),
-                        saldo: increment(recompensa), // Adicionado para refletir na conta
+                        pdlSemanal: pdlAntigo + recompensa,
+                        saldo: saldoAntigo + recompensa,
                         ultimoBau: hojeStr
                     }, { merge: true });
 
