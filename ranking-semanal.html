@@ -169,7 +169,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // CONFIGURAÇÕES DE ÍCONES
         const ICONE_PADRAO = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/0.jpg';
+        const URL_BASE_ICON = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/';
         const MOEDA_IMG = 'https://cdn-icons-png.flaticon.com/512/272/272525.png';
 
         function atualizarTimer() {
@@ -198,11 +200,8 @@
             return 100;
         }
 
-        // FUNÇÃO EM TEMPO REAL (onSnapshot)
         function carregarRankingRealTime() {
             const container = document.getElementById('ranking-lista');
-            
-            // ATENÇÃO: Mudado de "xp" para "pdlSemanal" para obedecer ao reset do Admin
             const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(20));
 
             onSnapshot(q, (snapshot) => {
@@ -217,12 +216,23 @@
                 snapshot.forEach(doc => {
                     const user = doc.data();
                     const premio = calcularPremio(i);
-                    const foto = (user.photoURL && user.photoURL !== "") ? user.photoURL : ICONE_PADRAO;
+                    
+                    // LÓGICA DE ÍCONE CORRIGIDA:
+                    let foto;
+                    if (user.fotoPerfil) {
+                        // Se a foto começa com http (Google), usa direto. Se for só o número, monta a URL.
+                        foto = user.fotoPerfil.startsWith('http') ? user.fotoPerfil : URL_BASE_ICON + user.fotoPerfil;
+                    } else if (user.photoURL) {
+                        foto = user.photoURL;
+                    } else {
+                        foto = ICONE_PADRAO;
+                    }
+
                     const valorPDL = user.pdlSemanal || 0;
 
                     html += `
                         <div class="ranking-item ${i <= 3 ? 'top-1' : ''}">
-                            <div class="pos-num">${i < 10 ? '0' + i : i}</div>
+                            <div class="pos-num">${i < 10 ? '0' + i : i}º</div>
                             <div class="icon-wrapper">
                                 <img src="${foto}" class="user-icon" alt="Invocador" onerror="this.src='${ICONE_PADRAO}'">
                             </div>
