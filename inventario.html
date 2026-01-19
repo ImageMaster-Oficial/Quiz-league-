@@ -103,11 +103,9 @@
 
         .btn-acao:hover { background: var(--ouro); color: black; }
         
-        /* Equipado Highlight */
         .item-card.equipado { border-color: var(--raro); box-shadow: 0 0 15px rgba(0, 207, 188, 0.2); }
         .btn-acao.equipado { background: var(--raro); color: black; border-color: var(--raro); }
 
-        /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: var(--azul-hex); border: 2px solid var(--ouro); padding: 30px; max-width: 350px; text-align: center; clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%); }
         .modal-nome { color: var(--ouro); font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
@@ -124,7 +122,7 @@
 
     <div class="header-inv">
         <h1>Meu Inventário</h1>
-        <a href="loja.html" class="btn-voltar">Voltar para Loja</a>
+        <a href="resgate.html" class="btn-voltar">Voltar</a>
     </div>
 
     <div class="grid-inventario" id="grid-inv">
@@ -160,12 +158,14 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Banco de dados local de informações (Mesmos IDs da Loja)
+        // Banco de dados local de informações sincronizado com a Loja
         const DATA_BASE = {
             'aatrox_comum': { nome: "Aatrox", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-comum.png" },
             'aatrox_raro': { nome: "Aatrox Caçador", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-raro.png" },
             'aatrox_epico': { nome: "Aatrox Vitorioso", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-epico.png" },
             'ahri_comum': { nome: "Ahri", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-comum.png" },
+            'ahri_raro': { nome: "Ahri Raposa Flamejante", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-raro.png" },
+            'ahri_epico': { nome: "Ahri K/DA", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-epico.png" },
             'anjo_guardiao': { nome: "Anjo Guardião", tipo: "consumivel", duracao: 7, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/anjo.png" }
         };
 
@@ -192,7 +192,6 @@
             const mochila = usuarioDados.mochila || [];
             const iconeEquipado = usuarioDados.iconeAtual || "";
 
-            // Se não tiver nada
             if (icones.length === 0 && mochila.length === 0) {
                 grid.innerHTML = '<p class="vazio">Você ainda não possui itens ou ícones.</p>';
                 return;
@@ -239,11 +238,11 @@
 
             if (tipo === 'icone') {
                 titulo.innerText = "EQUIPAR ÍCONE";
-                msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
+                msg.innerText = `Deseja equipar "${item.nome.replace('<br>', '')}" como seu ícone de perfil?`;
                 btnSim.onclick = () => equiparIcone(id);
             } else {
                 titulo.innerText = "ATIVAR CONSUMÍVEL";
-                msg.innerText = `Deseja ativar "${item.nome}" agora? Isso iniciará o tempo de ${item.duracao} dias.`;
+                msg.innerText = `Deseja ativar "${item.nome.replace('<br>', '')}" agora? Isso iniciará o tempo de ${item.duracao} dias.`;
                 btnSim.onclick = () => ativarConsumivel(id);
             }
             modal.style.display = 'flex';
@@ -262,16 +261,15 @@
             const item = DATA_BASE[id];
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
             
-            // Calcula expiração (Agora + dias em milissegundos)
             const tempoMs = item.duracao * 24 * 60 * 60 * 1000;
             const expiraEm = Date.now() + tempoMs;
 
             try {
                 await updateDoc(userRef, {
-                    mochila: arrayRemove(id), // Tira do inventário
-                    [`statusAtivo.${id}`]: expiraEm // Salva no status com data de validade
+                    mochila: arrayRemove(id),
+                    [`statusAtivo.${id}`]: expiraEm
                 });
-                alert(`${item.nome} ativado! Confira na aba de Status.`);
+                alert(`${item.nome.replace('<br>', '')} ativado! Confira na aba de Status.`);
             } catch (e) {
                 alert("Erro ao ativar item.");
             }
