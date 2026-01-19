@@ -84,6 +84,13 @@
             text-transform: uppercase;
             padding: 10px 20px;
             border: 1px solid var(--gold);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background: var(--gold);
+            color: var(--dark);
         }
     </style>
 </head>
@@ -94,7 +101,7 @@
         <div id="lista-status">
             <p class="sem-itens">Carregando...</p>
         </div>
-        <center><a href="index.html" class="btn-voltar">Voltar</a></center>
+        <center><a href="resgate.html" class="btn-voltar">Voltar para o Resgate</a></center>
     </div>
 
     <script type="module">
@@ -129,6 +136,7 @@
                     }
                 });
             } else {
+                // Aqui continua index.html pois se não houver usuário, ele deve logar.
                 window.location.href = "index.html";
             }
         });
