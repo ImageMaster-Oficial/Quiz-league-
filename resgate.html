@@ -795,28 +795,65 @@
         }
     };
 
-    window.equiparIcone = async (nomeImg) => {
+    // Função para Equipar (Agora com feedback de sucesso)
+window.equiparIcone = async (nomeImg) => {
     try {
         const user = auth.currentUser;
-        if(!user) {
-            alert("Usuário não autenticado!");
-            return;
-        }
-
-        const userRef = doc(db, "usuarios", user.uid);
+        if(!user) return;
         
-        // Usamos { merge: true } implicitamente no updateDoc para garantir que o campo seja criado se não existir
-        await updateDoc(userRef, { 
+        await updateDoc(doc(db, "usuarios", user.uid), { 
             fotoPerfil: nomeImg 
         });
 
-        if(modal) modal.style.display = 'none';
-        openModal("SUCESSO", "Ícone equipado! A alteração aparecerá em instantes.");
+        modal.style.display = 'none';
+        // Feedback para o usuário saber que funcionou
+        openModal("SUCESSO", "Ícone equipado com sucesso!");
         
-    } catch(e) {
-        console.error("Erro detalhado do Firebase:", e); // Olhe o F12 do navegador para ver o erro real
-        alert("Erro ao equipar: " + e.message);
+    } catch(e) { 
+        console.error("Erro ao equipar:", e);
+        openModal("ERRO", "Não foi possível equipar o ícone.");
     }
+};
+
+// Função para Abrir Inventário (Com gatilho de confirmação)
+window.abrirInventario = async () => {
+    if (!userRef) return;
+    
+    // Busca os dados atualizados do usuário
+    const userDoc = await getDocs(query(collection(db, "usuarios")));
+    const dadosUsuario = userDoc.docs.find(d => d.id === auth.currentUser.uid).data();
+    const meusItensIDs = dadosUsuario.iconesAdquiridos || [];
+    
+    let html = `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px;">`;
+    
+    // Filtra os itens que o jogador possui
+    CATALOGO_ITENS.filter(i => meusItensIDs.includes(i.id)).forEach(item => {
+        // Agora o onclick chama uma confirmação em vez de equipar direto
+        html += `
+        <div onclick="window.confirmarTroca('${item.img}', '${item.nome}')" style="cursor:pointer; text-align:center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <img src="${URL_BASE_ICON + item.img}" style="width:100%; border-radius:8px; border: 1px solid #c89b3c33;">
+            <div style="font-size:10px; color:var(--gold); margin-top:5px; font-weight:bold;">${item.nome}</div>
+        </div>`;
+    });
+
+    if (meusItensIDs.length === 0) {
+        html = `<div style="color:#eee; text-align:center; padding:20px;">Seu inventário está vazio.</div>`;
+    }
+
+    openModal("MEUS ITENS", html + "</div>");
+};
+
+// Nova Função: Janela de Confirmação
+window.confirmarTroca = (img, nome) => {
+    const previewHtml = `
+        <div style="text-align:center;">
+            <img src="${URL_BASE_ICON + img}" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold); margin-bottom:15px;">
+            <p>Deseja equipar o ícone <strong>${nome}</strong>?</p>
+        </div>
+    `;
+    
+    // Usa o tipo 'confirm' que já criamos no seu sistema de modal
+    openModal("CONFIRMAR", previewHtml, 'confirm', () => window.equiparIcone(img));
 };
 </script>
 
