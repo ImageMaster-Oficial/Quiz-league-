@@ -601,69 +601,52 @@ function atualizarVisualPodio(posicao, nome, foto) {
     }
 
     function carregarQuestao() {
-    const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-    if(!c || !t) return;
-    
-    if (acertosNoCiclo >= 10 && videosAssistidos < 3) { 
-        t.innerText = "META DE ACERTOS ATINGIDA!"; 
-        c.innerHTML = "<p style='color:var(--gold); font-weight:bold; text-align:center;'>Assista aos anúncios para liberar o quiz novamente!</p>"; 
-        return; 
-    }
+        const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
+        if(!c || !t) return;
+        
+        if (acertosNoCiclo >= 10 && videosAssistidos < 3) { 
+            t.innerText = "META DE ACERTOS ATINGIDA!"; 
+            c.innerHTML = "<p style='color:var(--gold); font-weight:bold; text-align:center;'>Assista aos anúncios para liberar o quiz novamente!</p>"; 
+            return; 
+        }
 
-    if (bancoPerguntas.length === 0) { t.innerText = "A sincronizar questões..."; return; }
-    if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
+        if (bancoPerguntas.length === 0) { t.innerText = "A sincronizar questões..."; return; }
+        if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
 
-    const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
-    let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
-    t.innerText = q.pergunta; c.innerHTML = "";
-    
-    opts.forEach(o => {
-        const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
-        b.onclick = async () => {
-            // SALVA OS VALORES ANTES DO CLIQUE
-            const eloAntesDoQuizNome = getEloInfo(pdlInterno).nome;
-            const pdlAntesDoQuizValor = pdlInterno;
-
-            const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
-            const rect = b.getBoundingClientRect();
-            
-            try {
-                if (o.correta) {
-                    b.classList.add('btn-correct');
-                    showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
-                    await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10), pdlSemanal: increment(10) });
-                } else {
-                    b.classList.add('btn-wrong');
-                    const agora = Date.now();
-                    const dataExpiracaoAnjo = dadosUserLocais.statusAtivo?.anjo_guardiao || 0;
-                    const temAnjoAtivo = dataExpiracaoAnjo > agora;
-
-                    if (temAnjoAtivo) {
-                        showFloatingPDL("🛡️ PROTEGIDO", "#00cfbc", rect.left + rect.width/2, rect.top);
+        const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
+        let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
+        t.innerText = q.pergunta; c.innerHTML = "";
+        
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = "option-btn"; b.innerText = o.texto;
+            b.onclick = async () => {
+                const eloAntesDoQuiz = getEloInfo(pdlInterno).nome;
+                const all = c.querySelectorAll('button'); all.forEach(x => x.disabled = true);
+                const rect = b.getBoundingClientRect();
+                try {
+                    if (o.correta) {
+                        b.classList.add('btn-correct');
+                        showFloatingPDL("+10 PDL", "#28a745", rect.left + rect.width/2, rect.top);
+                        await updateDoc(userRef, { saldo: increment(10), acertos: increment(1), xp: increment(10), pdlSemanal: increment(10) });
                     } else {
+                        b.classList.add('btn-wrong');
                         showFloatingPDL("-2 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
                         await updateDoc(userRef, { xp: Math.max(0, pdlInterno - 2) });
                     }
+                } finally { 
+                    setTimeout(() => {
+                        const infoNovo = getEloInfo(pdlInterno);
+                        if (infoNovo.nome !== eloAntesDoQuiz) exibirAnimacaoElo(infoNovo, true);
+                        carregarQuestao();
+                    }, 1200); 
                 }
-            } finally { 
-                setTimeout(() => {
-                    const infoNovo = getEloInfo(pdlInterno);
-                    if (infoNovo.nome !== eloAntesDoQuizNome) {
-                        // COMPARAÇÃO REAL: PDL subiu ou desceu?
-                        const subiu = pdlInterno > pdlAntesDoQuizValor;
-                        exibirAnimacaoElo(infoNovo, subiu);
-                    }
-                    carregarQuestao();
-                }, 1200); 
-            }
-        };
-        c.appendChild(b);
-    });
-}
+            };
+            c.appendChild(b);
+        });
+    }
     
     function atualizarInterface() {
         if(!document.getElementById('goldAmount')) return;
-        
         document.getElementById('goldAmount').innerText = Math.floor(goldDB).toLocaleString('pt-BR');
         
         const elementoLimite = document.getElementById('txtLimiteBotao');
@@ -675,9 +658,7 @@ function atualizarVisualPodio(posicao, nome, foto) {
         const info = getEloInfo(pdlInterno);
         const eloBadge = document.getElementById('txtElo');
         if(eloBadge) {
-            eloBadge.innerText = info.nome; 
-            eloBadge.style.backgroundColor = info.bg; 
-            eloBadge.style.color = info.color;
+            eloBadge.innerText = info.nome; eloBadge.style.backgroundColor = info.bg; eloBadge.style.color = info.color;
         }
 
         const bar = document.getElementById('xpMiniFill');
@@ -691,83 +672,25 @@ function atualizarVisualPodio(posicao, nome, foto) {
         const btnVXP = document.getElementById('btnVideoXP');
         const aviso = document.getElementById('avisoStatusQuiz');
         
-        const liberadoPeloCiclo = (acertosNoCiclo >= 10);
-        const limiteDiarioDisponivel = (totalVideosHoje < 35);
-
-        if(btnV) {
-            if (liberadoPeloCiclo && limiteDiarioDisponivel) {
-                btnV.disabled = false;
-                btnV.style.backgroundColor = "var(--gold)"; 
-                btnV.style.color = "#ffffff";              
-                btnV.style.cursor = "pointer";
-                btnV.style.filter = "none";
-            } else {
-                btnV.disabled = true;
-                btnV.style.backgroundColor = "#555";       
-                btnV.style.color = "#aaa";                 
-                btnV.style.cursor = "not-allowed";
-            }
-        }
-
-        if(btnVXP) {
-            if (liberadoPeloCiclo) {
-                btnVXP.disabled = false;
-                btnVXP.style.backgroundColor = "var(--gold)"; 
-                btnVXP.style.color = "#ffffff";              
-                btnVXP.style.cursor = "pointer";
-                btnVXP.style.filter = "none";
-            } else {
-                btnVXP.disabled = true;
-                btnVXP.style.backgroundColor = "#555";
-                btnVXP.style.color = "#aaa";
-                btnVXP.style.cursor = "not-allowed";
-            }
-        }
+        if(btnV) btnV.disabled = (acertosNoCiclo < 10 || totalVideosHoje >= 35);
+        if(btnVXP) btnVXP.disabled = (acertosNoCiclo < 10);
         
-        if (acertosNoCiclo < 10) {
-            aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
-        } else if (videosAssistidos < 3) {
-            aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS</span>`;
-        } else {
-            aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
-        }
+        if (acertosNoCiclo < 10) aviso.innerHTML = `ACERTE <span style="color:#28a745">${10-acertosNoCiclo}</span> QUESTÕES PARA LIBERAR ANÚNCIOS`;
+        else if (videosAssistidos < 3) aviso.innerHTML = `<span style="color:#c89b3c">META ATINGIDA, ASSISTA <span style="color:#28a745; font-weight:bold;">${3-videosAssistidos}</span> ANÚNCIOS</span>`;
+        else aviso.innerHTML = `<span style="color:#28a745">ANÚNCIOS LIBERADOS!</span>`;
 
-        // Continuação do resto da função (Lógica do Vídeo Livre)...
         const btnLivre = document.getElementById('btnVideoLivre');
         const salvoLivre = localStorage.getItem('proximoVideoLivre');
         const agoraLivre = Date.now();
         if (btnLivre) {
             if (salvoLivre && parseInt(salvoLivre) > agoraLivre) {
                 btnLivre.disabled = true;
-                btnLivre.style.backgroundColor = "#555";
-                btnLivre.style.color = "#aaa";
                 cooldownLivreAtivo = true; 
             } else if (!cooldownLivreAtivo) {
                 btnLivre.disabled = false;
-                btnLivre.style.backgroundColor = "var(--gold)";
-                btnLivre.style.color = "#ffffff";
             }
         }
-    
-
-    // Lógica do Vídeo Livre (Cooldown)
-    const btnLivre = document.getElementById('btnVideoLivre');
-    const salvoLivre = localStorage.getItem('proximoVideoLivre');
-    const agoraLivre = Date.now();
-    
-    if (btnLivre) {
-        if (salvoLivre && parseInt(salvoLivre) > agoraLivre) {
-            btnLivre.disabled = true;
-            btnLivre.style.backgroundColor = "#555";
-            btnLivre.style.color = "#aaa";
-            cooldownLivreAtivo = true; 
-        } else if (!cooldownLivreAtivo) {
-            btnLivre.disabled = false;
-            btnLivre.style.backgroundColor = "var(--gold)"; // BUSCANDO A VARIÁVEL CSS
-            btnLivre.style.color = "#ffffff";
-        }
-    }
-}
+    } 
    
     function showFloatingPDL(text, color, x, y) {
         const el = document.createElement('div'); el.className = 'floating-pdl'; el.innerText = text; el.style.color = color; el.style.left = `${x}px`; el.style.top = `${y}px`;
