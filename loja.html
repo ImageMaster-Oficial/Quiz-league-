@@ -360,8 +360,8 @@
                 return;
             }
 
-            itensFiltrados.forEach(item => {
-                const jaPossui = meusItens.includes(item.id) || minhaMochila.includes(item.id);
+               itensFiltrados.forEach(item => {
+                const jaPossui = item.cat === 'icones' ? meusItens.includes(item.id) : minhaMochila.includes(item.id);
                 const podeComprar = saldoGlobal >= item.preco;
                 const labelRaridade = item.raridade === 'epico' ? 'Épico' : item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
                 const urlFinal = (item.cat === 'itens') ? URL_ITENS + item.img : URL_ICONES + item.img;
