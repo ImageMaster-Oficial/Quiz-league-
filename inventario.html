@@ -133,7 +133,7 @@
         <div class="modal-content">
             <div id="modal-title" class="modal-nome">ATIVAR ITEM?</div>
             <div id="modal-message" class="modal-msg"></div>
-            <div class="modal-btns">
+            <div class="modal-btns" id="container-btns-modal">
                 <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
                 <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
             </div>
@@ -142,7 +142,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // ADICIONADO increment PARA LÓGICA DE CARGAS
         import { getFirestore, doc, onSnapshot, updateDoc, arrayRemove, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -167,7 +166,8 @@
             'ahri_raro': { nome: "Ahri Raposa Flamejante", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-raro.png" },
             'ahri_epico': { nome: "Ahri K/DA", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-epico.png" },
             'anjo_guardiao': { nome: "Anjo Guardião", tipo: "consumivel", duracao: 7, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/anjo.png" },
-            'sentinela-epico': { nome: "Sentinela de Controle", tipo: "carga", unidades: 3, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" }
+            'sentinela-epico': { nome: "Sentinela de Controle", tipo: "carga", unidades: 3, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" },
+            'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", duracaoHoras: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" }
         };
 
         let usuarioDados = {};
@@ -216,6 +216,7 @@
             let tagTexto = "Consumível";
             if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
             if (item.tipo === 'carga') tagTexto = "Utilizável";
+            if (item.tipo === 'multiplicador') tagTexto = "Bônus de PDL";
 
             return `
                 <div class="item-card ${isEquipado ? 'equipado' : ''}">
@@ -238,19 +239,30 @@
             const msg = document.getElementById('modal-message');
             const titulo = document.getElementById('modal-title');
             const btnSim = document.getElementById('btn-sim');
+            
+            // Resetar botões do modal para o padrão (caso tenha vindo de um sucesso anterior)
+            document.getElementById('container-btns-modal').innerHTML = `
+                <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            `;
+            const novoBtnSim = document.getElementById('btn-sim');
 
             if (tipo === 'icone') {
                 titulo.innerText = "EQUIPAR ÍCONE";
                 msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
-                btnSim.onclick = () => equiparIcone(id);
+                novoBtnSim.onclick = () => equiparIcone(id);
             } else if (tipo === 'carga') {
                 titulo.innerText = "ATIVAR REVELAÇÃO";
                 msg.innerText = `Deseja ativar "${item.nome}"? Isso adicionará ${item.unidades} cargas de revelação ao seu Quiz.`;
-                btnSim.onclick = () => ativarSentinela(id);
+                novoBtnSim.onclick = () => ativarSentinela(id);
+            } else if (tipo === 'multiplicador') {
+                titulo.innerText = "ATIVAR MULTIPLICADOR";
+                msg.innerText = `Deseja ativar "${item.nome}" agora? Isso dobrará seus ganhos de PDL por ${item.duracaoHoras} horas.`;
+                novoBtnSim.onclick = () => ativarMultiplicador(id);
             } else {
                 titulo.innerText = "ATIVAR CONSUMÍVEL";
                 msg.innerText = `Deseja ativar "${item.nome}" agora? Isso iniciará o tempo de ${item.duracao} dias (acumulativo).`;
-                btnSim.onclick = () => ativarConsumivel(id);
+                novoBtnSim.onclick = () => ativarConsumivel(id);
             }
             modal.style.display = 'flex';
         };
@@ -261,8 +273,8 @@
             const modal = document.getElementById('modal-confirm');
             document.getElementById('modal-title').innerText = titulo;
             document.getElementById('modal-message').innerHTML = htmlConteudo;
-            const containerBtns = document.querySelector('.modal-btns');
-            containerBtns.innerHTML = `<button class="btn-confirm" onclick="location.reload()">OK</button>`;
+            const containerBtns = document.getElementById('container-btns-modal');
+            containerBtns.innerHTML = `<button class="btn-confirm" onclick="fecharModal()">OK</button>`;
             modal.style.display = 'flex';
         }
 
@@ -301,6 +313,50 @@
             } catch (e) {
                 console.error("Erro ao ativar sentinela:", e);
                 mostrarModalSucesso("ERRO", "Falha na ativação Hextech.");
+            }
+        }
+
+        async function ativarMultiplicador(id) {
+            fecharModal();
+            const item = DATA_BASE[id];
+            const userRef = doc(db, "usuarios", auth.currentUser.uid);
+            const agora = Date.now();
+            const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
+
+            try {
+                const snap = await getDoc(userRef);
+                const dados = snap.data();
+                const statusAtivo = dados.statusAtivo || {};
+
+                // AVISO INTELIGENTE DE SOBREPOSIÇÃO
+                if (statusAtivo.dobrador_pdl && agora < statusAtivo.dobrador_pdl) {
+                    const confirmarSubstituicao = confirm(
+                        "ATENÇÃO INVOCADOR:\n\n" +
+                        "Detectamos que você já possui um item multiplicador ativo em sua conta.\n" +
+                        "Se você ativar este agora, o tempo restante do anterior será substituído por este novo bônus de 2 horas.\n\n" +
+                        "Deseja prosseguir com a substituição?"
+                    );
+                    
+                    if (!confirmarSubstituicao) return;
+                }
+
+                await updateDoc(userRef, {
+                    mochila: arrayRemove(id),
+                    "statusAtivo.dobrador_pdl": agora + duracaoMs
+                });
+
+                const msgSucesso = `
+                    <div style="text-align:center;">
+                        <img src="${item.img}" style="width:60px; margin-bottom:10px; filter: drop-shadow(0 0 10px var(--ouro));">
+                        <p style="color:var(--ouro); font-weight:bold; text-transform:uppercase;">${item.nome} Ativada!</p>
+                        <p>Seus ganhos de PDL estão <strong>DOBRADOS</strong> pelas próximas ${item.duracaoHoras} horas.</p>
+                    </div>
+                `;
+                mostrarModalSucesso("BÔNUS ATIVADO", msgSucesso);
+
+            } catch (e) {
+                console.error("Erro ao ativar multiplicador:", e);
+                mostrarModalSucesso("ERRO", "Não foi possível processar a ativação do multiplicador.");
             }
         }
 
