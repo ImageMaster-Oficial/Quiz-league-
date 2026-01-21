@@ -11,15 +11,12 @@
             --fundo: #010a13;
             --card-bg: rgba(9, 20, 40, 0.9);
             --azul-hex: #091428;
-            --comum: #808080;
-            --raro: #00cfbc;
-            --epico: #a335ee;
         }
 
         body {
             background: radial-gradient(circle at center, #0a323c 0%, #010a13 100%);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
@@ -47,7 +44,7 @@
         .grid-inventario {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 25px;
+            gap: 20px;
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -58,48 +55,13 @@
             padding: 20px 15px;
             text-align: center;
             position: relative;
-            transition: all 0.3s;
             clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
         }
 
-        .item-card:hover { transform: translateY(-5px); border-color: var(--ouro); }
+        .icon-container { width: 70px; height: 70px; margin: 0 auto 10px; }
+        .img-item { width: 100%; height: 100%; object-fit: cover; border: 1px solid rgba(200, 155, 60, 0.3); }
 
-        .icon-container { width: 80px; height: 80px; margin: 0 auto 15px; position: relative; }
-        .img-item { width: 100%; height: 100%; border-radius: 4px; object-fit: cover; border: 1px solid rgba(200, 155, 60, 0.3); }
-
-        .badge-qtd {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: var(--ouro);
-            color: black;
-            font-weight: 900;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            z-index: 2;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        .item-nome { 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            font-size: 0.8rem; 
-            margin-bottom: 10px; 
-            min-height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tag-tipo {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            color: var(--ouro-claro);
-            opacity: 0.7;
-        }
+        .item-nome { font-weight: 900; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 15px; min-height: 30px; }
 
         .btn-acao {
             background: linear-gradient(to bottom, #1e2328, #010a13);
@@ -112,41 +74,20 @@
             cursor: pointer;
             font-size: 0.7rem;
             clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
-            transition: 0.3s;
         }
 
-        .btn-acao:hover { background: var(--ouro); color: black; }
-        
-        .item-card.equipado { border-color: var(--raro); box-shadow: 0 0 15px rgba(0, 207, 188, 0.2); }
-        .btn-acao.equipado { background: var(--raro); color: black; border-color: var(--raro); }
+        .item-card.equipado { border-color: #00cfbc; }
+        .btn-acao.equipado { background: #00cfbc; color: black; border-color: #00cfbc; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--azul-hex); border: 2px solid var(--ouro); padding: 30px; max-width: 350px; text-align: center; clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%); }
-        .modal-nome { color: var(--ouro); font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
-        .modal-msg { color: #f0e6d2; font-size: 0.9rem; margin-bottom: 25px; line-height: 1.4; }
-        .btn-confirm { background: var(--ouro); border: 1px solid var(--ouro-claro); color: black; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--azul-hex); border: 2px solid var(--ouro); padding: 25px; text-align: center; width: 100%; max-width: 300px; clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%); }
+        .modal-nome { color: var(--ouro); font-weight: bold; margin-bottom: 10px; }
+        .modal-msg { color: #f0e6d2; font-size: 0.85rem; margin-bottom: 20px; }
+        .btn-confirm { background: var(--ouro); border: none; color: black; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
         .btn-cancel { background: transparent; border: 1px solid var(--ouro); color: var(--ouro); padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
 
-        .seletor-qtd {
-            margin: 15px 0;
-            background: rgba(0,0,0,0.4);
-            padding: 10px;
-            border: 1px solid rgba(200, 155, 60, 0.3);
-        }
-        .seletor-qtd label { font-size: 0.65rem; color: var(--ouro); display: block; margin-bottom: 5px; }
-        .seletor-qtd input { 
-            background: transparent; 
-            border: 1px solid var(--ouro); 
-            color: white; 
-            text-align: center; 
-            width: 60px; 
-            font-weight: bold;
-            outline: none;
-        }
-
-        .vazio { grid-column: 1/-1; text-align: center; padding: 100px; opacity: 0.5; font-style: italic; }
-        .btn-voltar { text-decoration: none; color: var(--ouro); border: 1px solid var(--ouro); padding: 5px 15px; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
-        .btn-voltar:hover { background: var(--ouro); color: black; }
+        .vazio { grid-column: 1/-1; text-align: center; padding: 100px; opacity: 0.5; }
+        .btn-voltar { text-decoration: none; color: var(--ouro); border: 1px solid var(--ouro); padding: 5px 15px; font-size: 0.8rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -157,15 +98,15 @@
     </div>
 
     <div class="grid-inventario" id="grid-inv">
-        <p class="vazio">Carregando seus espólios...</p>
+        <p class="vazio">Carregando espólios...</p>
     </div>
 
     <div class="modal-overlay" id="modal-confirm">
         <div class="modal-content">
             <div id="modal-title" class="modal-nome">ATIVAR ITEM?</div>
             <div id="modal-message" class="modal-msg"></div>
-            <div class="modal-btns" id="container-btns-modal">
-                <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
+            <div id="container-btns-modal">
+                <button class="btn-confirm" id="btn-sim">Confirmar</button>
                 <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
             </div>
         </div>
@@ -173,7 +114,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, arrayRemove, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -192,10 +133,6 @@
         const DATA_BASE = {
             'aatrox_comum': { nome: "Aatrox", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-comum.png" },
             'aatrox_raro': { nome: "Aatrox Caçador", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-raro.png" },
-            'aatrox_epico': { nome: "Aatrox Vitorioso", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-epico.png" },
-            'ahri_comum': { nome: "Ahri", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-comum.png" },
-            'ahri_raro': { nome: "Ahri Raposa Flamejante", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-raro.png" },
-            'ahri_epico': { nome: "Ahri K/DA", tipo: "icone", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-epico.png" },
             'anjo_guardiao': { nome: "Anjo Guardião", tipo: "consumivel", duracao: 7, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/anjo.png" },
             'sentinela-epico': { nome: "Sentinela de Controle", tipo: "carga", unidades: 3, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" },
             'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", duracaoHoras: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" }
@@ -211,183 +148,85 @@
                         renderInventario();
                     }
                 });
-            } else {
-                window.location.href = "index.html";
-            }
+            } else { window.location.href = "index.html"; }
         });
 
         function renderInventario() {
             const grid = document.getElementById('grid-inv');
-            let htmlFinal = ""; // Acumula primeiro para injetar uma única vez
+            grid.innerHTML = "";
 
+            const mochila = usuarioDados.mochila || [];
             const icones = usuarioDados.iconesAdquiridos || [];
-            const mochilaRaw = usuarioDados.mochila || [];
             const iconeEquipado = usuarioDados.iconeAtual || "";
 
-            // AGRUPAMENTO ABSOLUTO
-            const contagemItens = {};
-            mochilaRaw.forEach(id => {
-                contagemItens[id] = (contagemItens[id] || 0) + 1;
-            });
-
-            const idsUnicosMochila = Object.keys(contagemItens);
-
-            if (icones.length === 0 && idsUnicosMochila.length === 0) {
-                grid.innerHTML = '<p class="vazio">Você ainda não possui itens ou ícones.</p>';
+            if (mochila.length === 0 && icones.length === 0) {
+                grid.innerHTML = '<p class="vazio">Seu inventário está vazio.</p>';
                 return;
             }
 
-            // 1. Processa Itens da Mochila Agrupados
-            idsUnicosMochila.forEach(id => {
+            mochila.forEach((id, index) => {
                 const item = DATA_BASE[id];
-                if (item) {
-                    htmlFinal += criarCard(id, item, "ATIVAR", false, contagemItens[id]);
-                }
+                if (item) grid.innerHTML += criarCard(id, item, "ATIVAR", false);
             });
 
-            // 2. Processa Ícones (individuais)
             icones.forEach(id => {
                 const item = DATA_BASE[id];
                 if (item) {
-                    const estaEquipado = (id === iconeEquipado);
-                    htmlFinal += criarCard(id, item, estaEquipado ? "EQUIPADO" : "EQUIPAR", estaEquipado, 1);
+                    const equipado = (id === iconeEquipado);
+                    grid.innerHTML += criarCard(id, item, equipado ? "EQUIPADO" : "EQUIPAR", equipado);
                 }
             });
-
-            grid.innerHTML = htmlFinal; // Injeção única para evitar duplicidade de renderização
         }
 
-        function criarCard(id, item, txtBotao, isEquipado, qtd) {
-            let tagTexto = "Consumível";
-            if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
-            if (item.tipo === 'carga') tagTexto = "Utilizável";
-            if (item.tipo === 'multiplicador') tagTexto = "Bônus de PDL";
-
-            const badgeHtml = qtd > 1 ? `<div class="badge-qtd">${qtd}X</div>` : "";
-
+        function criarCard(id, item, txt, equipado) {
             return `
-                <div class="item-card ${isEquipado ? 'equipado' : ''}">
-                    ${badgeHtml}
-                    <div class="tag-tipo">${tagTexto}</div>
-                    <div class="icon-container">
-                        <img src="${item.img}" class="img-item">
-                    </div>
+                <div class="item-card ${equipado ? 'equipado' : ''}">
+                    <div class="icon-container"><img src="${item.img}" class="img-item"></div>
                     <div class="item-nome">${item.nome}</div>
-                    <button class="btn-acao ${isEquipado ? 'equipado' : ''}" 
-                        onclick="acaoItem('${id}', '${item.tipo}', ${qtd})" ${isEquipado ? 'disabled' : ''}>
-                        ${txtBotao}
+                    <button class="btn-acao ${equipado ? 'equipado' : ''}" 
+                        onclick="acaoItem('${id}', '${item.tipo}')" ${equipado ? 'disabled' : ''}>
+                        ${txt}
                     </button>
-                </div>
-            `;
+                </div>`;
         }
 
-        window.acaoItem = (id, tipo, qtdDisponivel) => {
+        window.acaoItem = (id, tipo) => {
             const item = DATA_BASE[id];
             const modal = document.getElementById('modal-confirm');
-            const msg = document.getElementById('modal-message');
-            const titulo = document.getElementById('modal-title');
+            document.getElementById('modal-title').innerText = "ATIVAR ITEM";
+            document.getElementById('modal-message').innerText = `Deseja usar "${item.nome}"?`;
             
-            document.getElementById('container-btns-modal').innerHTML = `
-                <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
-                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-            `;
-            const novoBtnSim = document.getElementById('btn-sim');
-
-            if (tipo === 'icone') {
-                titulo.innerText = "EQUIPAR ÍCONE";
-                msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
-                novoBtnSim.onclick = () => equiparIcone(id);
-            } 
-            else if (tipo === 'multiplicador') {
-                titulo.innerText = "ATIVAR MULTIPLICADOR";
-                const agora = Date.now();
-                if (usuarioDados.statusAtivo?.dobrador_pdl && agora < usuarioDados.statusAtivo.dobrador_pdl) {
-                    titulo.innerText = "ATENÇÃO INVOCADOR";
-                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador ativo!</span><br><br>Se ativar este agora, o tempo do anterior será substituído por este novo bônus de ${item.duracaoHoras} horas. Deseja prosseguir?`;
-                } else {
-                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso dobrará seus ganhos de PDL por ${item.duracaoHoras} horas.`;
-                }
-                novoBtnSim.onclick = () => processarUso(id, tipo, 1);
-            } 
-            else {
-                let htmlSeletor = "";
-                if(qtdDisponivel > 1) {
-                    htmlSeletor = `
-                        <div class="seletor-qtd">
-                            <label>QUANTIDADE PARA USAR (MAX: ${qtdDisponivel})</label>
-                            <input type="number" id="input-qtd" value="1" min="1" max="${qtdDisponivel}">
-                        </div>
-                    `;
-                } else {
-                    htmlSeletor = `<input type="hidden" id="input-qtd" value="1">`;
-                }
-
-                if (tipo === 'carga') {
-                    titulo.innerText = "ATIVAR REVELAÇÃO";
-                    msg.innerHTML = `Deseja ativar "${item.nome}"?<br>${htmlSeletor}`;
-                } else {
-                    titulo.innerText = "ATIVAR CONSUMÍVEL";
-                    msg.innerHTML = `Deseja ativar "${item.nome}"? O tempo será acumulado.<br>${htmlSeletor}`;
-                }
-
-                novoBtnSim.onclick = () => {
-                    const qtdSelecionada = parseInt(document.getElementById('input-qtd').value) || 1;
-                    processarUso(id, tipo, qtdSelecionada);
-                };
-            }
+            document.getElementById('btn-sim').onclick = () => {
+                if (tipo === 'icone') equiparIcone(id);
+                else processarUso(id, tipo);
+            };
             modal.style.display = 'flex';
         };
 
-        async function processarUso(id, tipo, qtd) {
+        async function processarUso(id, tipo) {
             fecharModal();
             const item = DATA_BASE[id];
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
             const agora = Date.now();
-            const removerEstoque = Array(qtd).fill(id);
 
             try {
-                let updates = { mochila: arrayRemove(...removerEstoque) };
-
-                if (tipo === 'carga') {
-                    updates["statusAtivo.sentinelas"] = increment(item.unidades * qtd);
-                } 
-                else if (tipo === 'multiplicador') {
-                    updates["statusAtivo.dobrador_pdl"] = agora + (item.duracaoHoras * 60 * 60 * 1000);
-                } 
+                let ups = { mochila: arrayRemove(id) };
+                if (tipo === 'carga') ups["statusAtivo.sentinelas"] = increment(item.unidades);
+                else if (tipo === 'multiplicador') ups["statusAtivo.dobrador_pdl"] = agora + (item.duracaoHoras * 3600000);
                 else if (tipo === 'consumivel') {
-                    const tempoMs = (item.duracao * qtd) * 24 * 60 * 60 * 1000;
-                    const tempoAtual = (usuarioDados.statusAtivo && usuarioDados.statusAtivo[id] > agora) ? usuarioDados.statusAtivo[id] : agora;
-                    updates[`statusAtivo.${id}`] = tempoAtual + tempoMs;
+                    const ms = item.duracao * 86400000;
+                    const base = (usuarioDados.statusAtivo && usuarioDados.statusAtivo[id] > agora) ? usuarioDados.statusAtivo[id] : agora;
+                    ups[`statusAtivo.${id}`] = base + ms;
                 }
-
-                await updateDoc(userRef, updates);
-                mostrarModalSucesso("SUCESSO", `Você utilizou ${qtd}x ${item.nome} com êxito!`);
-                
-            } catch (e) {
-                console.error(e);
-                mostrarModalSucesso("ERRO", "Falha na Transmissão Hextech.");
-            }
+                await updateDoc(userRef, ups);
+            } catch (e) { console.error(e); }
         }
 
         window.fecharModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
 
-        function mostrarModalSucesso(titulo, htmlConteudo) {
-            const modal = document.getElementById('modal-confirm');
-            document.getElementById('modal-title').innerText = titulo;
-            document.getElementById('modal-message').innerHTML = htmlConteudo;
-            const containerBtns = document.getElementById('container-btns-modal');
-            containerBtns.innerHTML = `<button class="btn-confirm" onclick="fecharModal()">OK</button>`;
-            modal.style.display = 'flex';
-        }
-
         async function equiparIcone(id) {
             fecharModal();
-            try {
-                const userRef = doc(db, "usuarios", auth.currentUser.uid);
-                await updateDoc(userRef, { iconeAtual: id });
-            } catch (e) {
-                console.error("Erro ao equipar:", e);
-            }
+            await updateDoc(doc(db, "usuarios", auth.currentUser.uid), { iconeAtual: id });
         }
     </script>
 </body>
