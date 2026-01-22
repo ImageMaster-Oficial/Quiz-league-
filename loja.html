@@ -231,6 +231,7 @@
             </div>
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -262,8 +263,9 @@
             { id: "coletora-comum", cat: "itens", nome: "A Coletora <br> (2 Horas)", preco: 3000, raridade: "comum", img: "coletora-comum.png", info: "Efeito Passivo: Dobra seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de PDL." },
             { id: "gume-raro", cat: "itens", nome: "Gume do infinito <br> (2 Horas)", preco: 5800, raridade: "raro", img: "gume-raro.png", info: "Efeito Passivo: Multiplica 4x seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de PDL." },
             { id: "sedenta-epico", cat: "itens", nome: "Sedenta por Sangue <br> (2 Horas)", preco: 7700, raridade: "epico", img: "sedenta-epico.png", info: "Efeito Passivo: Multiplica 6x seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de PDL." },
-            { id: "atlas-comum", cat: "itens", nome: "Atlas Mundial <br> (2 Horas)", preco: 3000, raridade: "comum", img: "atlas-comum.png", info: " Efeito Passivo: Dobra seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." },
-            { id: "bussola-raro", cat: "itens", nome: "Bússola Rúnica <br> (2 Horas)", preco: 5800, raridade: "raro", img: "bussola-raro.png", info: " Efeito Passivo: Multiplica 4x seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." }
+            { id: "atlas-comum", cat: "itens", nome: "Atlas Mundial <br> (2 Horas)", preco: 3000, raridade: "comum", img: "atlas-comum.png", info: "Efeito Passivo: Dobra seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." },
+            { id: "bussola-raro", cat: "itens", nome: "Bússola Rúnica <br> (2 Horas)", preco: 5800, raridade: "raro", img: "bussola-raro.png", info: "Efeito Passivo: Multiplica 4x seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." },
+            { id: "oposicao-epico", cat: "itens", nome: "Oposição Celestial <br> (2 Horas)", preco: 7700, raridade: "epico", img: "oposicao-epico.png", info: "Efeito Passivo: Multiplica 6x seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." }
         ];        
         
         let saldoGlobal = 0;
@@ -389,6 +391,8 @@
                         mostrarSucesso("O Atlas Mundial foi enviado para seu inventário. Ative-o para dobrar seus ganhos de Moedas por 2 horas!");
                     } else if (id === "bussola-raro") {
                         mostrarSucesso("A Bússola Rúnica foi enviada para seu inventário. Ative-a para multiplicar seus ganhos de Moedas por 4 por 2 horas!");
+                    } else if (id === "oposicao-epico") {
+                        mostrarSucesso("A Oposição Celestial foi enviada para seu inventário. Ative-a para multiplicar seus ganhos de Moedas por 6 por 2 horas!");
                     } else {
                         mostrarSucesso("Item enviado para o seu inventário! Vá até lá para ativar seu benefício.");
                     }
