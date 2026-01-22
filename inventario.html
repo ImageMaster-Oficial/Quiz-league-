@@ -188,7 +188,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // DATABASE ATUALIZADA COM RARIDADES
         const DATA_BASE = {
             'aatrox_comum': { nome: "Aatrox", tipo: "icone", raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-comum.png" },
             'aatrox_raro': { nome: "Aatrox Caçador", tipo: "icone", raridade: "raro", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-raro.png" },
@@ -198,8 +197,8 @@
             'ahri_epico': { nome: "Ahri K/DA", tipo: "icone", raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-epico.png" },
             'anjo_guardiao': { nome: "Anjo Guardião", tipo: "consumivel", raridade: "raro", duracao: 7, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/anjo.png" },
             'sentinela-epico': { nome: "Sentinela de Controle", tipo: "carga", raridade: "epico", unidades: 3, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" },
-            'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", raridade: "comum", duracaoHoras: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" },
-            'gume-raro': { nome: "Gume do infinito", tipo: "multiplicador", raridade: "raro", duracaoHoras: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/gume-raro.png" }
+            'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", raridade: "comum", duracaoHoras: 2, multiplicadorPDL: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" },
+            'gume-raro': { nome: "Gume do infinito", tipo: "multiplicador", raridade: "raro", duracaoHoras: 2, multiplicadorPDL: 4, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/gume-raro.png" }
         };
 
         let usuarioDados = {};
@@ -230,14 +229,12 @@
                 return;
             }
 
-            // Renderizar Itens da Mochila (Consumíveis)
             mochila.forEach(id => {
                 const item = DATA_BASE[id];
                 if (!item) return;
                 grid.innerHTML += criarCard(id, item, "ATIVAR", false);
             });
 
-            // Renderizar Ícones
             icones.forEach(id => {
                 const item = DATA_BASE[id];
                 if (!item) return;
@@ -250,7 +247,7 @@
             let tagTexto = "Consumível";
             if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
             if (item.tipo === 'carga') tagTexto = "Utilizável";
-            if (item.tipo === 'multiplicador') tagTexto = "Bônus de PDL";
+            if (item.tipo === 'multiplicador') tagTexto = `Bônus ${item.multiplicadorPDL}x PDL`;
 
             const labelRaridade = item.raridade === 'epico' ? 'Épico' : item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
 
@@ -269,8 +266,6 @@
                 </div>
             `;
         }
-
-        // --- LÓGICA DE AÇÕES (MODAIS E FIREBASE) ---
 
         window.acaoItem = (id, tipo) => {
             const item = DATA_BASE[id];
@@ -297,9 +292,9 @@
                 const agora = Date.now();
                 if (usuarioDados.statusAtivo?.dobrador_pdl && agora < usuarioDados.statusAtivo.dobrador_pdl) {
                     titulo.innerText = "ATENÇÃO INVOCADOR";
-                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador ativo!</span><br><br>Se ativar este agora, o tempo do anterior será substituído. Deseja prosseguir?`;
+                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador ativo!</span><br><br>Se ativar este agora, o tempo e o valor (${item.multiplicadorPDL}x) do novo item substituirão o anterior. Deseja prosseguir?`;
                 } else {
-                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso dobrará seus ganhos de PDL por ${item.duracaoHoras} horas.`;
+                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de PDL por ${item.multiplicadorPDL} durante ${item.duracaoHoras} horas.`;
                 }
                 novoBtnSim.onclick = () => ativarMultiplicador(id);
             } else {
@@ -347,12 +342,17 @@
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
             const agora = Date.now();
             const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
+            const multiplicador = item.multiplicadorPDL;
+
             try {
                 await updateDoc(userRef, {
                     mochila: arrayRemove(id),
-                    "statusAtivo.dobrador_pdl": agora + duracaoMs
+                    "statusAtivo.dobrador_pdl": agora + duracaoMs,
+                    "statusAtivo.valor_multiplicador": multiplicador
                 });
-                mostrarModalSucesso("BÔNUS ATIVADO", `<p>Seus ganhos de PDL estão <strong>DOBRADOS</strong> por ${item.duracaoHoras}h.</p>`);
+                
+                const textoEfeito = multiplicador === 4 ? "QUADRUPLICADOS" : "DOBRADOS";
+                mostrarModalSucesso("BÔNUS ATIVADO", `<p>Seus ganhos de PDL estão <strong>${textoEfeito}</strong> por ${item.duracaoHoras}h.</p>`);
             } catch (e) { console.error(e); }
         }
 
