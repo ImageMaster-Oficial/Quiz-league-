@@ -256,13 +256,13 @@
         <div style="text-align: center;">
             <div class="video-buttons-container">
                 <button id="btnVideo" class="video-btn">
-                   📺 +100 MOEDAS 
+                   📺 +500 MOEDAS 
                    <span id="txtMetaAcertos">META 10 ACERTOS</span>
                    <span id="txtLimiteBotao" style="font-size: 0.65rem; display: block; opacity: 0.8;">LIMITE DIÁRIO: 0/35</span>
                 </button>
                 
                 <button id="btnVideoLivre" class="video-btn active" style="border-color: #28a745 !important;">
-                    📺 +10 MOEDAS <span>+100 PDL</span>
+                    📺 +100 MOEDAS <span>+100 PDL</span>
                 </button>
                 
                 <button id="btnVideoXP" class="video-btn">📺 +500 PDL <span>META 10 ACERTOS</span></button>
@@ -557,7 +557,7 @@ function atualizarVisualPodio(posicao, nome, foto) {
                 cooldownLivreAtivo = false;
                 localStorage.removeItem('proximoVideoLivre');
                 btn.disabled = false;
-                btn.innerHTML = `📺 +10 MOEDAS <span>+100 PDL</span>`;
+                btn.innerHTML = `📺 +100 MOEDAS <span>+100 PDL</span>`;
                 if(typeof atualizarInterface === 'function') atualizarInterface();
             }
         }, 1000);
@@ -614,14 +614,14 @@ function atualizarVisualPodio(posicao, nome, foto) {
         const eloAntes = getEloInfo(pdlInterno).nome;
 
         if (tipoRecompensa === "moeda") {
-            up = { saldo: increment(100), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
-            msg = "Você ganhou 100 moedas!";
+            up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
+            msg = "Você ganhou 500 moedas!";
         } else if (tipoRecompensa === "pdl") {
             up = { xp: increment(500), pdlSemanal: increment(500), videosAssistidos: increment(1) };
             msg = "Você ganhou 500 PDL!";
         } else if (tipoRecompensa === "livre") {
-            up = { saldo: increment(10), xp: increment(100), pdlSemanal: increment(100) };
-            msg = "Bônus Livre: +10 Moedas e +100 PDL!";
+            up = { saldo: increment(100), xp: increment(100), pdlSemanal: increment(100) };
+            msg = "Bônus Livre: +100 Moedas e +100 PDL!";
             iniciarCooldownLivre(120);
         }
 
@@ -929,7 +929,7 @@ function atualizarVisualPodio(posicao, nome, foto) {
                 <div class="pos-destaque" style="font-size: 3.5rem; color: #0ac8b9; font-weight: bold; margin: 10px 0; font-family: sans-serif;">${dados.posicao}º</div>
                 <p style="color: #f0e6d2; font-family: sans-serif;">Você recebeu:</p>
                 <div style="color:#c89b3c; font-size: 1.5rem; font-weight: bold; font-family: sans-serif;">
-                    ${dados.valor.toLocaleString()} <span style="font-size: 12px;">OURO</span>
+                    ${dados.valor.toLocaleString()} <span style="font-size: 12px;">MOEDAS</span>
                 </div>
                 <button id="btnColetar" style="background: #c89b3c; color: #010a13; border: none; padding: 15px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 20px; font-family: sans-serif;">
                     Coletar Recompensa
