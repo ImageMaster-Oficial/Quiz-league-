@@ -656,8 +656,9 @@ function atualizarVisualPodio(posicao, nome, foto) {
 
     async function carregarQuestao() {
     const c = document.getElementById('opcoes'), t = document.getElementById('perguntaTexto');
-    if(!c || !t) return;
+    if (!c || !t) return;
     
+    // Verificação de ciclo de acertos e anúncios
     if (acertosNoCiclo >= 10 && videosAssistidos < 3) { 
         t.innerText = "META DE ACERTOS ATINGIDA!"; 
         c.innerHTML = "<p style='color:var(--gold); font-weight:bold; text-align:center;'>Assista aos anúncios para liberar o quiz novamente!</p>"; 
@@ -667,13 +668,15 @@ function atualizarVisualPodio(posicao, nome, foto) {
     if (bancoPerguntas.length === 0) { t.innerText = "A sincronizar questões..."; return; }
     if (totalVideosHoje >= 35 && acertosNoCiclo >= 10) { t.innerText = "LIMITE DIÁRIO ATINGIDO!"; c.innerHTML = ""; return; }
 
-    const q = bancoPerguntas[Math.floor(Math.random()*bancoPerguntas.length)];
+    // Seleção da pergunta e embaralhamento das opções
+    const q = bancoPerguntas[Math.floor(Math.random() * bancoPerguntas.length)];
     let opts = q.opcoes.map((o, i) => ({ texto: o, correta: i === q.correta })).sort(() => Math.random() - 0.5);
     
     t.innerText = q.pergunta; 
     c.innerHTML = "";
 
     // --- LÓGICA DA SENTINELA (REVELAÇÃO) ---
+    // Verifica se o usuário tem cargas de sentinela ativas no banco de dados local
     const cargasSentinela = dadosUserLocais.statusAtivo?.sentinelas || 0;
     const sentinelaAtiva = cargasSentinela > 0;
     // ---------------------------------------
@@ -683,6 +686,7 @@ function atualizarVisualPodio(posicao, nome, foto) {
         b.className = "option-btn"; 
         b.innerText = o.texto;
 
+        // Se houver sentinela ativa, aplica a classe visual na resposta correta antes do clique
         if (sentinelaAtiva && o.correta) {
             b.classList.add('sentinela-revelar');
         }
@@ -694,6 +698,7 @@ function atualizarVisualPodio(posicao, nome, foto) {
             const rect = b.getBoundingClientRect();
             
             try {
+                // CONSUMO DE CARGA DA SENTINELA
                 if (sentinelaAtiva) {
                     await updateDoc(userRef, { "statusAtivo.sentinelas": increment(-1) });
                 }
@@ -721,16 +726,16 @@ function atualizarVisualPodio(posicao, nome, foto) {
                     
                     // --- CONSTRUÇÃO DO FEEDBACK VISUAL ---
                     let textoFlutuante = `+${ganhoFinalPDL} PDL`;
-                    let corFlutuante = "#28a745";
+                    let corFlutuante = "#28a745"; // Verde padrão
 
-                    // Feedback se o Multiplicador de PDL estiver ativo
+                    // Feedback visual customizado por raridade do item de PDL
                     if (temPDLAtivo) {
-                        let iconePDL = "💥"; 
+                        let iconePDL = "💥"; // Comum (Coletora)
                         if (fatorPDL === 4) {
-                            iconePDL = "⚡"; 
+                            iconePDL = "⚡"; // Raro (Gume)
                             corFlutuante = "#c89b3c"; 
                         } else if (fatorPDL === 6) {
-                            iconePDL = "🩸"; 
+                            iconePDL = "🩸"; // Épico (Sedenta)
                             corFlutuante = "#a335ee"; 
                         } else {
                             corFlutuante = "#c89b3c";
@@ -738,27 +743,27 @@ function atualizarVisualPodio(posicao, nome, foto) {
                         textoFlutuante = `${iconePDL} +${ganhoFinalPDL} PDL`;
                     }
 
-                    // Feedback se o Multiplicador de Moedas (Atlas) estiver ativo
+                    // Adição do feedback de Moedas se o Atlas Mundial estiver ativo
                     if (temMoedasAtivo) {
-                        // Se ambos estiverem ativos, combinamos as mensagens
                         textoFlutuante += ` | 🪙 +${ganhoFinalMoedas} Moedas`;
-                        if (!temPDLAtivo) corFlutuante = "#00cfbc"; // Cor do Atlas (Raro) se for o único bônus
+                        if (!temPDLAtivo) corFlutuante = "#00cfbc"; // Cor ciano se apenas o Atlas estiver ativo
                     } else {
-                        // Se não houver Atlas, apenas mostra o ganho padrão de moedas no console ou log discreto
                         console.log(`Ganho padrão: ${ganhoFinalMoedas} moedas`);
                     }
 
-                    showFloatingPDL(textoFlutuante, corFlutuante, rect.left + rect.width/2, rect.top);
+                    showFloatingPDL(textoFlutuante, corFlutuante, rect.left + rect.width / 2, rect.top);
                     
                     // --- ATUALIZAÇÃO DO FIRESTORE ---
+                    // Registra os ganhos multiplicados no banco de dados
                     await updateDoc(userRef, { 
-                        saldo: increment(ganhoFinalMoedas), // Agora o saldo é multiplicado pelo fatorMoedas
+                        saldo: increment(ganhoFinalMoedas), 
                         acertos: increment(1), 
                         xp: increment(ganhoFinalPDL), 
                         pdlSemanal: increment(ganhoFinalPDL) 
                     });
 
                 } else {
+                    // LÓGICA DE ERRO
                     b.classList.add('btn-wrong');
 
                     const agora = Date.now();
@@ -766,13 +771,18 @@ function atualizarVisualPodio(posicao, nome, foto) {
                     const temAnjoAtivo = dataExpiracaoAnjo > agora;
 
                     if (temAnjoAtivo) {
-                        showFloatingPDL("🛡️ PROTEGIDO", "#00cfbc", rect.left + rect.width/2, rect.top);
+                        // Se o Anjo Guardião estiver ativo, não subtrai PDL
+                        showFloatingPDL("🛡️ PROTEGIDO", "#00cfbc", rect.left + rect.width / 2, rect.top);
                     } else {
-                        showFloatingPDL("-10 PDL", "#dc3545", rect.left + rect.width/2, rect.top);
+                        // Subtração padrão de PDL em caso de erro
+                        showFloatingPDL("-10 PDL", "#dc3545", rect.left + rect.width / 2, rect.top);
                         await updateDoc(userRef, { xp: Math.max(0, pdlInterno - 10) });
                     }
                 }
+            } catch (error) {
+                console.error("Erro ao processar resposta:", error);
             } finally { 
+                // Delay para o jogador ver o feedback antes da próxima questão
                 setTimeout(() => {
                     const infoNovo = getEloInfo(pdlInterno);
                     if (infoNovo.nome !== eloAntesDoQuiz) exibirAnimacaoElo(infoNovo, true);
