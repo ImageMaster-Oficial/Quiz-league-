@@ -710,9 +710,10 @@ function atualizarVisualPodio(posicao, nome, foto) {
                     const fatorMultiplicador = temMultiplicadorAtivo ? (dadosUserLocais.statusAtivo?.valor_multiplicador || 2) : 1;
                     
                     const basePDL = 50;
-                    let ganhoFinal = basePDL * fatorMultiplicador;
+                    const ganhoMoedasFixo = 50; // Valor de moedas que NÃO será multiplicado
+                    let ganhoFinalPDL = basePDL * fatorMultiplicador; // Apenas o PDL/XP multiplica
                     
-                    let textoFlutuante = `+${ganhoFinal} PDL`;
+                    let textoFlutuante = `+${ganhoFinalPDL} PDL`;
                     let corFlutuante = "#28a745";
 
                     if (temMultiplicadorAtivo) {
@@ -729,17 +730,18 @@ function atualizarVisualPodio(posicao, nome, foto) {
                             corFlutuante = "#c89b3c"; // Cor padrão para bônus ativos
                         }
 
-                        textoFlutuante = `${icone} +${ganhoFinal} PDL`;
+                        textoFlutuante = `${icone} +${ganhoFinalPDL} PDL`;
                     }
                     // -------------------------------------------------------------
 
                     showFloatingPDL(textoFlutuante, corFlutuante, rect.left + rect.width/2, rect.top);
                     
+                    // ATUALIZAÇÃO DO FIRESTORE: Saldo recebe valor fixo, XP e PDL recebem o multiplicado
                     await updateDoc(userRef, { 
-                        saldo: increment(ganhoFinal), 
+                        saldo: increment(ganhoMoedasFixo), 
                         acertos: increment(1), 
-                        xp: increment(ganhoFinal), 
-                        pdlSemanal: increment(ganhoFinal) 
+                        xp: increment(ganhoFinalPDL), 
+                        pdlSemanal: increment(ganhoFinalPDL) 
                     });
 
                 } else {
