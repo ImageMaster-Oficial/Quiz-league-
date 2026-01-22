@@ -81,9 +81,9 @@
         }
 
         .pos-num {
-            width: 35px;
+            width: 45px;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--hextech-blue);
         }
 
@@ -122,7 +122,7 @@
             gap: 6px;
         }
 
-        .top-1 { background: rgba(200, 155, 60, 0.1); }
+        .top-tier { background: rgba(200, 155, 60, 0.1); }
 
         .btn-voltar {
             margin-top: 30px;
@@ -192,19 +192,17 @@
             calcular();
         }
 
-        // --- ATUALIZADO COM SEUS NOVOS VALORES ---
         function calcularPremio(pos) {
             if (pos === 1) return 50000;
             if (pos === 2) return 40000;
             if (pos === 3) return 30000;
             if (pos >= 4 && pos <= 10) return 25000;
             if (pos >= 11 && pos <= 100) return 10000;
-            return 0; // Para quem ficar acima de 100
+            return 0;
         }
 
         function carregarRankingRealTime() {
             const container = document.getElementById('ranking-lista');
-            // --- ATUALIZADO DE 20 PARA 100 ---
             const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(100));
 
             onSnapshot(q, (snapshot) => {
@@ -214,14 +212,22 @@
                 }
 
                 let html = "";
-                let i = 1;
+                let posicaoVisual = 0;
+                let pdlAnterior = -1;
 
                 snapshot.forEach(doc => {
                     const user = doc.data();
-                    const premio = calcularPremio(i);
+                    const valorPDL = user.pdlSemanal || 0;
+
+                    // LÓGICA DE RANKING DENSO (MESMA DO ADMIN)
+                    if (valorPDL !== pdlAnterior) {
+                        posicaoVisual++;
+                    }
+                    pdlAnterior = valorPDL;
+
+                    const premio = calcularPremio(posicaoVisual);
                     
                     let foto = ICONE_PADRAO;
-
                     if (user.iconeAtual) {
                         const idLimpo = user.iconeAtual.replace('_', '-');
                         foto = URL_ICONES_BASE + idLimpo + '.png';
@@ -239,11 +245,9 @@
                         foto = user.photoURL;
                     }
 
-                    const valorPDL = user.pdlSemanal || 0;
-
                     html += `
-                        <div class="ranking-item ${i <= 3 ? 'top-1' : ''}">
-                            <div class="pos-num">${i < 10 ? '0' + i : i}º</div>
+                        <div class="ranking-item ${posicaoVisual <= 3 ? 'top-tier' : ''}">
+                            <div class="pos-num">${posicaoVisual < 10 ? '0' + posicaoVisual : posicaoVisual}º</div>
                             <div class="icon-wrapper">
                                 <img src="${foto}" class="user-icon" alt="Invocador" onerror="this.src='${ICONE_PADRAO}'">
                             </div>
@@ -259,7 +263,6 @@
                             </div>
                         </div>
                     `;
-                    i++;
                 });
                 container.innerHTML = html;
             }, (error) => {
