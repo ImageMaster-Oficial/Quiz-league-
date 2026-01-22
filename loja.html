@@ -249,6 +249,7 @@
         const auth = getAuth(app);
         const URL_ICONES = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
         const URL_ITENS = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/";
+        
         const itens = [
             { id: "aatrox_comum", cat: "icones", nome: "Aatrox", preco: 5000, raridade: "comum", img: "aatrox-comum.png", info: "Ícone de perfil do campeão Aatrox." },
             { id: "aatrox_raro", cat: "icones", nome: "Aatrox Caçador de Almas", preco: 25000, raridade: "raro", img: "aatrox-raro.png", info: "Ícone raro da skin Caçador de Almas." },
@@ -261,6 +262,7 @@
             { id: "coletora-comum", cat: "itens", nome: "A Coletora <br> (2 Horas)", preco: 3000, raridade: "comum", img: "coletora-comum.png", info: "Efeito Passivo: Dobra seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores." },
             { id: "gume-raro", cat: "itens", nome: "Gume do infinito <br> (2 Horas)", preco: 5500, raridade: "raro", img: "gume-raro.png", info: "Efeito Passivo: Quadruplica seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores." }
         ];        
+        
         let saldoGlobal = 0;
         let meusItens = [];
         let minhaMochila = [];
@@ -371,10 +373,14 @@
                         saldo: increment(-valor),
                         mochila: arrayUnion(id)
                     });
+                    
+                    // Lógica de mensagens personalizada para cada item
                     if (id === "sentinela-epico") {
                         mostrarSucesso("Você adquiriu o pacote de Sentinelas! Ative-as no seu Inventário para ganhar 3 cargas.");
                     } else if (id === "coletora-comum") {
                         mostrarSucesso("A Coletora foi enviada para seu inventário. Ative-a para dobrar seus PDLs por 2 horas!");
+                    } else if (id === "gume-raro") {
+                        mostrarSucesso("O Gume do Infinito foi enviado para seu inventário. Ative-o para quadruplicar seus PDLs por 2 horas!");
                     } else {
                         mostrarSucesso("Item enviado para o seu inventário! Vá até lá para ativar seu benefício.");
                     }
