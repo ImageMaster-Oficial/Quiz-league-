@@ -148,7 +148,7 @@
 
     <div class="header-inv">
         <h1>Meu Inventário</h1>
-        <a href="loja.html" class="btn-voltar">Voltar</a>
+        <a href="resgate.html" class="btn-voltar">Voltar</a>
     </div>
 
     <div class="grid-inventario" id="grid-inv">
@@ -198,7 +198,6 @@
             'sedenta-epico': { nome: "Sedenta por Sangue", tipo: "multiplicador", raridade: "epico", duracaoHoras: 2, multiplicadorPDL: 6, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sedenta-epico.png" },
             'atlas-comum': { nome: "Atlas Mundial", tipo: "multiplicadorMoedas", raridade: "comum", duracaoHoras: 2, multiplicadorMoedas: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/atlas-comum.png" },
             'bussola-raro': { nome: "Bússola Arcaica", tipo: "multiplicadorMoedas", raridade: "raro", duracaoHoras: 2, multiplicadorMoedas: 4, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/bussola-raro.png" },
-            // ADICIONADO: Oposição Celestial (6x Moedas)
             'oposicao-epico': { nome: "Oposição Celestial", tipo: "multiplicadorMoedas", raridade: "epico", duracaoHoras: 2, multiplicadorMoedas: 6, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/oposicao-epico.png" }
         };
 
@@ -230,17 +229,12 @@
                 return;
             }
 
-            // Mochila primeiro (itens ativáveis)
             mochila.forEach(id => {
                 const item = DATA_BASE[id];
-                if (!item) {
-                    console.warn("Item ID não encontrado no DATA_BASE:", id);
-                    return;
-                }
+                if (!item) return;
                 grid.innerHTML += criarCard(id, item, "ATIVAR", false);
             });
 
-            // Ícones (itens equipáveis)
             icones.forEach(id => {
                 const item = DATA_BASE[id];
                 if (!item) return;
