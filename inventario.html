@@ -199,7 +199,7 @@
             'sentinela-epico': { nome: "Sentinela de Controle", tipo: "carga", raridade: "epico", unidades: 3, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" },
             'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", raridade: "comum", duracaoHoras: 2, multiplicadorPDL: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" },
             'gume-raro': { nome: "Gume do infinito", tipo: "multiplicador", raridade: "raro", duracaoHoras: 2, multiplicadorPDL: 4, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/gume-raro.png" },
-            'sedenta-epico': { nome: "Sedenta por PDL", tipo: "multiplicador", raridade: "epico", duracaoHoras: 2, multiplicadorPDL: 6, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sedenta-epico.png" }
+            'sedenta-epico': { nome: "Sedenta por Sangue", tipo: "multiplicador", raridade: "epico", duracaoHoras: 2, multiplicadorPDL: 6, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sedenta-epico.png" }
         };
 
         let usuarioDados = {};
@@ -352,7 +352,10 @@
                     "statusAtivo.valor_multiplicador": multiplicador
                 });
                 
-                const textoEfeito = multiplicador === 4 ? "QUADRUPLICADOS" : "DOBRADOS";
+                let textoEfeito = "DOBRADOS";
+                if (multiplicador === 4) textoEfeito = "QUADRUPLICADOS";
+                if (multiplicador === 6) textoEfeito = "SEXTUPLICADOS";
+                
                 mostrarModalSucesso("BÔNUS ATIVADO", `<p>Seus ganhos de PDL estão <strong>${textoEfeito}</strong> por ${item.duracaoHoras}h.</p>`);
             } catch (e) { console.error(e); }
         }
