@@ -168,16 +168,13 @@
             const agora = Date.now();
             let temItensVisiveis = false;
 
-            // Ordenação lógica para exibição
             const chaves = Object.keys(itensAtivos);
 
             for (let id of chaves) {
                 let valor = itensAtivos[id];
                 
-                // Pular campos de valor técnico
                 if (id === 'valor_multiplicador' || id === 'valor_multiplicador_moedas') continue;
 
-                // Lógica de Itens com Cargas (Sentinelas)
                 if (id === 'sentinelas') {
                     if (valor > 0) {
                         temItensVisiveis = true;
@@ -186,7 +183,6 @@
                     continue;
                 }
 
-                // Lógica de Itens Temporais
                 if (agora < valor) {
                     temItensVisiveis = true;
                     const tempoRestante = valor - agora;
@@ -199,7 +195,6 @@
                     let cardClass = "item-comum";
                     let barraClass = "barra-comum";
 
-                    // CONFIGURAÇÃO ESPECÍFICA: ANJO GUARDIÃO (RARO)
                     if (id === 'anjo_guardiao') {
                         subtexto = 'PROTEÇÃO ATIVA';
                         cardClass = "item-raro";
@@ -207,7 +202,6 @@
                         imgItem = 'anjo.png';
                     }
 
-                    // CONFIGURAÇÃO ESPECÍFICA: MULTIPLICADOR PDL (DINÂMICO)
                     if (id === 'dobrador_pdl') {
                         const mult = itensAtivos.valor_multiplicador || 2;
                         if (mult === 6) {
@@ -229,17 +223,22 @@
                         subtexto = `GANHOS DE PDL ${mult}X`;
                     }
 
-                    // CONFIGURAÇÃO ESPECÍFICA: ATLAS MUNDIAL (DINÂMICO)
+                    // --- LÓGICA ATUALIZADA: MULTIPLICADOR DE MOEDAS (OPOSIÇÃO CELESTIAL) ---
                     if (id === 'dobrador_moedas') {
                         const multM = itensAtivos.valor_multiplicador_moedas || 2;
-                        nome = 'Atlas Mundial';
                         
-                        // Bússola é o Atlas Mundial quando está no modo Raro (4x)
-                        if (multM >= 4) {
+                        if (multM === 6) {
+                            nome = 'Oposição Celestial';
+                            imgItem = 'oposicao-epico.png'; // Verifique se o nome do arquivo bate com seu repositório
+                            cardClass = "item-epico";
+                            barraClass = "barra-epica";
+                        } else if (multM === 4) {
+                            nome = 'Bússola do Explorador';
                             imgItem = 'bussola-raro.png';
                             cardClass = "item-raro";
                             barraClass = "barra-raro";
                         } else {
+                            nome = 'Atlas Mundial';
                             imgItem = 'atlas-comum.png';
                             cardClass = "item-gold";
                             barraClass = "barra-gold";
@@ -279,7 +278,7 @@
 
         function criarCardCarga(id, cargas) {
             const div = document.createElement('div');
-            div.className = 'item-ativo item-epico'; // Sentinela é épica/roxo
+            div.className = 'item-ativo item-epico'; 
             div.innerHTML = `
                 <img src="https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sentinela-epico.png" class="item-img" alt="item">
                 <div class="info-item">
@@ -346,7 +345,7 @@
                 'anjo_guardiao': 'Anjo Guardião',
                 'sentinelas': 'Sentinelas de Controle',
                 'dobrador_pdl': 'Multiplicador de PDL',
-                'dobrador_moedas': 'Atlas Mundial'
+                'dobrador_moedas': 'Multiplicador de Moedas'
             };
             return nomes[id] || id;
         }
