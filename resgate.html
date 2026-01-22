@@ -701,12 +701,12 @@ function atualizarVisualPodio(posicao, nome, foto) {
                 if (o.correta) {
                     b.classList.add('btn-correct');
 
-                    // --- LÓGICA DE MULTIPLICADOR DINÂMICO (COLETORA OU GUME) ---
+                    // --- LÓGICA DE MULTIPLICADOR DINÂMICO (COLETORA, GUME OU SEDENTA) ---
                     const agora = Date.now();
                     const expiraMultiplicador = dadosUserLocais.statusAtivo?.dobrador_pdl || 0;
                     const temMultiplicadorAtivo = expiraMultiplicador > agora;
                     
-                    // Se não houver multiplicador, o valor é 1. Se houver, usa o valor salvo (2 ou 4).
+                    // Captura o valor do multiplicador (2, 4 ou 6). Se não houver, padrão é 1.
                     const fatorMultiplicador = temMultiplicadorAtivo ? (dadosUserLocais.statusAtivo?.valor_multiplicador || 2) : 1;
                     
                     const basePDL = 50;
@@ -716,10 +716,20 @@ function atualizarVisualPodio(posicao, nome, foto) {
                     let corFlutuante = "#28a745";
 
                     if (temMultiplicadorAtivo) {
-                        // Se o fator for 4 (Gume), muda o ícone e a cor para destacar
-                        const icone = fatorMultiplicador === 4 ? "💎" : "🔥";
+                        // Identidade Visual baseada no multiplicador
+                        let icone = "💥"; // Padrão Coletora (2x)
+                        
+                        if (fatorMultiplicador === 4) {
+                            icone = "⚡"; // Gume do Infinito (4x)
+                            corFlutuante = "#c89b3c"; 
+                        } else if (fatorMultiplicador === 6) {
+                            icone = "🩸"; // Sedenta por Sangue (6x)
+                            corFlutuante = "#a335ee"; // Cor Épica (Roxo)
+                        } else {
+                            corFlutuante = "#c89b3c"; // Cor padrão para bônus ativos
+                        }
+
                         textoFlutuante = `${icone} +${ganhoFinal} PDL`;
-                        corFlutuante = "#c89b3c"; 
                     }
                     // -------------------------------------------------------------
 
