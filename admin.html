@@ -110,10 +110,9 @@
         document.getElementById('btn_sair').onclick = () => signOut(auth).then(() => location.reload());
 
         window.resetarRankingSemanal = async () => {
-            if (!confirm("⚠️ ATENÇÃO: Deseja pagar as recompensas e zerar o ranking de todos os jogadores agora?")) return;
+            if (!confirm("⚠️ ATENÇÃO: Deseja pagar prêmios (respeitando empates) e zerar o ranking agora?")) return;
 
             try {
-                // Aumentado o limit para 100 para garantir que todos recebam
                 const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(100));
                 const querySnapshot = await getDocs(q);
                 
@@ -122,8 +121,10 @@
                     return;
                 }
 
-                let contadorPosicao = 1;
+                let posicaoExibida = 1;
+                let pdlAnterior = -1;
                 let premiadosCount = 0;
+                let acumuladorDeVagas = 0;
 
                 for (const usuarioDoc of querySnapshot.docs) {
                     const userRef = doc(db, "usuarios", usuarioDoc.id);
@@ -131,13 +132,25 @@
                     const pdlAtual = dados.pdlSemanal || 0;
 
                     if (pdlAtual > 0) {
-                        // NOVOS VALORES DE RECOMPENSA
+                        // LÓGICA DE EMPATE (RANKING DE COMPETIÇÃO)
+                        if (pdlAtual !== pdlAnterior) {
+                            // Se o PDL mudou, a posição "anda" conforme as vagas ocupadas anteriormente
+                            posicaoExibida = posicaoExibida + acumuladorDeVagas;
+                            acumuladorDeVagas = 1;
+                        } else {
+                            // Se o PDL é igual ao anterior, mantém a posiçãoExibida e apenas conta a vaga
+                            acumuladorDeVagas++;
+                        }
+
+                        pdlAnterior = pdlAtual;
+
+                        // VALORES DE RECOMPENSA BASEADOS NA POSIÇÃO (COM EMPATE)
                         let premio = 0;
-                        if (contadorPosicao === 1) premio = 50000;
-                        else if (contadorPosicao === 2) premio = 40000;
-                        else if (contadorPosicao === 3) premio = 30000;
-                        else if (contadorPosicao >= 4 && contadorPosicao <= 10) premio = 25000;
-                        else if (contadorPosicao >= 11 && contadorPosicao <= 100) premio = 10000;
+                        if (posicaoExibida === 1) premio = 50000;
+                        else if (posicaoExibida === 2) premio = 40000;
+                        else if (posicaoExibida === 3) premio = 30000;
+                        else if (posicaoExibida >= 4 && posicaoExibida <= 10) premio = 25000;
+                        else if (posicaoExibida >= 11 && posicaoExibida <= 100) premio = 10000;
 
                         // Atualiza saldo, zera PDL e cria o registro da notificação
                         await updateDoc(userRef, {
@@ -145,19 +158,19 @@
                             pdlSemanal: 0,
                             notificacaoPremio: {
                                 valor: premio,
-                                posicao: contadorPosicao,
+                                posicao: posicaoExibida,
                                 data: new Date().toLocaleDateString()
                             }
                         });
                         
                         premiadosCount++;
-                        contadorPosicao++; 
                     } else {
+                        // Apenas zera quem não pontuou
                         await updateDoc(userRef, { pdlSemanal: 0 });
                     }
                 }
 
-                alert(`Sucesso! ${premiadosCount} jogadores foram premiados e o ranking reiniciado.`);
+                alert(`Sucesso! ${premiadosCount} jogadores foram premiados (empates aplicados) e o ranking reiniciado.`);
                 location.reload();
             } catch (e) {
                 console.error("Erro no processamento:", e);
