@@ -196,7 +196,9 @@
             'coletora-comum': { nome: "A Coletora", tipo: "multiplicador", raridade: "comum", duracaoHoras: 2, multiplicadorPDL: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/coletora-comum.png" },
             'gume-raro': { nome: "Gume do infinito", tipo: "multiplicador", raridade: "raro", duracaoHoras: 2, multiplicadorPDL: 4, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/gume-raro.png" },
             'sedenta-epico': { nome: "Sedenta por Sangue", tipo: "multiplicador", raridade: "epico", duracaoHoras: 2, multiplicadorPDL: 6, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/sedenta-epico.png" },
-            'atlas-comum': { nome: "Atlas Mundial", tipo: "multiplicadorMoedas", raridade: "comum", duracaoHoras: 2, multiplicadorMoedas: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/atlas-comum.png" }
+            'atlas-comum': { nome: "Atlas Mundial", tipo: "multiplicadorMoedas", raridade: "comum", duracaoHoras: 2, multiplicadorMoedas: 2, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/atlas-comum.png" },
+            // ADICIONADO: Bússola Rara (4x Moedas)
+            'bussola-raro': { nome: "Bússola Arcaica", tipo: "multiplicadorMoedas", raridade: "raro", duracaoHoras: 2, multiplicadorMoedas: 4, img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/bussola-raro.png" }
         };
 
         let usuarioDados = {};
@@ -230,7 +232,10 @@
             // Mochila primeiro (itens ativáveis)
             mochila.forEach(id => {
                 const item = DATA_BASE[id];
-                if (!item) return;
+                if (!item) {
+                    console.warn("Item ID não encontrado no DATA_BASE:", id);
+                    return;
+                }
                 grid.innerHTML += criarCard(id, item, "ATIVAR", false);
             });
 
@@ -299,13 +304,13 @@
                 }
                 novoBtnSim.onclick = () => ativarMultiplicador(id);
             } else if (tipo === 'multiplicadorMoedas') {
-                titulo.innerText = "ATIVAR ATLAS MUNDIAL";
+                titulo.innerText = "ATIVAR " + item.nome.toUpperCase();
                 const agora = Date.now();
                 if (usuarioDados.statusAtivo?.dobrador_moedas && agora < usuarioDados.statusAtivo.dobrador_moedas) {
                     titulo.innerText = "ATENÇÃO INVOCADOR";
-                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador de moedas ativo!</span><br><br>Substituir o efeito atual pelo novo bônus (${item.multiplicadorMoedas}x)?`;
+                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um bônus de moedas ativo!</span><br><br>Substituir o efeito atual pelo novo bônus (${item.multiplicadorMoedas}x)?`;
                 } else {
-                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso dobrará seus ganhos de Moedas durante ${item.duracaoHoras} horas.`;
+                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de Moedas por ${item.multiplicadorMoedas} durante ${item.duracaoHoras} horas.`;
                 }
                 novoBtnSim.onclick = () => ativarMultiplicadorMoedas(id);
             } else {
@@ -383,7 +388,7 @@
                     "statusAtivo.dobrador_moedas": agora + duracaoMs,
                     "statusAtivo.valor_multiplicador_moedas": item.multiplicadorMoedas
                 });
-                mostrarModalSucesso("SUPORTE ATIVADO", `<p>O <strong>Atlas Mundial</strong> está ativo! Ganhos de moedas dobrados por ${item.duracaoHoras}h.</p>`);
+                mostrarModalSucesso("BÔNUS ATIVADO", `<p>O item <strong>${item.nome}</strong> está ativo! Ganhos de moedas multiplicados por ${item.multiplicadorMoedas}x por ${item.duracaoHoras}h.</p>`);
             } catch (e) { console.error(e); }
         }
 
