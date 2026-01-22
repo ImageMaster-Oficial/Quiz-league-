@@ -86,7 +86,7 @@
             transition: width 1s linear;
         }
 
-        /* Cor específica para a barra da coletora */
+        /* Cor específica para a barra de multiplicadores */
         #barra-dobrador_pdl { background: var(--gold); }
 
         .sem-itens { text-align: center; color: #666; margin-top: 20px; font-style: italic; }
@@ -140,9 +140,10 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // CONFIGURAÇÕES DE DURAÇÃO PARA AS BARRAS
         const DURACAO_TOTAL = {
             'anjo_guardiao': 7 * 24 * 60 * 60 * 1000,
-            'dobrador_pdl': 2 * 60 * 60 * 1000 // 2 Horas da Coletora
+            'dobrador_pdl': 2 * 60 * 60 * 1000 
         };
 
         onAuthStateChanged(auth, (user) => {
@@ -166,6 +167,9 @@
 
             for (let [id, valor] of Object.entries(itensAtivos)) {
                 
+                // PULAR CAMPOS QUE NÃO SÃO ITENS (COMO O VALOR DO MULTIPLICADOR)
+                if (id === 'valor_multiplicador') continue;
+
                 // LÓGICA PARA ITENS DE CARGA (SENTINELAS)
                 if (id === 'sentinelas') {
                     if (valor > 0) {
@@ -175,23 +179,33 @@
                     continue;
                 }
 
-                // LÓGICA PARA ITENS DE TEMPO (ANJO E COLETORA)
+                // LÓGICA PARA ITENS DE TEMPO (ANJO E MULTIPLICADORES)
                 if (agora < valor) {
                     temItensVisiveis = true;
                     const tempoRestante = valor - agora;
                     const total = DURACAO_TOTAL[id] || (24 * 60 * 60 * 1000);
                     const porcentagem = (tempoRestante / total) * 100;
 
+                    // Lógica dinâmica para nome/subtexto/imagem do multiplicador
+                    let nome = nomeExibicao(id);
+                    let subtexto = (id === 'anjo_guardiao') ? 'PROTEÇÃO ATIVA' : 'BÔNUS ATIVO';
+                    let imgItem = obterImagem(id);
+
+                    if (id === 'dobrador_pdl') {
+                        const mult = itensAtivos.valor_multiplicador || 2;
+                        nome = (mult === 4) ? 'Gume do Infinito' : 'A Coletora';
+                        subtexto = `GANHOS DE PDL ${mult}X`;
+                        imgItem = (mult === 4) ? 'gume-raro.png' : 'coletora-comum.png';
+                    }
+
                     const div = document.createElement('div');
-                    // Define a classe baseada no tipo de item
                     const classeTipo = (id === 'dobrador_pdl') ? 'item-multiplicador' : 'item-tempo';
-                    const subtexto = (id === 'dobrador_pdl') ? 'PDL EM DOBRO' : 'PROTEÇÃO ATIVA';
 
                     div.className = `item-ativo ${classeTipo}`;
                     div.innerHTML = `
-                        <img src="https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/${obterImagem(id)}" class="item-img" alt="item">
+                        <img src="https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/${imgItem}" class="item-img" alt="item">
                         <div class="info-item">
-                            <h3>${nomeExibicao(id)}</h3>
+                            <h3>${nome}</h3>
                             <p>${subtexto}</p>
                         </div>
                         <div class="status-valor" id="timer-${id}">${formatarTempo(tempoRestante)}</div>
@@ -200,6 +214,7 @@
                     container.appendChild(div);
                     iniciarContagem(id, valor, total, uid);
                 } else {
+                    // Remover item e seu valor de multiplicador quando expirar
                     removerExpirado(uid, id);
                 }
             }
@@ -243,7 +258,12 @@
         async function removerExpirado(uid, id) {
             const userRef = doc(db, "usuarios", uid);
             try {
-                await updateDoc(userRef, { [`statusAtivo.${id}`]: deleteField() });
+                const updates = { [`statusAtivo.${id}`]: deleteField() };
+                // Se o dobrador expirar, removemos também o valor numérico dele
+                if (id === 'dobrador_pdl') {
+                    updates['statusAtivo.valor_multiplicador'] = deleteField();
+                }
+                await updateDoc(userRef, updates);
             } catch (e) {
                 console.error("Erro ao remover expirado:", e);
             }
@@ -265,7 +285,7 @@
             const imgs = { 
                 'anjo_guardiao': 'anjo.png',
                 'sentinelas': 'sentinela-epico.png',
-                'dobrador_pdl': 'coletora-comum.png'
+                'dobrador_pdl': 'coletora-comum.png' // Default, mas é sobrescrito na renderização
             };
             return imgs[id] || 'default.png';
         }
@@ -274,7 +294,7 @@
             const nomes = { 
                 'anjo_guardiao': 'Anjo Guardião',
                 'sentinelas': 'Sentinelas de Controle',
-                'dobrador_pdl': 'A Coletora'
+                'dobrador_pdl': 'Multiplicador de PDL'
             };
             return nomes[id] || id;
         }
