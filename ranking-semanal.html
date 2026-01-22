@@ -169,7 +169,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // URL base correta para os ícones do GitHub
         const URL_ICONES_BASE = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
         const ICONE_PADRAO = URL_ICONES_BASE + '0.png';
         const MOEDA_IMG = 'https://cdn-icons-png.flaticon.com/512/272/272525.png';
@@ -193,16 +192,20 @@
             calcular();
         }
 
+        // --- ATUALIZADO COM SEUS NOVOS VALORES ---
         function calcularPremio(pos) {
-            if (pos === 1) return 5000;
-            if (pos === 2) return 2500;
-            if (pos === 3) return 1250;
-            return 100;
+            if (pos === 1) return 50000;
+            if (pos === 2) return 40000;
+            if (pos === 3) return 30000;
+            if (pos >= 4 && pos <= 10) return 25000;
+            if (pos >= 11 && pos <= 100) return 10000;
+            return 0; // Para quem ficar acima de 100
         }
 
         function carregarRankingRealTime() {
             const container = document.getElementById('ranking-lista');
-            const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(20));
+            // --- ATUALIZADO DE 20 PARA 100 ---
+            const q = query(collection(db, "usuarios"), orderBy("pdlSemanal", "desc"), limit(100));
 
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
@@ -219,12 +222,10 @@
                     
                     let foto = ICONE_PADRAO;
 
-                    // PRIORIDADE 1: Ícone Equipado da Loja (Novo sistema)
                     if (user.iconeAtual) {
                         const idLimpo = user.iconeAtual.replace('_', '-');
                         foto = URL_ICONES_BASE + idLimpo + '.png';
                     } 
-                    // PRIORIDADE 2: fotoPerfil antiga
                     else if (user.fotoPerfil) {
                         const valor = String(user.fotoPerfil);
                         if (valor.startsWith('http')) {
@@ -234,7 +235,6 @@
                             foto = URL_ICONES_BASE + idLimpo + '.png';
                         }
                     } 
-                    // PRIORIDADE 3: photoURL (Google/Auth)
                     else if (user.photoURL) {
                         foto = user.photoURL;
                     }
@@ -253,7 +253,7 @@
                             </div>
                             <div class="reward-box">
                                 <div class="reward-gold">
-                                    <span>${premio}</span>
+                                    <span>${premio.toLocaleString()}</span>
                                     <img src="${MOEDA_IMG}" width="16" alt="ouro">
                                 </div>
                             </div>
