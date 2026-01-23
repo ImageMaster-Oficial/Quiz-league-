@@ -163,12 +163,12 @@
             clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
         }
         .item-card:hover { transform: translateY(-8px); }
-        .comum { border-color: var(--comum) !important; filter: drop-shadow(0 0 5px var(--comum)); }
-        .raro { border-color: var(--raro) !important; filter: drop-shadow(0 0 10px var(--raro)); }
-        .epico { border-color: var(--epico) !important; filter: drop-shadow(0 0 15px var(--epico)); }
+        .item-card.comum { border-color: var(--comum) !important; filter: drop-shadow(0 0 5px var(--comum)); }
+        .item-card.raro { border-color: var(--raro) !important; filter: drop-shadow(0 0 10px var(--raro)); }
+        .item-card.epico { border-color: var(--epico) !important; filter: drop-shadow(0 0 15px var(--epico)); }
 
         /* --- NOVO: ESTILO PRISMÁTICO NO CARD --- */
-        .prismatico {
+        .item-card.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(var(--card-bg), var(--card-bg)), var(--prismatico);
             background-origin: border-box;
@@ -283,6 +283,7 @@
         </div>
     </div>
     <div class="grid-loja" id="grid-itens"></div>
+
     <div class="modal-overlay" id="modal-compra">
         <div class="modal-content">
             <div id="modal-item-nome" class="modal-nome"></div>
@@ -293,8 +294,7 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+
     <div class="modal-overlay" id="modal-sucesso">
         <div class="modal-content">
             <div class="modal-nome">AQUISIÇÃO CONCLUÍDA</div>
@@ -304,7 +304,8 @@
             </div>
         </div>
     </div>
-      <script type="module">
+
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -418,12 +419,12 @@
 
             const desabilitado = jaPossui || (saldoGlobal < item.preco);
             
-            // AJUSTE: Tradução da Label incluindo Prismático
             let labelRaridade = "";
             if (item.raridade === 'epico') labelRaridade = 'Épico';
             else if (item.raridade === 'prismatico') labelRaridade = 'Prismático';
             else labelRaridade = item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
 
+            // CORREÇÃO: Escolha dinâmica da URL baseado no item.cat
             const urlFinal = (item.cat === 'itens') ? URL_ITENS + item.img : URL_ICONES + item.img;
             const classeExtra = (item.cat === 'itens') ? 'tipo-item' : '';
 
@@ -456,13 +457,16 @@
     window.fecharModal = () => { document.getElementById('modal-compra').style.display = 'none'; };
 
     window.mostrarSucesso = (mensagem) => {
-        // Nota: Certifique-se de que o HTML do modal-sucesso exista na sua página
         const msgSucesso = document.getElementById('modal-sucesso-msg');
-        if(msgSucesso) msgSucesso.innerText = mensagem;
+        if(msgSucesso) msgSucesso.innerText = mensaje;
         
         const modalSucesso = document.getElementById('modal-sucesso');
-        if(modalSucesso) modalSucesso.style.display = 'flex';
-        else alert(mensagem); // Fallback caso o modal de sucesso não esteja no HTML
+        if(modalSucesso) {
+            document.getElementById('modal-sucesso-msg').innerText = mensagem;
+            modalSucesso.style.display = 'flex';
+        } else {
+            alert(mensagem);
+        }
     };
 
     window.fecharModalSucesso = () => {
@@ -515,5 +519,5 @@
         }
     }
 </script>
-    </body>
+</body>
 </html>
