@@ -182,7 +182,7 @@
 
         /* --- ÍCONE PRISMÁTICO MAIOR --- */
         .item-card.prismatico .icon-container {
-            width: 100px; /* Aumentado de 80px */
+            width: 100px; /* Tamanho maior para Prismáticos */
             height: 100px;
             margin-bottom: 10px;
             box-shadow: 0 0 20px rgba(27, 200, 206, 0.4);
@@ -262,6 +262,7 @@
             border: 3px solid var(--ouro);
             overflow: hidden;
             position: relative;
+            transition: 0.3s ease;
         }
 
         /* Efeito de pulse no preview se for prismático */
@@ -338,7 +339,7 @@
     <script>
         // Função para abrir o modal com a lógica de destaque Prismático
         function abrirModalCompra(idItem) {
-            const item = DATA_BASE[idItem];
+            const item = DATA_BASE[idItem]; // Certifique-se que DATA_BASE está acessível aqui
             const modal = document.getElementById('modal-compra');
             const contentBox = document.getElementById('modal-content-box');
             
@@ -347,15 +348,13 @@
             document.getElementById('modal-nome').innerText = item.nome;
             document.getElementById('modal-info').innerText = `Deseja adquirir este item por ${item.preco} moedas?`;
             
-            // Remove classes antigas
+            // Gerencia classes de raridade no modal para o efeito de pulse
             contentBox.classList.remove('is-prismatico');
-            
-            // Adiciona classe especial se for Prismático para disparar o Zoom e o Pulse
             if(item.raridade === 'prismatico') {
                 contentBox.classList.add('is-prismatico');
             }
             
-            // Lógica do botão confirmar...
+            // Lógica do botão confirmar
             document.getElementById('btn-confirmar-compra').onclick = () => realizarCompra(idItem);
             
             modal.style.display = 'flex';
