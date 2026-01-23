@@ -156,21 +156,28 @@
         .raro { border-color: var(--raro) !important; filter: drop-shadow(0 0 10px var(--raro)); }
         .epico { border-color: var(--epico) !important; filter: drop-shadow(0 0 15px var(--epico)); }
         
-        /* AJUSTE DOS ÍCONES REDONDOS */
+        /* --- BLOCO DE ÍCONES (REDONDOS) --- */
         .icon-container { 
             width: 80px; 
             height: 80px; 
             margin: 0 auto 15px; 
-            overflow: hidden; /* Garante que nada saia do círculo */
-            border-radius: 50%; /* Faz o container ser um círculo */
+            overflow: hidden; 
+            border-radius: 50%; /* PADRÃO É REDONDO */
         }
         .img-campeao { 
             width: 100%; 
             height: 100%; 
-            border-radius: 50%; /* Deixa a imagem redonda */
-            object-fit: cover; /* Não deixa a imagem quadrada esticar */
-            border: none; /* Remove qualquer borda */
+            border-radius: 50%; /* PADRÃO É REDONDO */
+            object-fit: cover; 
+            border: none; 
             display: block;
+        }
+
+        /* --- BLOCO DE ITENS (QUADRADOS) --- */
+        /* Se o card tiver a classe 'tipo-item', forçamos o formato quadrado */
+        .item-card.tipo-item .icon-container,
+        .item-card.tipo-item .img-campeao {
+            border-radius: 4px !important; /* FORMATO QUADRADO PARA ITENS */
         }
         
         .item-nome { 
