@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recarga Hextech - Quiz Legends</title>
+    <title>Depósito Hextech - Quiz Legends</title>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Roboto:wght@400;700;900&display=swap');
 
-        /* Moldura Dourada Fixa */
+        /* Borda grossa que contorna a tela inteira de ponta a ponta */
         body::before {
             content: "";
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             border: 15px solid #B8860B;
             pointer-events: none;
             z-index: 9999;
@@ -28,14 +31,16 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .titulo-principal {
             font-family: 'Orbitron', sans-serif;
             color: #FFD700;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             text-transform: uppercase;
-            margin-bottom: 50px;
+            letter-spacing: 4px;
+            margin-bottom: 60px;
             text-align: center;
             background: linear-gradient(180deg, #FFD700 30%, #967000 100%);
             -webkit-background-clip: text;
@@ -46,133 +51,151 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 40px;
-            max-width: 1100px;
+            gap: 50px;
+            max-width: 1200px;
             margin-bottom: 60px;
         }
 
         .card-moeda {
             position: relative;
-            width: 240px;
+            width: 260px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Container da Imagem com Borda Dourada e Corte */
+        /* Container da imagem com borda dourada e corte chanfrado */
         .container-img {
             position: relative;
             width: 100%;
-            height: 300px;
+            height: 320px;
             background: #111;
             clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
-            border: 3px solid #B8860B;
+            border: 4px solid #B8860B; 
             box-sizing: border-box;
-            overflow: hidden;
         }
 
-        .container-img img { width: 100%; height: 100%; object-fit: cover; }
+        .container-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .selo-popular {
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            background: #ff0000;
+            color: white;
+            font-weight: 900;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            z-index: 30;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transform: rotate(5deg);
+        }
 
         .overlay-interno {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
+            pointer-events: none;
             z-index: 10;
         }
 
         .raridade-nome {
-            margin-top: 25px;
+            margin-top: 30px;
             color: #FFD700;
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
-            text-shadow: 2px 2px 4px #000;
+            font-size: 1rem;
+            text-shadow: 2px 2px 5px #000;
         }
 
-        .info-valor-interno { margin-top: auto; margin-bottom: 70px; text-align: center; }
+        .info-valor-interno {
+            margin-top: auto;
+            margin-bottom: 80px;
+            text-align: center;
+        }
 
-        .quantidade-moedas { display: block; font-size: 1.6rem; font-weight: 900; text-shadow: 2px 2px 5px #000; }
+        .quantidade-moedas {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 8px #000;
+        }
 
-        .bonus-txt { display: block; font-size: 0.8rem; color: #fff; font-weight: bold; margin-top: 5px; }
+        .bonus-txt {
+            display: block;
+            font-size: 0.85rem;
+            color: #ffffff; 
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 4px;
+            text-shadow: 1px 1px 4px #000;
+        }
 
-        /* Botão de Preço */
         .btn-preco {
             position: absolute;
-            bottom: -15px;
-            width: 150px;
-            padding: 10px 0;
+            bottom: -20px;
+            width: 170px;
+            padding: 12px 0;
             background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%);
             border: 2px solid #5c4306;
+            border-radius: 4px;
             color: #000;
             font-weight: 900;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             cursor: pointer;
             z-index: 20;
-            transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            transition: 0.2s ease-in-out;
         }
 
-        .btn-preco:hover { transform: scale(1.1); filter: brightness(1.2); }
-
-        .selo-popular {
-            position: absolute;
-            top: -10px; right: -10px;
-            background: #ff0000;
-            color: white;
-            padding: 5px 10px;
-            font-size: 0.7rem;
-            font-weight: 900;
-            z-index: 30;
-            transform: rotate(5deg);
+        .btn-preco:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
         }
 
-        /* Rodapé de Suporte */
-        .suporte-footer {
-            margin-top: auto;
+        .footer-loja {
+            width: 100%;
+            max-width: 850px;
             text-align: center;
-            padding: 20px;
-            z-index: 100;
+            padding: 30px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid #333;
+            margin-bottom: 50px;
+            z-index: 5;
         }
 
-        .btn-suporte {
-            background: transparent;
-            border: 1px solid #B8860B;
-            color: #B8860B;
-            padding: 12px 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
+        .footer-loja p {
+            color: #bbb;
+            margin: 8px 0;
+            font-size: 0.95rem;
         }
 
-        .btn-suporte:hover {
-            background: #B8860B;
-            color: #000;
-            box-shadow: 0 0 15px rgba(184, 134, 11, 0.5);
-        }
-
-        .suporte-txt {
-            display: block;
-            font-size: 0.7rem;
-            color: #555;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .destaque-mp { color: #009EE3; font-weight: bold; }
+        .link-suporte { color: #FFD700; text-decoration: none; font-weight: bold; border-bottom: 1px solid #FFD700; }
     </style>
 </head>
 <body>
 
-    <h1 class="titulo-principal">Pacotes de Moedas</h1>
+    <h1 class="titulo-principal">Moedas Hextech</h1>
 
     <div class="loja-wrapper">
+
         <div class="card-moeda">
             <div class="container-img">
-                <img src="ícones/comum.png">
+                <img src="ícones/pacote-comum.png" alt="Comum">
                 <div class="overlay-interno">
                     <span class="raridade-nome">COMUM</span>
                     <div class="info-valor-interno">
@@ -185,7 +208,7 @@
 
         <div class="card-moeda">
             <div class="container-img">
-                <img src="ícones/raro.png">
+                <img src="ícones/pacote-raro.png" alt="Raro">
                 <div class="overlay-interno">
                     <span class="raridade-nome">RARO</span>
                     <div class="info-valor-interno">
@@ -199,7 +222,7 @@
         <div class="card-moeda">
             <div class="selo-popular">Mais Vendido</div>
             <div class="container-img">
-                <img src="ícones/epico.png">
+                <img src="ícones/pacote-epico.png" alt="Épico">
                 <div class="overlay-interno">
                     <span class="raridade-nome">ÉPICO</span>
                     <div class="info-valor-interno">
@@ -213,7 +236,7 @@
 
         <div class="card-moeda">
             <div class="container-img">
-                <img src="ícones/prismatico.png">
+                <img src="ícones/pacote-prismatico.png" alt="Prismático">
                 <div class="overlay-interno">
                     <span class="raridade-nome">PRISMÁTICO</span>
                     <div class="info-valor-interno">
@@ -224,24 +247,27 @@
             </div>
             <button class="btn-preco" onclick="iniciarCheckout('1.1M', 35.00)">R$ 35,00</button>
         </div>
+
     </div>
 
-    <div class="suporte-footer">
-        <a href="mailto:suportequizlegends@gmail.com" class="btn-suporte">Fale com o suporte</a>
-        <span class="suporte-txt">Atendimento Hextech via E-mail</span>
-    </div>
+    <footer class="footer-loja">
+        <p>🔒 <strong>Ambiente Seguro:</strong> Seus dados e pagamentos estão protegidos.</p>
+        <p>Pagamentos via PIX processados pelo <span class="destaque-mp">Mercado Pago</span>.</p>
+        <p>Moedas creditadas na hora! Dúvidas? <a href="mailto:suportequizlegends@gmail.com" class="link-suporte">Fale com o suporte</a>.</p>
+    </footer>
 
     <script>
         // Configuração inicial do Mercado Pago
+        // Substituiremos 'SUA_PUBLIC_KEY' em breve
         const mp = new MercadoPago('SUA_PUBLIC_KEY_AQUI', {
             locale: 'pt-BR'
         });
 
         function iniciarCheckout(nomePacote, preco) {
-            console.log(`Iniciando compra do pacote ${nomePacote} por R$ ${preco}`);
+            console.log(`Iniciando compra: ${nomePacote} - R$ ${preco}`);
             
-            // Alerta informativo antes da integração final com o backend
-            alert(`Sistema de Checkout Iniciado!\nPacote: ${nomePacote}\nValor: R$ ${preco}\n\nPróximo passo: Conectar suas credenciais do Mercado Pago.`);
+            // Lógica para chamar o backend e gerar o PIX
+            alert(`Iniciando pagamento do Pacote ${nomePacote}.\nValor: R$ ${preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}\n\nConectando ao Mercado Pago...`);
         }
     </script>
 
