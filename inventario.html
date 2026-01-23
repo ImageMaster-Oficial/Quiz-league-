@@ -228,7 +228,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // DATA_BASE ATUALIZADA
+        // DATA_BASE ATUALIZADA - ID CORRIGIDO PARA O PRESTÍGIO
         const DATA_BASE = {
             // --- ÍCONES ---
             'aatrox_comum': { nome: "Aatrox", tipo: "icone", raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-comum.png" },
@@ -242,6 +242,8 @@
             'aatrox-lua': { nome: "Aatrox Lua Sangrenta", tipo: "icone", raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-lua-epico.png" },
             'aatrox-primordiano': { nome: "Aatrox Primordiano", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-primordiano-prismatico.png" },
             'aatrox-prestigio': { nome: "Aatrox Lua Sangrenta de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-lua-prestigio-prismatico.png" },
+            
+            // ID ÚNICO PARA PRESTÍGIO CORRIGIDO
             'aatrox-drx-prestigio': { nome: "Aatrox DRX de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-drx-prestigio-prismatico.png" },
             
             'ahri_comum': { nome: "Ahri", tipo: "icone", raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-comum.png" },
@@ -398,6 +400,7 @@
             try {
                 const userRef = doc(db, "usuarios", auth.currentUser.uid);
                 await updateDoc(userRef, { iconeAtual: id });
+                // Removido o alerta manual para evitar travamento da renderização
             } catch (e) { console.error(e); }
         }
 
