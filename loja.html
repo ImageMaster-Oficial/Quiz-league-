@@ -155,8 +155,24 @@
         .comum { border-color: var(--comum) !important; filter: drop-shadow(0 0 5px var(--comum)); }
         .raro { border-color: var(--raro) !important; filter: drop-shadow(0 0 10px var(--raro)); }
         .epico { border-color: var(--epico) !important; filter: drop-shadow(0 0 15px var(--epico)); }
-        .icon-container { width: 80px; height: 80px; margin: 0 auto 15px; }
-        .img-campeao { width: 100%; height: 100%; border-radius: 4px; object-fit: cover; }
+        
+        /* AJUSTE DOS ÍCONES REDONDOS */
+        .icon-container { 
+            width: 80px; 
+            height: 80px; 
+            margin: 0 auto 15px; 
+            overflow: hidden; /* Garante que nada saia do círculo */
+            border-radius: 50%; /* Faz o container ser um círculo */
+        }
+        .img-campeao { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; /* Deixa a imagem redonda */
+            object-fit: cover; /* Não deixa a imagem quadrada esticar */
+            border: none; /* Remove qualquer borda */
+            display: block;
+        }
+        
         .item-nome { 
             font-weight: 900; 
             text-transform: uppercase; 
@@ -224,7 +240,6 @@
         </div>
     </div>
     <div class="grid-loja" id="grid-itens"></div>
-
     <div class="modal-overlay" id="modal-compra">
         <div class="modal-content">
             <div id="modal-item-nome" class="modal-nome"></div>
