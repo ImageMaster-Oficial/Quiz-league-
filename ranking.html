@@ -9,7 +9,6 @@
             --ouro: #c89b3c;
             --fundo-profundo: #010a13;
             --hextech-blue: #0ac8b9;
-            --borda-item: rgba(200, 155, 60, 0.3);
         }
 
         body {
@@ -39,7 +38,6 @@
             font-size: 1.5rem;
             margin: 10px 0;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(200, 155, 60, 0.5);
         }
 
         #lista-ranking {
@@ -52,16 +50,16 @@
             display: flex;
             align-items: center;
             background: rgba(9, 20, 40, 0.9);
-            border: 1px solid var(--borda-item);
+            border: 1px solid rgba(200, 155, 60, 0.3);
             padding: 10px 15px;
             border-radius: 4px;
-            height: 75px; 
+            height: 70px; 
         }
 
         .posicao {
             font-weight: 900;
             color: #f0e6d2;
-            width: 35px;
+            width: 40px;
             flex-shrink: 0;
             font-size: 1.1rem;
         }
@@ -70,13 +68,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 65px;
+            width: 70px;
             flex-shrink: 0;
         }
 
         .elo-emblema {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
         }
 
@@ -85,19 +83,16 @@
             color: var(--ouro);
             text-transform: uppercase;
             font-weight: bold;
-            text-align: center;
             margin-top: 2px;
         }
 
         .user-avatar {
-            width: 55px;  
-            height: 55px; 
-            border-radius: 50%; 
-            border: 2px solid var(--ouro);      
-            margin: 0 12px;
+            width: 50px;  
+            height: 50px; 
+            margin: 0 15px;
             flex-shrink: 0;
             object-fit: cover;
-            background: #000;
+            border: 1px solid var(--ouro);
         }
 
         .nome {
@@ -105,19 +100,18 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.9rem;
-            color: #fff;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .info-pdl {
             text-align: right;
-            flex-shrink: 0;
+            min-width: 100px;
         }
 
         .pdl-valor {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--hextech-blue);
             font-weight: bold;
             display: block;
@@ -162,23 +156,40 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // CONFIGURAÇÃO DE URLS
         const URL_RAIZ = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/";
-        const URL_ICONES = URL_RAIZ + "ícones/";
-        const ICONE_PADRAO = URL_ICONES + "0.png";
+        const ICONE_PADRAO = URL_RAIZ + "ícones/0.png";
+
+        // DATA_BASE IDENTICA AO SEU INVENTÁRIO PARA NÃO TER ERRO
+        const DATA_BASE = {
+            'aatrox_comum': { img: URL_RAIZ + "ícones/aatrox-comum.png" },
+            'aatrox_raro': { img: URL_RAIZ + "ícones/aatrox-raro.png" },
+            'aatrox_epico': { img: URL_RAIZ + "ícones/aatrox-epico.png" },
+            'aatrox-mech': { img: URL_RAIZ + "ícones/aatrox-mech-epico.png" },
+            'aatrox-drx': { img: URL_RAIZ + "ícones/aatrox-drx-epico.png" },
+            'aatrox-eclipse': { img: URL_RAIZ + "ícones/aatrox-eclipse-epico.png" },
+            'aatrox-odisseia': { img: URL_RAIZ + "ícones/aatrox-odisseia-epico.png" },
+            'aatrox-vitorioso': { img: URL_RAIZ + "ícones/aatrox-vitorioso-epico.png" },
+            'aatrox-lua': { img: URL_RAIZ + "ícones/aatrox-lua-epico.png" },
+            'aatrox-primordiano': { img: URL_RAIZ + "ícones/aatrox-primordiano-prismatico.png" },
+            'aatrox-prestigio': { img: URL_RAIZ + "ícones/aatrox-lua-prestigio-prismatico.png" },
+            'aatrox-drx-prestigio': { img: URL_RAIZ + "ícones/aatrox-drx-prestigio-prismatico.png" },
+            'ahri_comum': { img: URL_RAIZ + "ícones/ahri-comum.png" },
+            'ahri_raro': { img: URL_RAIZ + "ícones/ahri-raro.png" },
+            'ahri_epico': { img: URL_RAIZ + "ícones/ahri-epico.png" },
+            'chibi-akali': { img: URL_RAIZ + "ícones/chibi-akali.png" }
+        };
 
         function getEloInfo(xp) {
-            let elo = { nome: "", arquivo: "" };
-            if (xp >= 1000000) { elo.nome = "Desafiante"; elo.arquivo = "desafiante.png"; }
-            else if (xp >= 600000) { elo.nome = "Grão-Mestre"; elo.arquivo = "graomestre.png"; }
-            else if (xp >= 300000) { elo.nome = "Mestre"; elo.arquivo = "mestre.png"; }
-            else if (xp >= 150000) { elo.arquivo = "diamante.png"; elo.nome = "Diamante"; }
-            else if (xp >= 100000) { elo.arquivo = "esmeralda.png"; elo.nome = "Esmeralda"; }
-            else if (xp >= 60000) { elo.arquivo = "platina.png"; elo.nome = "Platina"; }
-            else if (xp >= 30000) { elo.arquivo = "ouro.png"; elo.nome = "Ouro"; }
-            else if (xp >= 10000) { elo.arquivo = "prata.png"; elo.nome = "Prata"; }
-            else if (xp >= 5000) { elo.arquivo = "bronze.png"; elo.nome = "Bronze"; }
-            else { elo.arquivo = "ferro.png"; elo.nome = "Ferro"; }
+            let elo = { nome: "Ferro", arquivo: "ferro.png" };
+            if (xp >= 1000000) { elo = { nome: "Desafiante", arquivo: "desafiante.png" }; }
+            else if (xp >= 600000) { elo = { nome: "Grão-Mestre", arquivo: "graomestre.png" }; }
+            else if (xp >= 300000) { elo = { nome: "Mestre", arquivo: "mestre.png" }; }
+            else if (xp >= 150000) { elo = { nome: "Diamante", arquivo: "diamante.png" }; }
+            else if (xp >= 100000) { elo = { nome: "Esmeralda", arquivo: "esmeralda.png" }; }
+            else if (xp >= 60000) { elo = { nome: "Platina", arquivo: "platina.png" }; }
+            else if (xp >= 30000) { elo = { nome: "Ouro", arquivo: "ouro.png" }; }
+            else if (xp >= 10000) { elo = { nome: "Prata", arquivo: "prata.png" }; }
+            else if (xp >= 5000) { elo = { nome: "Bronze", arquivo: "bronze.png" }; }
             return elo;
         }
 
@@ -190,28 +201,18 @@
                 container.innerHTML = "";
                 let posicao = 1;
 
-                querySnapshot.forEach((doc) => {
-                    const usuario = doc.data();
-                    const xpAtual = usuario.xp || 0;
-                    const elo = getEloInfo(xpAtual);
+                querySnapshot.forEach((docSnap) => {
+                    const user = docSnap.data();
+                    const elo = getEloInfo(user.xp || 0);
                     
-                    let fotoFinal = ICONE_PADRAO;
+                    // AQUI ESTÁ O SEGREDO: Usar o ID salvo para pegar a imagem na DATA_BASE
+                    let fotoUrl = ICONE_PADRAO;
+                    const idEquipado = user.iconeAtual;
 
-                    // LÓGICA DE FOTO CORRIGIDA
-                    // Tentamos pegar o valor de qualquer campo que possa conter a foto
-                    const valorFoto = usuario.fotoAtual || usuario.iconeAtual || usuario.fotoPerfil || usuario.photoURL;
-
-                    if (valorFoto) {
-                        let nome = String(valorFoto);
-                        
-                        if (nome.startsWith('http')) {
-                            fotoFinal = nome;
-                        } else {
-                            // Remove extensões se existirem para evitar "arquivo.png.png"
-                            nome = nome.replace('.png', '').replace('.jpg', '');
-                            // Monta o caminho correto: PASTA ÍCONES + NOME + .PNG
-                            fotoFinal = URL_ICONES + nome + ".png";
-                        }
+                    if (idEquipado && DATA_BASE[idEquipado]) {
+                        fotoUrl = DATA_BASE[idEquipado].img;
+                    } else if (user.photoURL) {
+                        fotoUrl = user.photoURL; // Fallback para foto do Google
                     }
 
                     const item = document.createElement('div');
@@ -219,21 +220,19 @@
                     item.innerHTML = `
                         <div class="posicao">${posicao}°</div>
                         <div class="coluna-elo">
-                            <img src="${URL_RAIZ + elo.arquivo}" class="elo-emblema" onerror="this.style.visibility='hidden'">
+                            <img src="${URL_RAIZ + elo.arquivo}" class="elo-emblema">
                             <span class="elo-nome-abaixo">${elo.nome}</span>
                         </div>
-                        <img src="${fotoFinal}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
-                        <div class="nome">${usuario.nome || "Invocador"}</div>
+                        <img src="${fotoUrl}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
+                        <div class="nome">${user.nome || "Invocador"}</div>
                         <div class="info-pdl">
-                            <span class="pdl-valor">${Math.floor(xpAtual).toLocaleString()} PDL</span>
+                            <span class="pdl-valor">${Math.floor(user.xp || 0).toLocaleString()} PDL</span>
                         </div>
                     `;
                     container.appendChild(item);
                     posicao++;
                 });
-            } catch (error) {
-                console.error("Erro:", error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         carregarRanking();
