@@ -190,7 +190,7 @@
         const URL_ICONES = URL_RAIZ + "ícones/";
         const ICONE_PADRAO = URL_ICONES + "0.png";
 
-        // LISTA DE ITENS PRISMÁTICOS (Nomes exatos dos arquivos no GitHub sem a extensão)
+        // LISTA DE ITENS PRISMÁTICOS (Normalizados para comparação)
         const ICONES_PRISMATICOS = ["brasao-invencivel", "rei-da-loja", "mestre-prismatico"]; 
 
         function getEloInfo(xp) {
@@ -224,21 +224,22 @@
                     let classePrismatica = "";
 
                     if (idEquipado) {
-                        // Padroniza o ID para comparar (minúsculo e com traço)
-                        const nomeBase = String(idEquipado).replace(/_/g, '-').toLowerCase().trim();
+                        // MANTÉM O NOME ORIGINAL PARA A URL (Evita erro de underline/traço)
+                        const nomeOriginal = String(idEquipado).trim();
                         
-                        // Verifica se este nome base está na nossa lista de prismáticos
-                        // Usamos normalize para ignorar acentos na hora da comparação
+                        // CRIA VERSÃO DE COMPARAÇÃO (Padroniza apenas para checar na lista)
+                        const nomeParaComparar = nomeOriginal.replace(/_/g, '-').toLowerCase();
+
                         const isPrismatico = ICONES_PRISMATICOS.some(p => 
-                            p.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
-                            nomeBase.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                            p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === 
+                            nomeParaComparar.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                         );
 
                         if (isPrismatico) {
-                            fotoUrl = `${URL_ICONES}${nomeBase}.gif`;
+                            fotoUrl = `${URL_ICONES}${nomeOriginal}.gif`;
                             classePrismatica = "prismatico";
                         } else {
-                            fotoUrl = `${URL_ICONES}${nomeBase}.png`;
+                            fotoUrl = `${URL_ICONES}${nomeOriginal}.png`;
                         }
                     } else if (user.photoURL) {
                         fotoUrl = user.photoURL;
