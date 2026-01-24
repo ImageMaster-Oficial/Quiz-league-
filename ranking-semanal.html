@@ -215,11 +215,10 @@
                 let posicaoVisual = 0;
                 let pdlAnterior = -1;
 
-                snapshot.forEach(doc => {
-                    const user = doc.data();
+                snapshot.forEach(docSnap => {
+                    const user = docSnap.data();
                     const valorPDL = user.pdlSemanal || 0;
 
-                    // LÓGICA DE RANKING DENSO (MESMA DO ADMIN)
                     if (valorPDL !== pdlAnterior) {
                         posicaoVisual++;
                     }
@@ -227,29 +226,26 @@
 
                     const premio = calcularPremio(posicaoVisual);
                     
-                    let foto = ICONE_PADRAO;
+                    // LÓGICA DE ICONE E GIF BASEADA NO INVENTÁRIO
+                    let idEquipado = "0";
                     if (user.iconeAtual) {
-                        const idLimpo = user.iconeAtual.replace('_', '-');
-                        foto = URL_ICONES_BASE + idLimpo + '.png';
-                    } 
-                    else if (user.fotoPerfil) {
-                        const valor = String(user.fotoPerfil);
-                        if (valor.startsWith('http')) {
-                            foto = valor; 
-                        } else {
-                            const idLimpo = valor.replace('.png', '').replace('.jpg', '');
-                            foto = URL_ICONES_BASE + idLimpo + '.png';
-                        }
-                    } 
-                    else if (user.photoURL) {
-                        foto = user.photoURL;
+                        idEquipado = String(user.iconeAtual).replace('.png', '').replace('.gif', '').replace('_', '-');
+                    } else if (user.fotoPerfil) {
+                        idEquipado = String(user.fotoPerfil).replace('.png', '').replace('.gif', '').replace('.jpg', '');
                     }
+
+                    // A lógica tenta .gif primeiro se o nome sugerir raridade, 
+                    // ou simplesmente tenta gif e cai para png no onerror.
+                    let urlPrincipal = URL_ICONES_BASE + idEquipado;
 
                     html += `
                         <div class="ranking-item ${posicaoVisual <= 3 ? 'top-tier' : ''}">
                             <div class="pos-num">${posicaoVisual < 10 ? '0' + posicaoVisual : posicaoVisual}º</div>
                             <div class="icon-wrapper">
-                                <img src="${foto}" class="user-icon" alt="Invocador" onerror="this.src='${ICONE_PADRAO}'">
+                                <img src="${urlPrincipal}.gif" 
+                                     class="user-icon" 
+                                     alt="Invocador" 
+                                     onerror="if(this.src.includes('.gif')){ this.src='${urlPrincipal}.png'; } else if(this.src.includes('.png')){ this.src='${ICONE_PADRAO}'; }">
                             </div>
                             <div class="user-info">
                                 <span class="user-name">${user.nome || 'Invocador'}</span>
