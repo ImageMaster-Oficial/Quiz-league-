@@ -70,20 +70,20 @@
         .item-card.raro { border-color: var(--raro); filter: drop-shadow(0 0 10px var(--raro)); }
         .item-card.epico { border-color: var(--epico); filter: drop-shadow(0 0 15px var(--epico)); }
 
-        /* ESTILO PRISMÁTICO NO INVENTÁRIO */
+        /* --- ATUALIZADO: ESTILO PRISMÁTICO NO INVENTÁRIO COM PULSAR --- */
         .item-card.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(var(--card-bg), var(--card-bg)), var(--prismatico);
             background-origin: border-box;
             background-clip: padding-box, border-box;
             filter: drop-shadow(0 0 15px rgba(27, 200, 206, 0.5));
-            animation: animaPrismatico 4s ease infinite;
+            animation: animaPrismatico 2s ease-in-out infinite;
         }
 
         @keyframes animaPrismatico {
-            0% { filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
-            50% { filter: drop-shadow(0 0 20px #fff311) brightness(1.2); }
-            100% { filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px #fff311) brightness(1.3); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
         }
 
         .item-card.equipado { 
@@ -99,7 +99,15 @@
             position: relative; 
             overflow: hidden; 
             border-radius: 50%; 
+            transition: 0.3s;
         }
+
+        /* --- ATUALIZADO: TAMANHO 100PX PARA PRISMÁTICOS NO INVENTÁRIO --- */
+        .item-card.prismatico .icon-container {
+            width: 100px;
+            height: 100px;
+        }
+
         .img-item { 
             width: 100%; 
             height: 100%; 
@@ -239,9 +247,9 @@
             'aatrox-odisseia': { nome: "Aatrox Odisseia", tipo: "icone", raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-odisseia-epico.png" },
             'aatrox-vitorioso': { nome: "Aatrox Vitorioso", tipo: "icone", raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-vitorioso-epico.png" },
             'aatrox-lua': { nome: "Aatrox Lua Sangrenta", tipo: "icone", raridade: "epico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-lua-epico.png" },
-            'aatrox-primordiano': { nome: "Aatrox Primordiano", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-primordiano-prismatico.png" },
-            'aatrox-prestigio': { nome: "Aatrox Lua Sangrenta de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-lua-prestigio-prismatico.png" },
-            'aatrox-drx-prestigio': { nome: "Aatrox DRX de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-drx-prestigio-prismatico.png" },
+            'aatrox-primordiano': { nome: "Aatrox Primordiano", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-primordiano-prismatico.gif" },
+            'aatrox-prestigio': { nome: "Aatrox Lua Sangrenta de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-lua-prestigio-prismatico.gif" },
+            'aatrox-drx-prestigio': { nome: "Aatrox DRX de Prestígio", tipo: "icone", raridade: "prismatico", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/aatrox-drx-prestigio-prismatico.gif" },
             
             'ahri_comum': { nome: "Ahri", tipo: "icone", raridade: "comum", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-comum.png" },
             'ahri_raro': { nome: "Ahri Raposa Flamejante", tipo: "icone", raridade: "raro", img: "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/ahri-raro.png" },
@@ -321,11 +329,17 @@
             
             const classeFormato = isQuadrado ? 'tipo-item' : '';
 
+            // LÓGICA DE GIF PARA RARIDADE PRISMÁTICA
+            let urlImagem = item.img;
+            if (item.raridade === 'prismatico') {
+                urlImagem = urlImagem.replace('.png', '.gif');
+            }
+
             return `
                 <div class="item-card ${item.raridade} ${isEquipado ? 'equipado' : ''} ${classeFormato}">
                     <div class="tag-tipo">${tagTexto}</div>
                     <div class="icon-container">
-                        <img src="${item.img}" class="img-item">
+                        <img src="${urlImagem}" class="img-item">
                     </div>
                     <div class="item-nome">${item.nome}</div>
                     <div class="raridade-label">${labelRaridade}</div>
@@ -336,7 +350,6 @@
                 </div>
             `;
         }
-
         window.acaoItem = (id, tipo) => {
             const item = DATA_BASE[id];
             const modal = document.getElementById('modal-confirm');
