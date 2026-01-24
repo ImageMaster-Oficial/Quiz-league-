@@ -14,6 +14,7 @@
             --comum: #808080;
             --raro: #00cfbc;
             --epico: #a335ee;
+            /* Nova variável com o seu gradiente Prismático */
             --prismatico: linear-gradient(135deg, #1bc8ce 0%, #cefff7 25%, #4739b2 50%, #1bc8ce 75%, #fff311 100%);
         }
         body {
@@ -33,104 +34,247 @@
             margin-bottom: 20px;
         }
         .header-loja h1 {
-            margin: 0; font-size: 1.5rem; letter-spacing: 3px;
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
             background: linear-gradient(to bottom, var(--ouro-claro), var(--ouro));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-transform: uppercase;
         }
         .saldo-box {
-            background: var(--azul-hex); padding: 8px 15px; border: 1px solid var(--ouro);
-            color: var(--ouro); font-weight: bold; display: flex; align-items: center; gap: 10px;
+            background: var(--azul-hex);
+            padding: 8px 15px;
+            border: 1px solid var(--ouro);
+            color: var(--ouro);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .controles-loja { max-width: 1000px; margin: 0 auto 30px; display: flex; flex-direction: column; gap: 20px; }
-        .menu-categorias { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .controles-loja {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .menu-categorias {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
         .tab-btn {
-            background: transparent; border: none; color: #888; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
-            padding: 10px 15px; border-bottom: 2px solid transparent; transition: 0.3s;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
         }
-        .tab-btn.active { color: var(--ouro); border-bottom: 2px solid var(--ouro); }
+        .tab-btn.active {
+            color: var(--ouro);
+            border-bottom: 2px solid var(--ouro);
+        }
         .barra-ferramentas {
-            display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
-            gap: 30px; background: rgba(1, 10, 19, 0.8); padding: 15px 20px; border: 1px solid #1e2328;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px; 
+            background: rgba(1, 10, 19, 0.8);
+            padding: 15px 20px;
+            border: 1px solid #1e2328;
+            box-sizing: border-box;
         }
-        .busca-container { position: relative; width: 300px; }
+        .busca-container {
+            position: relative;
+            width: 300px; 
+            max-width: 100%;
+        }
         .busca-container input {
-            width: 100%; background: #091428; border: 1px solid var(--ouro);
-            padding: 10px 40px 10px 15px; color: white; outline: none;
+            width: 100%;
+            background: #091428;
+            border: 1px solid var(--ouro);
+            padding: 10px 40px 10px 15px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 0.9rem;
         }
-        .filtros-raridade { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .busca-container span {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ouro);
+            pointer-events: none;
+        }
+        .filtros-raridade {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         .filter-rarity-btn {
-            background: transparent; border: 1px solid #333; color: #888; padding: 7px 15px;
-            font-size: 11px; cursor: pointer; text-transform: uppercase; transition: 0.2s;
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 7px 15px; 
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            min-width: 70px;
         }
-        .filter-rarity-btn.active { border-color: var(--ouro); color: var(--ouro); background: rgba(200, 155, 60, 0.1); }
+        .filter-rarity-btn.active[data-rarity="comum"] { border-color: var(--comum); color: var(--comum); background: rgba(128, 128, 128, 0.1); }
+        .filter-rarity-btn.active[data-rarity="raro"] { border-color: var(--raro); color: var(--raro); background: rgba(0, 207, 188, 0.1); }
+        .filter-rarity-btn.active[data-rarity="epico"] { border-color: var(--epico); color: var(--epico); background: rgba(163, 53, 238, 0.1); }
+        
+        /* Estilo do botão de filtro Prismático */
+        .filter-rarity-btn.active[data-rarity="prismatico"] { 
+            border-color: #1bc8ce; 
+            color: #cefff7; 
+            background: rgba(71, 57, 178, 0.2); 
+            box-shadow: 0 0 10px rgba(27, 200, 206, 0.3);
+        }
+
+        .filter-rarity-btn.active[data-rarity="todos"] { border-color: var(--ouro); color: var(--ouro); background: rgba(200, 155, 60, 0.1); }
         
         .grid-loja {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 25px; max-width: 1000px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
         .item-card {
-            background: var(--card-bg); border: 1px solid #1e2328; padding: 20px 15px;
-            text-align: center; transition: all 0.3s; position: relative;
+            background: var(--card-bg);
+            border: 1px solid #1e2328;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
             clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
         }
         .item-card:hover { transform: translateY(-8px); }
-        
-        /* Prismático */
+        .item-card.comum { border-color: var(--comum) !important; filter: drop-shadow(0 0 5px var(--comum)); }
+        .item-card.raro { border-color: var(--raro) !important; filter: drop-shadow(0 0 10px var(--raro)); }
+        .item-card.epico { border-color: var(--epico) !important; filter: drop-shadow(0 0 15px var(--epico)); }
+
+        /* --- ATUALIZADO: ESTILO PRISMÁTICO NO CARD COM PULSAR --- */
         .item-card.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(var(--card-bg), var(--card-bg)), var(--prismatico);
-            background-origin: border-box; background-clip: padding-box, border-box;
-            animation: animaPrismatico 4s ease infinite;
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            filter: drop-shadow(0 0 15px rgba(27, 200, 206, 0.5));
+            animation: animaPrismatico 2s ease-in-out infinite;
         }
+
         @keyframes animaPrismatico {
-            0%, 100% { filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
-            50% { filter: drop-shadow(0 0 20px #fff311) brightness(1.2); }
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px #fff311) brightness(1.3); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px #1bc8ce) brightness(1.1); }
         }
 
-        .icon-container { width: 80px; height: 80px; margin: 0 auto 15px; overflow: hidden; border-radius: 50%; border: 1px solid rgba(200, 155, 60, 0.3); }
-        .img-campeao { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .item-card.tipo-item .icon-container, .item-card.tipo-item .img-campeao { border-radius: 4px !important; }
+        .prismatico .raridade-label {
+            background: var(--prismatico);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: brightness(1.3);
+            font-weight: 900;
+        }
+        
+        /* --- BLOCO DE ÍCONES (REDONDOS) --- */
+        .icon-container { 
+            width: 80px; 
+            height: 80px; 
+            margin: 0 auto 15px; 
+            overflow: hidden; 
+            border-radius: 50%; /* PADRÃO É REDONDO */
+            transition: 0.3s;
+        }
 
-        .item-nome { font-weight: 900; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 8px; min-height: 40px; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+        /* --- ATUALIZADO: TAMANHO 100PX PARA PRISMÁTICOS --- */
+        .item-card.prismatico .icon-container {
+            width: 100px;
+            height: 100px;
+        }
+
+        .img-campeao { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; /* PADRÃO É REDONDO */
+            object-fit: cover; 
+            border: none; 
+            display: block;
+        }
+
+        /* --- BLOCO DE ITENS (QUADRADOS) --- */
+        .item-card.tipo-item .icon-container,
+        .item-card.tipo-item .img-campeao {
+            border-radius: 4px !important; /* FORMATO QUADRADO PARA ITENS */
+        }
+        
+        .item-nome { 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            margin-bottom: 8px; 
+            min-height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
         .raridade-label { font-size: 10px; text-transform: uppercase; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; }
+        .comum .raridade-label { color: var(--comum); }
+        .raro .raridade-label { color: var(--raro); }
+        .epico .raridade-label { color: var(--epico); }
+
         .btn-comprar {
-            background: linear-gradient(to bottom, #c89b3c, #785a28); border: 1px solid var(--ouro-claro);
-            color: black; padding: 10px; width: 100%; font-weight: bold; cursor: pointer;
+            background: linear-gradient(to bottom, #c89b3c, #785a28);
+            border: 1px solid var(--ouro-claro);
+            color: black;
+            padding: 10px;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
             clip-path: polygon(15% 0, 85% 0, 100% 50%, 85% 100%, 15% 100%, 0 50%);
         }
-        .btn-comprar:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
-
-        /* Modais */
+        .btn-comprar:disabled { background: #1e2328 !important; color: #555 !important; border-color: #333 !important; cursor: not-allowed; box-shadow: none !important; filter: grayscale(1); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: var(--azul-hex); border: 2px solid var(--ouro); padding: 30px; max-width: 400px; text-align: center; clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%); }
-        .preview-img-container { width: 100px; height: 100px; margin: 0 auto 20px; border: 2px solid var(--ouro); overflow: hidden; transition: 0.4s; }
-        
-        .modal-content.is-prismatico .preview-img-container { 
-            width: 140px; height: 140px; border: 3px solid #fff311; 
-            animation: pulsePrismatico 2s infinite; 
-        }
-        @keyframes pulsePrismatico { 0% {transform: scale(1);} 50% { transform: scale(1.08); box-shadow: 0 0 25px rgba(255, 243, 17, 0.5); } 100% {transform: scale(1);} }
-
         .modal-nome { color: var(--ouro); font-weight: bold; text-transform: uppercase; margin-bottom: 5px; font-size: 1.1rem; }
         .modal-info { color: #888; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.4; }
-        .btn-confirm { background: var(--ouro); color: black; padding: 10px 25px; font-weight: bold; cursor: pointer; border: none; margin: 5px; text-transform: uppercase; }
-        .btn-cancel { background: transparent; border: 1px solid var(--ouro); color: var(--ouro); padding: 10px 25px; cursor: pointer; margin: 5px; text-transform: uppercase; }
+        .btn-confirm { background: var(--ouro); border: 1px solid var(--ouro-claro); color: black; padding: 10px 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
+        .btn-cancel { background: transparent; border: 1px solid var(--ouro); color: var(--ouro); padding: 10px 25px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
     </style>
 </head>
 <body>
-
     <div class="header-loja">
         <h1>Loja Hextech</h1>
-        <div class="saldo-box"><span>🟡</span><span id="saldo-valor">...</span></div>
+        <div class="saldo-box">
+            <span>🟡</span>
+            <span id="saldo-valor">...</span>
+        </div>
     </div>
-
     <div class="controles-loja">
         <div class="menu-categorias">
             <button class="tab-btn active" onclick="filtrarCategoria('icones', this)">Ícones</button>
             <button class="tab-btn" onclick="filtrarCategoria('itens', this)">Itens</button>
-            <a href="vendas-moedas.html" style="text-decoration: none;"><button class="tab-btn">Moedas</button></a>
+            
+            <a href="vendas-moedas.html" style="text-decoration: none;">
+                <button class="tab-btn">Moedas</button>
+            </a>
         </div>
         <div class="barra-ferramentas" id="barra-filtros">
             <div class="busca-container">
@@ -138,22 +282,18 @@
                 <span>🔍</span>
             </div>
             <div class="filtros-raridade">
-                <button class="filter-rarity-btn active" onclick="setRaridade('todos', this)">Todos</button>
-                <button class="filter-rarity-btn" onclick="setRaridade('comum', this)">Comum</button>
-                <button class="filter-rarity-btn" onclick="setRaridade('raro', this)">Raro</button>
-                <button class="filter-rarity-btn" onclick="setRaridade('epico', this)">Épico</button>
-                <button class="filter-rarity-btn" onclick="setRaridade('prismatico', this)">Prismático</button>
+                <button class="filter-rarity-btn active" data-rarity="todos" onclick="setRaridade('todos', this)">Todos</button>
+                <button class="filter-rarity-btn" data-rarity="comum" onclick="setRaridade('comum', this)">Comum</button>
+                <button class="filter-rarity-btn" data-rarity="raro" onclick="setRaridade('raro', this)">Raro</button>
+                <button class="filter-rarity-btn" data-rarity="epico" onclick="setRaridade('epico', this)">Épico</button>
+                <button class="filter-rarity-btn" data-rarity="prismatico" onclick="setRaridade('prismatico', this)">Prismático</button>
             </div>
         </div>
     </div>
-
     <div class="grid-loja" id="grid-itens"></div>
 
     <div class="modal-overlay" id="modal-compra">
-        <div class="modal-content" id="modal-content-box">
-            <div class="preview-img-container" id="modal-img-container">
-                <img id="modal-item-img" src="" style="width:100%; height:100%; object-fit:cover;">
-            </div>
+        <div class="modal-content">
             <div id="modal-item-nome" class="modal-nome"></div>
             <div id="modal-item-info" class="modal-info"></div>
             <div class="modal-btns">
@@ -167,10 +307,11 @@
         <div class="modal-content">
             <div class="modal-nome">AQUISIÇÃO CONCLUÍDA</div>
             <div id="modal-sucesso-msg" class="modal-info" style="color: #f0e6d2; margin-top: 15px;"></div>
-            <button class="btn-confirm" onclick="fecharModalSucesso()" style="width: 100%;">ENTENDIDO</button>
+            <div class="modal-btns">
+                <button class="btn-confirm" onclick="fecharModalSucesso()" style="width: 100%; margin: 0;">ENTENDIDO</button>
+            </div>
         </div>
     </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -184,14 +325,12 @@
         messagingSenderId: "1050463164018",
         appId: "1:1050463164018:web:91de002b8afc8e678f54eb"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     const URL_ICONES = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
     const URL_ITENS = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/itens/";
-
+    
     const itens = [
         { id: "aatrox_comum", cat: "icones", nome: "Aatrox", preco: 5000, raridade: "comum", img: "aatrox-comum.png", info: "Ícone de perfil do campeão Aatrox." },
         { id: "aatrox_raro", cat: "icones", nome: "Aatrox Caçador dos Mares", preco: 25000, raridade: "raro", img: "aatrox-raro.png", info: "Ícone raro da skin Caçador dos Mares." },
@@ -205,10 +344,12 @@
         { id: "aatrox-primordiano", cat: "icones", nome: "Aatrox Primordiano", preco: 100000, raridade: "prismatico", img: "aatrox-primordiano-prismatico.png", info: "Ícone Prismático Aatrox Primordiano." },
         { id: "aatrox-prestigio", cat: "icones", nome: "Aatrox Lua Sangrenta de Prestígio", preco: 100000, raridade: "prismatico", img: "aatrox-lua-prestigio-prismatico.png", info: "Ícone Prismático Aatrox Lua Sangrenta de prestígio." },
         { id: "aatrox-drx-prestigio", cat: "icones", nome: "Aatrox DRX de prestígio", preco: 100000, raridade: "prismatico", img: "aatrox-drx-prestigio-prismatico.png", info: "Ícone Prismático Aatrox DRX de prestígio." },
+  
         { id: "ahri_comum", cat: "icones", nome: "Ahri", preco: 5000, raridade: "comum", img: "ahri-comum.png", info: "Ícone de perfil da campeã Ahri." },
         { id: "ahri_raro", cat: "icones", nome: "Ahri Raposa Flamejante", preco: 25000, raridade: "raro", img: "ahri-raro.png", info: "Ícone raro da skin Raposa Flamejante." },
         { id: "ahri_epico", cat: "icones", nome: "Ahri K/DA", preco: 50000, raridade: "epico", img: "ahri-epico.png", info: "Ícone épico da skin Ahri K/DA." },
         { id: "chibi-akali", cat: "icones", nome: "Chibi Akali", preco: 5000, raridade: "comum", img: "chibi-akali.png", info: "Ícone de perfil da campeã Akali." },
+        
         { id: "anjo_guardiao", cat: "itens", nome: "Anjo Guardião <br> (7 Dias)", preco: 100000, raridade: "raro", img: "anjo.png", info: "Proteção Hextech: Você não perderá PDL ao errar perguntas durante 7 dias." },
         { id: "sentinela-epico", cat: "itens", nome: "Sentinela de Controle <br> (3 Unidades)", preco: 3000, raridade: "epico", img: "sentinela-epico.png", info: "Revelação: Revela a resposta da próxima pergunta." },
         { id: "coletora-comum", cat: "itens", nome: "A Coletora <br> (2 Horas)", preco: 10000, raridade: "comum", img: "coletora-comum.png", info: "Efeito Passivo: Dobra seus ganhos de PDL por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de PDL." },
@@ -217,8 +358,8 @@
         { id: "atlas-comum", cat: "itens", nome: "Atlas Mundial <br> (2 Horas)", preco: 10000, raridade: "comum", img: "atlas-comum.png", info: "Efeito Passivo: Dobra seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." },
         { id: "bussola-raro", cat: "itens", nome: "Bússola Rúnica <br> (2 Horas)", preco: 18000, raridade: "raro", img: "bussola-raro.png", info: "Efeito Passivo: Multiplica 4x seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." },
         { id: "oposicao-epico", cat: "itens", nome: "Oposição Celestial <br> (2 Horas)", preco: 21000, raridade: "epico", img: "oposicao-epico.png", info: "Efeito Passivo: Multiplica 6x seus ganhos de Moedas por 2 horas. Atenção: Este item não é acumulativo com outros multiplicadores de moedas." }
-    ];
-
+    ];        
+    
     let saldoGlobal = 0;
     let meusItens = [];
     let minhaMochila = [];
@@ -246,6 +387,7 @@
         categoriaAtual = categoria;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         elemento.classList.add('active');
+        document.getElementById('barra-filtros').style.display = (categoria === 'moedas') ? 'none' : 'flex';
         renderLoja();
     };
 
@@ -265,22 +407,43 @@
             const bateCategoria = item.cat === categoriaAtual;
             const bateRaridade = raridadeFiltro === 'todos' || item.raridade === raridadeFiltro;
             const nomeLimpo = item.nome.replace('<br>', '').toLowerCase();
-            return bateCategoria && bateRaridade && nomeLimpo.includes(busca);
+            const bateBusca = nomeLimpo.includes(busca);
+            return bateCategoria && bateRaridade && bateBusca;
         });
 
+        if (itensFiltrados.length === 0) {
+            grid.innerHTML = "<p style='grid-column: 1/-1; opacity: 0.5; text-align:center; margin-top: 50px;'>Nenhum item encontrado.</p>";
+            return;
+        }
+
         itensFiltrados.forEach(item => {
-            const jaPossui = item.cat === 'icones' ? meusItens.includes(item.id) : minhaMochila.includes(item.id);
+            let jaPossui = false;
+            if (item.cat === 'icones') {
+                jaPossui = meusItens.includes(item.id);
+            } else if (item.cat === 'itens') {
+                jaPossui = minhaMochila.includes(item.id);
+            }
+
             const desabilitado = jaPossui || (saldoGlobal < item.preco);
-            const urlFinal = (item.cat === 'itens') ? URL_ITENS + item.img : URL_ICONES + item.img;
             
+            let labelRaridade = "";
+            if (item.raridade === 'epico') labelRaridade = 'Épico';
+            else if (item.raridade === 'prismatico') labelRaridade = 'Prismático';
+            else labelRaridade = item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
+
+            // CORREÇÃO: Escolha dinâmica da URL baseado no item.cat
+            const urlFinal = (item.cat === 'itens') ? URL_ITENS + item.img : URL_ICONES + item.img;
+            const classeExtra = (item.cat === 'itens') ? 'tipo-item' : '';
+
             grid.innerHTML += `
-                <div class="item-card ${item.raridade} ${item.cat === 'itens' ? 'tipo-item' : ''}">
+                <div class="item-card ${item.raridade} ${classeExtra}">
                     <div class="icon-container">
                         <img src="${urlFinal}" class="img-campeao">
                     </div>
                     <div class="item-nome">${item.nome}</div>
-                    <div class="raridade-label">${item.raridade}</div>
-                    <button class="btn-comprar" ${desabilitado ? 'disabled' : ''} onclick="abrirModalCompra('${item.id}')">
+                    <div class="raridade-label">${labelRaridade}</div>
+                    <button class="btn-comprar" ${desabilitado ? 'disabled' : ''} 
+                        onclick="abrirModalCompra('${item.id}')">
                         ${jaPossui ? 'Possuído' : '💰 ' + item.preco.toLocaleString()}
                     </button>
                 </div>`;
@@ -289,48 +452,79 @@
 
     window.abrirModalCompra = (id) => {
         const item = itens.find(i => i.id === id);
+        if(!item) return;
         const modal = document.getElementById('modal-compra');
-        const contentBox = document.getElementById('modal-content-box');
-        const imgContainer = document.getElementById('modal-img-container');
-        const imgElement = document.getElementById('modal-item-img');
-
-        imgElement.src = (item.cat === 'itens') ? URL_ITENS + item.img : URL_ICONES + item.img;
         document.getElementById('modal-item-nome').innerHTML = item.nome;
-        document.getElementById('modal-item-info').innerText = `${item.info}\n\nPreço: ${item.preco.toLocaleString()} moedas.`;
-        
-        imgContainer.style.borderRadius = (item.cat === 'itens') ? "4px" : "50%";
-        contentBox.classList.toggle('is-prismatico', item.raridade === 'prismatico');
-
+        document.getElementById('modal-item-info').innerText = `${item.info} \n\n Preço: ${item.preco.toLocaleString()} moedas.`;
+        const btnConfirmar = document.getElementById('confirmar-btn');
         modal.style.display = 'flex';
-        document.getElementById('confirmar-btn').onclick = () => processarCompra(id, item.preco);
+        btnConfirmar.onclick = () => processarCompra(id, item.preco);
     };
 
-    window.fecharModal = () => document.getElementById('modal-compra').style.display = 'none';
+    window.fecharModal = () => { document.getElementById('modal-compra').style.display = 'none'; };
+
+    window.mostrarSucesso = (mensagem) => {
+        const msgSucesso = document.getElementById('modal-sucesso-msg');
+        if(msgSucesso) msgSucesso.innerText = mensaje;
+        
+        const modalSucesso = document.getElementById('modal-sucesso');
+        if(modalSucesso) {
+            document.getElementById('modal-sucesso-msg').innerText = mensagem;
+            modalSucesso.style.display = 'flex';
+        } else {
+            alert(mensagem);
+        }
+    };
+
+    window.fecharModalSucesso = () => {
+        const modalSucesso = document.getElementById('modal-sucesso');
+        if(modalSucesso) modalSucesso.style.display = 'none';
+    };
 
     async function processarCompra(id, valor) {
         fecharModal();
         try {
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
-            const item = itens.find(i => i.id === id);
-            const campoUpdate = item.cat === 'icones' ? { iconesAdquiridos: arrayUnion(id) } : { mochila: arrayUnion(id) };
+            const itemDados = itens.find(i => i.id === id);
             
-            await updateDoc(userRef, {
-                saldo: increment(-valor),
-                ...campoUpdate
-            });
-            
-            mostrarSucesso("Aquisição realizada! O item está no seu inventário.");
-        } catch (e) {
-            alert("Erro ao processar compra.");
+            if (itemDados.cat === 'itens') {
+                await updateDoc(userRef, {
+                    saldo: increment(-valor),
+                    mochila: arrayUnion(id)
+                });
+                
+                if (id === "sentinela-epico") {
+                    mostrarSucesso("Você adquiriu o pacote de Sentinelas! Ative-as no seu Inventário para ganhar 3 cargas.");
+                } else if (id === "coletora-comum") {
+                    mostrarSucesso("A Coletora foi enviada para seu inventário. Ative-a para dobrar seus PDLs por 2 horas!");
+                } else if (id === "gume-raro") {
+                    mostrarSucesso("O Gume do Infinito foi enviado para seu inventário. Ative-o para quadruplicar seus PDLs por 2 horas!");
+                } else if (id === "sedenta-epico") {
+                    mostrarSucesso("A Sedenta por Sangue foi enviada para seu inventário. Ative-a para multiplicar seus PDLs por 6 por 2 horas!");
+                } else if (id === "atlas-comum") {
+                    mostrarSucesso("O Atlas Mundial foi enviado para seu inventário. Ative-a para dobrar seus ganhos de Moedas por 2 horas!");
+                } else if (id === "bussola-raro") {
+                    mostrarSucesso("A Bússola Rúnica foi enviada para seu inventário. Ative-a para multiplicar seus ganhos de Moedas por 4 por 2 horas!");
+                } else if (id === "oposicao-epico") {
+                    mostrarSucesso("A Oposição Celestial foi enviada para seu inventário. Ative-a para multiplicar seus ganhos de Moedas por 6 por 2 horas!");
+                } else {
+                    mostrarSucesso("Item enviado para o seu inventário! Vá até lá para ativar seu benefício.");
+                }
+                return;
+            }
+            if (itemDados.cat === 'icones') {
+                await updateDoc(userRef, {
+                    saldo: increment(-valor),
+                    iconesAdquiridos: arrayUnion(id)
+                });
+                mostrarSucesso("Ícone enviado para o seu inventário!");
+                return;
+            }
+        } catch (e) { 
+            console.error(e);
+            mostrarSucesso("Erro ao processar compra. Verifique sua conexão."); 
         }
     }
-
-    window.mostrarSucesso = (msg) => {
-        document.getElementById('modal-sucesso-msg').innerText = msg;
-        document.getElementById('modal-sucesso').style.display = 'flex';
-    };
-
-    window.fecharModalSucesso = () => document.getElementById('modal-sucesso').style.display = 'none';
 </script>
 </body>
 </html>
