@@ -59,7 +59,7 @@
             position: relative;
         }
 
-        /* BRILHO PRISMÁTICO */
+        /* CLASSE PRISMÁTICA - APLICADA PELO JS SE FOR GIF */
         .ranking-item.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(rgba(9, 20, 40, 0.9), rgba(9, 20, 40, 0.9)), var(--prismatico);
@@ -112,13 +112,7 @@
             flex-shrink: 0;
             object-fit: cover;
             border-radius: 50%;
-            border: 1px solid rgba(200, 155, 60, 0.2);
-        }
-
-        .ranking-item.prismatico .user-avatar {
-            width: 58px;
-            height: 58px;
-            border: 2px solid white;
+            border: none;
         }
 
         .nome {
@@ -126,6 +120,9 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .info-pdl {
@@ -152,6 +149,7 @@
             font-size: 0.8rem;
             transition: 0.3s;
         }
+        .btn-voltar:hover { background: var(--ouro); color: black; }
     </style>
 </head>
 <body>
@@ -206,40 +204,25 @@
                 container.innerHTML = "";
                 let posicao = 1;
 
-                for (const docSnap of querySnapshot.docs) {
+                querySnapshot.forEach((docSnap) => {
                     const user = docSnap.data();
                     const elo = getEloInfo(user.xp || 0);
-                    const idEquipado = user.iconeAtual;
-                    
+                    const idEquipado = user.iconeAtual || "0";
+
                     const item = document.createElement('div');
-                    item.className = 'ranking-item';
+                    item.className = "ranking-item";
                     
-                    let finalUrl = ICONE_PADRAO;
-
-                    if (idEquipado) {
-                        const gifUrl = `${URL_ICONES}${idEquipado}.gif`;
-                        const pngUrl = `${URL_ICONES}${idEquipado}.png`;
-
-                        // TESTA SE O GIF EXISTE NA PASTA "ícones"
-                        const checkGif = await fetch(gifUrl, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
-                        
-                        if (checkGif) {
-                            finalUrl = gifUrl;
-                            item.classList.add('prismatico');
-                        } else {
-                            finalUrl = pngUrl;
-                        }
-                    } else if (user.photoURL) {
-                        finalUrl = user.photoURL;
-                    }
-
+                    // Lógica de "Tentativa e Erro" sem pesar o site
                     item.innerHTML = `
                         <div class="posicao">${posicao}°</div>
                         <div class="coluna-elo">
                             <img src="${URL_RAIZ + elo.arquivo}" class="elo-emblema">
                             <span class="elo-nome-abaixo">${elo.nome}</span>
                         </div>
-                        <img src="${finalUrl}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
+                        <img src="${URL_ICONES}${idEquipado}.gif" 
+                             class="user-avatar" 
+                             onload="this.closest('.ranking-item').classList.add('prismatico')"
+                             onerror="if(this.src.includes('.gif')){ this.src='${URL_ICONES}${idEquipado}.png'; this.closest('.ranking-item').classList.remove('prismatico'); } else { this.src='${ICONE_PADRAO}'; }">
                         <div class="nome">${user.nome || "Invocador"}</div>
                         <div class="info-pdl">
                             <span class="pdl-valor">${Math.floor(user.xp || 0).toLocaleString()} PDL</span>
@@ -247,9 +230,9 @@
                     `;
                     container.appendChild(item);
                     posicao++;
-                }
+                });
             } catch (error) { 
-                console.error("Erro: ", error); 
+                console.error("Erro no ranking: ", error); 
             }
         }
 
