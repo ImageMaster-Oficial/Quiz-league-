@@ -411,53 +411,53 @@
         const vencedores = [];
         querySnapshot.forEach((doc) => { vencedores.push(doc.data()); });        
 
-        // Função interna para decidir qual imagem usar com base na prioridade
-        const obterFotoVencedor = (usuario) => {
+        const obterDadosFoto = (usuario) => {
             const URL_BASE_GH = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/";
+            const fotoPadrao = URL_BASE_GH + '0.png';
             
+            let idLimpo = null;
+            let urlDireta = null;
+
             // 1ª PRIORIDADE: Ícone Equipado na Loja
             if (usuario.iconeAtual) {
-                const idLimpo = usuario.iconeAtual.replace('_', '-');
-                return URL_BASE_GH + idLimpo + '.png';
+                idLimpo = String(usuario.iconeAtual).replace('.png', '').replace('.gif', '').replace('_', '-');
             }
-            
             // 2ª PRIORIDADE: fotoPerfil antiga
-            if (usuario.fotoPerfil) {
+            else if (usuario.fotoPerfil) {
                 const valor = String(usuario.fotoPerfil);
-                if (valor.startsWith('http')) return valor;
-                const idLimpo = valor.replace('.png', '').replace('.jpg', '');
-                return URL_BASE_GH + idLimpo + '.png';
+                if (valor.startsWith('http')) {
+                    urlDireta = valor;
+                } else {
+                    idLimpo = valor.replace('.png', '').replace('.gif', '').replace('.jpg', '');
+                }
             }
-            
-            // 3ª PRIORIDADE: photoURL (Google/Auth)
-            return usuario.photoURL || usuario.fotoUrl || null;
+            // 3ª PRIORIDADE: photoURL
+            else if (usuario.photoURL || usuario.fotoUrl) {
+                urlDireta = usuario.photoURL || usuario.fotoUrl;
+            }
+
+            // Retornamos um objeto com a URL base ou a URL direta para a função visual tratar
+            return {
+                id: idLimpo,
+                urlFixa: urlDireta,
+                urlBaseGH: URL_BASE_GH,
+                padrao: fotoPadrao
+            };
         };
 
-        if(vencedores[0]) {
-            atualizarVisualPodio(1, vencedores[0].nome, obterFotoVencedor(vencedores[0]));
-        }
-        if(vencedores[1]) {
-            atualizarVisualPodio(2, vencedores[1].nome, obterFotoVencedor(vencedores[1]));
-        }
-        if(vencedores[2]) {
-            atualizarVisualPodio(3, vencedores[2].nome, obterFotoVencedor(vencedores[2]));
-        }
+        if(vencedores[0]) atualizarVisualPodio(1, vencedores[0].nome, obterDadosFoto(vencedores[0]));
+        if(vencedores[1]) atualizarVisualPodio(2, vencedores[1].nome, obterDadosFoto(vencedores[1]));
+        if(vencedores[2]) atualizarVisualPodio(3, vencedores[2].nome, obterDadosFoto(vencedores[2]));
+
     } catch (error) {
         console.error("Erro ao carregar pódio:", error);
     }
 }
 
-function atualizarVisualPodio(posicao, nome, foto) {
-    // Busca todos os containers de colunas dentro do pódio
+function atualizarVisualPodio(posicao, nome, dadosFoto) {
     const containers = document.querySelectorAll("#containerRankingResumo div[style*='flex-direction: column']");
     if (containers.length < 3) return;
 
-    const fotoPadrao = 'https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/0.png';
-    
-    // A variável 'foto' já vem processada com a URL completa da lógica acima
-    const urlFinal = foto ? foto : fotoPadrao;
-
-    // Mapeamento fixo pela ordem do seu HTML: 2º (index 0), 1º (index 1), 3º (index 2)
     let alvo = null;
     if (posicao === 2) alvo = containers[0];
     if (posicao === 1) alvo = containers[1];
@@ -468,13 +468,36 @@ function atualizarVisualPodio(posicao, nome, foto) {
         const imgTag = alvo.querySelector("img");
         
         if (small) small.innerText = nome.split(' ')[0];
+        
         if (imgTag) {
-            imgTag.src = urlFinal;
+            // Se for uma URL externa (Google/Auth), carrega direto
+            if (dadosFoto.urlFixa) {
+                imgTag.src = dadosFoto.urlFixa;
+                imgTag.onerror = () => { imgTag.src = dadosFoto.padrao; };
+            } 
+            // Se for ID do GitHub, aplica a lógica GIF -> PNG
+            else if (dadosFoto.id) {
+                const urlSemExtensao = dadosFoto.urlBaseGH + dadosFoto.id;
+                
+                imgTag.src = urlSemExtensao + ".gif";
+                
+                imgTag.onerror = () => {
+                    // Se falhou o .gif, tenta .png
+                    if (imgTag.src.includes('.gif')) {
+                        imgTag.src = urlSemExtensao + ".png";
+                    } 
+                    // Se falhou o .png, coloca o padrão 0.png
+                    else if (imgTag.src.includes('.png')) {
+                        imgTag.src = dadosFoto.padrao;
+                    }
+                };
+            } else {
+                imgTag.src = dadosFoto.padrao;
+            }
+
             imgTag.style.width = "100%";
             imgTag.style.height = "100%";
             imgTag.style.objectFit = "cover";
-            // Garante que se a imagem falhar, use o padrão
-            imgTag.onerror = () => { imgTag.src = fotoPadrao; };
         }
     }
 }
