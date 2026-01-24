@@ -59,7 +59,7 @@
             position: relative;
         }
 
-        /* ESTILO APLICADO QUANDO O GIF É DETECTADO */
+        /* BRILHO PRISMÁTICO */
         .ranking-item.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(rgba(9, 20, 40, 0.9), rgba(9, 20, 40, 0.9)), var(--prismatico);
@@ -112,14 +112,13 @@
             flex-shrink: 0;
             object-fit: cover;
             border-radius: 50%;
-            border: none;
-            transition: 0.3s;
+            border: 1px solid rgba(200, 155, 60, 0.2);
         }
 
         .ranking-item.prismatico .user-avatar {
-            width: 62px;
-            height: 62px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            width: 58px;
+            height: 58px;
+            border: 2px solid white;
         }
 
         .nome {
@@ -127,9 +126,6 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .info-pdl {
@@ -156,7 +152,6 @@
             font-size: 0.8rem;
             transition: 0.3s;
         }
-        .btn-voltar:hover { background: var(--ouro); color: black; }
     </style>
 </head>
 <body>
@@ -211,16 +206,32 @@
                 container.innerHTML = "";
                 let posicao = 1;
 
-                querySnapshot.forEach((docSnap) => {
+                for (const docSnap of querySnapshot.docs) {
                     const user = docSnap.data();
                     const elo = getEloInfo(user.xp || 0);
                     const idEquipado = user.iconeAtual;
-
-                    const item = document.createElement('div');
-                    item.className = `ranking-item`; // Começa sem a classe prismática
                     
-                    // URL inicial: Tentamos o GIF primeiro por padrão
-                    let fotoUrl = idEquipado ? `${URL_ICONES}${idEquipado}.gif` : (user.photoURL || ICONE_PADRAO);
+                    const item = document.createElement('div');
+                    item.className = 'ranking-item';
+                    
+                    let finalUrl = ICONE_PADRAO;
+
+                    if (idEquipado) {
+                        const gifUrl = `${URL_ICONES}${idEquipado}.gif`;
+                        const pngUrl = `${URL_ICONES}${idEquipado}.png`;
+
+                        // TESTA SE O GIF EXISTE NA PASTA "ícones"
+                        const checkGif = await fetch(gifUrl, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
+                        
+                        if (checkGif) {
+                            finalUrl = gifUrl;
+                            item.classList.add('prismatico');
+                        } else {
+                            finalUrl = pngUrl;
+                        }
+                    } else if (user.photoURL) {
+                        finalUrl = user.photoURL;
+                    }
 
                     item.innerHTML = `
                         <div class="posicao">${posicao}°</div>
@@ -228,41 +239,17 @@
                             <img src="${URL_RAIZ + elo.arquivo}" class="elo-emblema">
                             <span class="elo-nome-abaixo">${elo.nome}</span>
                         </div>
-                        <img src="${fotoUrl}" class="user-avatar" id="img-${posicao}">
+                        <img src="${finalUrl}" class="user-avatar" onerror="this.src='${ICONE_PADRAO}'">
                         <div class="nome">${user.nome || "Invocador"}</div>
                         <div class="info-pdl">
                             <span class="pdl-valor">${Math.floor(user.xp || 0).toLocaleString()} PDL</span>
                         </div>
                     `;
                     container.appendChild(item);
-
-                    // LÓGICA DE DETECÇÃO AUTOMÁTICA
-                    const imgElement = document.getElementById(`img-${posicao}`);
-                    
-                    // Se a tentativa inicial (GIF) carregar com sucesso:
-                    imgElement.onload = function() {
-                        if (this.src.endsWith('.gif')) {
-                            item.classList.add('prismatico'); // Ativa o brilho se for GIF
-                        }
-                    };
-
-                    // Se a tentativa inicial (GIF) falhar:
-                    imgElement.onerror = function() {
-                        if (this.src.endsWith('.gif')) {
-                            // Se o GIF falhou, tenta o PNG
-                            this.src = `${URL_ICONES}${idEquipado}.png`;
-                        } else if (this.src.endsWith('.png')) {
-                            // Se o PNG também falhar, coloca o ícone padrão 0.png
-                            this.src = ICONE_PADRAO;
-                            item.classList.remove('prismatico');
-                        }
-                        this.onerror = null; // Evita loop infinito
-                    };
-
                     posicao++;
-                });
+                }
             } catch (error) { 
-                console.error("Erro no ranking: ", error); 
+                console.error("Erro: ", error); 
             }
         }
 
