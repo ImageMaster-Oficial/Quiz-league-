@@ -5,72 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventário Hextech - Quiz Legends</title>
     <style>
-
-        /* Container que agrupa busca e filtros */
-.barra-ferramentas-inventario {
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 30px; 
-    background: rgba(1, 10, 19, 0.8);
-    padding: 15px 20px;
-    border: 1px solid #1e2328;
-    box-sizing: border-box;
-    margin: 0 auto 30px;
-    max-width: 1000px; /* Mesma largura da grade da loja */
-}
-
-/* Campo de Busca Exato */
-.busca-container-inv {
-    position: relative;
-    width: 300px; 
-    max-width: 100%;
-}
-
-.busca-container-inv input {
-    width: 100%;
-    background: #091428;
-    border: 1px solid var(--ouro);
-    padding: 10px 40px 10px 15px; /* Espaço para a lupa na direita */
-    color: white;
-    outline: none;
-    box-sizing: border-box;
-    font-size: 0.9rem;
-}
-
-.busca-container-inv span {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--ouro);
-    pointer-events: none;
-}
-
-/* Botões de Filtro de Raridade */
-.filtros-raridade-inv {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.filter-btn-inv {
-    background: transparent;
-    border: 1px solid #333;
-    color: #888;
-    padding: 7px 15px; 
-    font-size: 11px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.2s;
-    min-width: 70px;
-}
-
-/* Estados ativos conforme sua loja */
-.filter-btn-inv.active { border-color: var(--ouro); color: var(--ouro); background: rgba(200, 155, 60, 0.1); }
-        
         :root {
             --ouro: #c89b3c;
             --ouro-claro: #f0e6d2;
@@ -80,7 +14,6 @@
             --comum: #808080;
             --raro: #00cfbc;
             --epico: #a335ee;
-            /* NOVA RARIDADE PRISMÁTICA */
             --prismatico: linear-gradient(135deg, #1bc8ce 0%, #cefff7 25%, #4739b2 50%, #1bc8ce 75%, #fff311 100%);
         }
 
@@ -100,6 +33,9 @@
             border-bottom: 2px solid var(--ouro);
             padding-bottom: 15px;
             margin-bottom: 30px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .header-inv h1 {
@@ -112,6 +48,73 @@
             text-transform: uppercase;
         }
 
+        /* BARRA DE FERRAMENTAS */
+        .barra-ferramentas-inventario {
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px; 
+            background: rgba(1, 10, 19, 0.8);
+            padding: 15px 20px;
+            border: 1px solid #1e2328;
+            box-sizing: border-box;
+            margin: 0 auto 30px;
+            max-width: 1000px;
+        }
+
+        .busca-container-inv {
+            position: relative;
+            width: 300px; 
+            max-width: 100%;
+        }
+
+        .busca-container-inv input {
+            width: 100%;
+            background: #091428;
+            border: 1px solid var(--ouro);
+            padding: 10px 40px 10px 15px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        .busca-container-inv span {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ouro);
+            pointer-events: none;
+        }
+
+        .filtros-raridade-inv {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn-inv {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 7px 15px; 
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            min-width: 70px;
+        }
+
+        .filter-btn-inv.active { 
+            border-color: var(--ouro); 
+            color: var(--ouro); 
+            background: rgba(200, 155, 60, 0.1); 
+        }
+
+        /* GRADE E CARDS */
         .grid-inventario {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -131,12 +134,10 @@
         }
 
         .item-card:hover { transform: translateY(-5px); }
-
         .item-card.comum { border-color: var(--comum); filter: drop-shadow(0 0 5px var(--comum)); }
         .item-card.raro { border-color: var(--raro); filter: drop-shadow(0 0 10px var(--raro)); }
         .item-card.epico { border-color: var(--epico); filter: drop-shadow(0 0 15px var(--epico)); }
 
-        /* --- ATUALIZADO: ESTILO PRISMÁTICO NO INVENTÁRIO COM PULSAR --- */
         .item-card.prismatico {
             border: 1px solid transparent !important;
             background-image: linear-gradient(var(--card-bg), var(--card-bg)), var(--prismatico);
@@ -155,75 +156,35 @@
         .item-card.equipado { 
             border-color: var(--ouro) !important; 
             filter: drop-shadow(0 0 15px var(--ouro));
-            box-shadow: inset 0 0 15px rgba(200, 155, 60, 0.2);
         }
 
         .icon-container { 
-            width: 80px; 
-            height: 80px; 
-            margin: 0 auto 15px; 
-            position: relative; 
-            overflow: hidden; 
-            border-radius: 50%; 
-            transition: 0.3s;
+            width: 80px; height: 80px; margin: 0 auto 15px; 
+            position: relative; overflow: hidden; border-radius: 50%; 
         }
 
-        /* --- ATUALIZADO: TAMANHO 100PX PARA PRISMÁTICOS NO INVENTÁRIO --- */
-        .item-card.prismatico .icon-container {
-            width: 100px;
-            height: 100px;
-        }
+        .item-card.prismatico .icon-container { width: 100px; height: 100px; }
 
-        .img-item { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-        }
-
-        .item-card.tipo-item .icon-container,
-        .item-card.tipo-item .img-item {
-            border-radius: 4px !important; 
-        }
+        .img-item { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
         .item-nome { 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            font-size: 0.8rem; 
-            margin-bottom: 5px; 
-            min-height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.2;
-        }
-
-        .tag-tipo {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            color: var(--ouro-claro);
-            opacity: 0.6;
+            font-weight: 900; text-transform: uppercase; font-size: 0.8rem; 
+            margin-bottom: 5px; min-height: 35px; display: flex;
+            align-items: center; justify-content: center;
         }
 
         .raridade-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+            font-size: 10px; text-transform: uppercase; font-weight: bold;
+            margin-bottom: 15px; letter-spacing: 2px;
         }
+
         .comum .raridade-label { color: var(--comum); }
         .raro .raridade-label { color: var(--raro); }
         .epico .raridade-label { color: var(--epico); }
-        
-        /* LABEL PRISMÁTICA */
         .prismatico .raridade-label {
             background: var(--prismatico);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: brightness(1.3);
             font-weight: 900;
         }
 
@@ -238,31 +199,49 @@
             cursor: pointer;
             font-size: 0.7rem;
             clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
-            transition: 0.3s;
         }
 
-        .btn-acao:hover:not(:disabled) { background: var(--ouro); color: black; }
-        
-        .btn-acao.equipado { 
-            background: var(--ouro) !important; 
-            color: black !important; 
-            border-color: var(--ouro-claro); 
-            cursor: default;
+        .btn-acao:hover { background: var(--ouro); color: black; }
+
+        .btn-voltar {
+            text-decoration: none; color: var(--ouro); border: 1px solid var(--ouro);
+            padding: 5px 15px; font-size: 0.8rem; text-transform: uppercase;
         }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--azul-hex); border: 2px solid var(--ouro); padding: 30px; max-width: 350px; text-align: center; clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 85%, 90% 100%, 10% 100%, 0 85%, 0 15%); }
-        .modal-nome { color: var(--ouro); font-weight: bold; text-transform: uppercase; margin-bottom: 10px; font-size: 1.1rem; }
-        .modal-msg { color: #f0e6d2; font-size: 0.9rem; margin-bottom: 25px; line-height: 1.4; }
-        .btn-confirm { background: var(--ouro); border: 1px solid var(--ouro-claro); color: black; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
-        .btn-cancel { background: transparent; border: 1px solid var(--ouro); color: var(--ouro); padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin: 5px; }
-
-        .vazio { grid-column: 1/-1; text-align: center; padding: 100px; opacity: 0.5; font-style: italic; }
-        .btn-voltar { text-decoration: none; color: var(--ouro); border: 1px solid var(--ouro); padding: 5px 15px; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
-        .btn-voltar:hover { background: var(--ouro); color: black; }
     </style>
 </head>
 <body>
+
+    <div class="header-inv">
+        <h1>Inventário Hextech</h1>
+        <a href="#" class="btn-voltar">Voltar</a>
+    </div>
+
+    <div class="barra-ferramentas-inventario">
+        <div class="busca-container-inv">
+            <input type="text" placeholder="PESQUISAR NO INVENTÁRIO...">
+            <span>🔍</span>
+        </div>
+        <div class="filtros-raridade-inv">
+            <button class="filter-btn-inv active">Todos</button>
+            <button class="filter-btn-inv">Comum</button>
+            <button class="filter-btn-inv">Raro</button>
+            <button class="filter-btn-inv">Épico</button>
+            <button class="filter-btn-inv">Prismático</button>
+        </div>
+    </div>
+
+    <div class="grid-inventario">
+        <div class="item-card prismatico">
+            <div class="raridade-label">Prismático</div>
+            <div class="icon-container">
+                <img src="https://via.placeholder.com/100" class="img-item">
+            </div>
+            <div class="item-nome">Cápsula de Honra</div>
+            <button class="btn-acao">Abrir</button>
+        </div>
+    </div>
+</body>
+
 
     <div class="header-inv">
         <h1>Meu Inventário</h1>
@@ -387,227 +366,263 @@
             }
         });
 
-        function renderInventario() {
-            const grid = document.getElementById('grid-inv');
-            grid.innerHTML = "";
+<script>
+    // Variáveis de controle de filtro
+    let filtroRaridadeAtivo = 'todos';
+    let buscaTextoAtiva = '';
 
-            const icones = usuarioDados.iconesAdquiridos || [];
-            const mochila = usuarioDados.mochila || [];
-            const iconeEquipado = usuarioDados.iconeAtual || "";
+    // --- FUNÇÃO DE RENDERIZAÇÃO PRINCIPAL (ATUALIZADA) ---
+    function renderInventario() {
+        const grid = document.getElementById('grid-inv');
+        grid.innerHTML = "";
 
-            if (icones.length === 0 && mochila.length === 0) {
-                grid.innerHTML = '<p class="vazio">Você ainda não possui itens ou ícones.</p>';
-                return;
-            }
+        const icones = usuarioDados.iconesAdquiridos || [];
+        const mochila = usuarioDados.mochila || [];
+        const iconeEquipado = usuarioDados.iconeAtual || "";
 
-            // MOCHILA (ITENS QUADRADOS)
-            mochila.forEach(id => {
-                const item = DATA_BASE[id];
-                if (!item) return;
+        if (icones.length === 0 && mochila.length === 0) {
+            grid.innerHTML = '<p class="vazio">Você ainda não possui itens ou ícones.</p>';
+            return;
+        }
+
+        let itensRenderizados = 0;
+
+        // MOCHILA (ITENS QUADRADOS)
+        mochila.forEach(id => {
+            const item = DATA_BASE[id];
+            if (!item) return;
+            
+            // Lógica de Filtro Aplicada aqui
+            if (passaNoFiltro(item)) {
                 grid.innerHTML += criarCard(id, item, "ATIVAR", false, true);
-            });
+                itensRenderizados++;
+            }
+        });
 
-            // ÍCONES (REDONDOS)
-            icones.forEach(id => {
-                const item = DATA_BASE[id];
-                if (!item) return;
-                
-                // LÓGICA DE COMPARAÇÃO CORRIGIDA PARA O BRILHO DOURADO
+        // ÍCONES (REDONDOS)
+        icones.forEach(id => {
+            const item = DATA_BASE[id];
+            if (!item) return;
+            
+            // Lógica de Filtro Aplicada aqui
+            if (passaNoFiltro(item)) {
                 const nomeArquivo = item.img.split('/').pop().replace('.png', '');
                 const estaEquipado = (nomeArquivo === iconeEquipado);
-                
                 grid.innerHTML += criarCard(id, item, estaEquipado ? "EQUIPADO" : "EQUIPAR", estaEquipado, false);
-            });
+                itensRenderizados++;
+            }
+        });
+
+        // Feedback de busca vazia
+        if (itensRenderizados === 0) {
+            grid.innerHTML = '<p class="vazio">Nenhum item corresponde à sua busca.</p>';
+        }
+    }
+
+    // --- NOVAS FUNÇÕES DO CAMPO DE PESQUISA E FILTRO ---
+    
+    // Chamada pelo 'oninput' do campo de busca
+    window.filtrarPorTexto = (valor) => {
+        buscaTextoAtiva = valor.toLowerCase();
+        renderInventario();
+    };
+
+    // Chamada pelo 'onclick' dos botões de raridade
+    window.setFiltroRaridade = (raridade, btn) => {
+        filtroRaridadeAtivo = raridade;
+        
+        // Atualiza visual dos botões
+        document.querySelectorAll('.filter-btn-inv').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        renderInventario();
+    };
+
+    // Verifica se o item deve aparecer conforme os filtros atuais
+    function passaNoFiltro(item) {
+        const nomeBate = item.nome.toLowerCase().includes(buscaTextoAtiva);
+        const raridadeBate = (filtroRaridadeAtivo === 'todos' || item.raridade === filtroRaridadeAtivo);
+        return nomeBate && raridadeBate;
+    }
+
+    // --- CRIAÇÃO DE CARD (MANTIDA INTEGRALMENTE) ---
+    function criarCard(id, item, txtBotao, isEquipado, isQuadrado) {
+        let tagTexto = "Consumível";
+        if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
+        if (item.tipo === 'carga') tagTexto = "Utilizável";
+        if (item.tipo === 'multiplicador') tagTexto = `Bônus ${item.multiplicadorPDL}x PDL`;
+        if (item.tipo === 'multiplicadorMoedas') tagTexto = `Bônus ${item.multiplicadorMoedas}x Moedas`;
+
+        let labelRaridade = "";
+        if (item.raridade === 'epico') labelRaridade = 'Épico';
+        else if (item.raridade === 'prismatico') labelRaridade = 'Prismático';
+        else labelRaridade = item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
+        
+        const classeFormato = isQuadrado ? 'tipo-item' : '';
+
+        let urlImagem = item.img;
+        if (item.raridade === 'prismatico') {
+            urlImagem = urlImagem.replace('.png', '.gif');
         }
 
-        function criarCard(id, item, txtBotao, isEquipado, isQuadrado) {
-            let tagTexto = "Consumível";
-            if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
-            if (item.tipo === 'carga') tagTexto = "Utilizável";
-            if (item.tipo === 'multiplicador') tagTexto = `Bônus ${item.multiplicadorPDL}x PDL`;
-            if (item.tipo === 'multiplicadorMoedas') tagTexto = `Bônus ${item.multiplicadorMoedas}x Moedas`;
-
-            let labelRaridade = "";
-            if (item.raridade === 'epico') labelRaridade = 'Épico';
-            else if (item.raridade === 'prismatico') labelRaridade = 'Prismático';
-            else labelRaridade = item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1);
-            
-            const classeFormato = isQuadrado ? 'tipo-item' : '';
-
-            // LÓGICA DE GIF PARA RARIDADE PRISMÁTICA
-            let urlImagem = item.img;
-            if (item.raridade === 'prismatico') {
-                urlImagem = urlImagem.replace('.png', '.gif');
-            }
-
-            return `
-                <div class="item-card ${item.raridade} ${isEquipado ? 'equipado' : ''} ${classeFormato}">
-                    <div class="tag-tipo">${tagTexto}</div>
-                    <div class="icon-container">
-                        <img src="${urlImagem}" class="img-item">
-                    </div>
-                    <div class="item-nome">${item.nome}</div>
-                    <div class="raridade-label">${labelRaridade}</div>
-                    <button class="btn-acao ${isEquipado ? 'equipado' : ''}" 
-                        onclick="acaoItem('${id}', '${item.tipo}')" ${isEquipado ? 'disabled' : ''}>
-                        ${txtBotao}
-                    </button>
+        return `
+            <div class="item-card ${item.raridade} ${isEquipado ? 'equipado' : ''} ${classeFormato}">
+                <div class="tag-tipo">${tagTexto}</div>
+                <div class="icon-container">
+                    <img src="${urlImagem}" class="img-item">
                 </div>
-            `;
-        }
-        window.acaoItem = (id, tipo) => {
-            const item = DATA_BASE[id];
-            const modal = document.getElementById('modal-confirm');
-            const msg = document.getElementById('modal-message');
-            const titulo = document.getElementById('modal-title');
-            
-            document.getElementById('container-btns-modal').innerHTML = `
-                <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
-                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-            `;
-            const novoBtnSim = document.getElementById('btn-sim');
+                <div class="item-nome">${item.nome}</div>
+                <div class="raridade-label">${labelRaridade}</div>
+                <button class="btn-acao ${isEquipado ? 'equipado' : ''}" 
+                    onclick="acaoItem('${id}', '${item.tipo}')" ${isEquipado ? 'disabled' : ''}>
+                    ${txtBotao}
+                </button>
+            </div>
+        `;
+    }
 
-            if (tipo === 'icone') {
-                titulo.innerText = "EQUIPAR ÍCONE";
-                msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
-                novoBtnSim.onclick = () => equiparIcone(id);
-            } else if (tipo === 'carga') {
-                titulo.innerText = "ATIVAR REVELAÇÃO";
-                msg.innerText = `Deseja ativar "${item.nome}"? Isso adicionará ${item.unidades} cargas de revelação ao seu Quiz.`;
-                novoBtnSim.onclick = () => ativarSentinela(id);
-            } else if (tipo === 'multiplicador') {
-                titulo.innerText = "ATIVAR MULTIPLICADOR";
-                const agora = Date.now();
-                if (usuarioDados.statusAtivo?.dobrador_pdl && agora < usuarioDados.statusAtivo.dobrador_pdl) {
-                    titulo.innerText = "ATENÇÃO INVOCADOR";
-                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador de PDL ativo!</span><br><br>Se ativar este agora, o tempo e o valor (${item.multiplicadorPDL}x) do novo item substituirão o anterior. Deseja prosseguir?`;
-                } else {
-                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de PDL por ${item.multiplicadorPDL} durante ${item.duracaoHoras} horas.`;
-                }
-                novoBtnSim.onclick = () => ativarMultiplicador(id);
-            } else if (tipo === 'multiplicadorMoedas') {
-                titulo.innerText = "ATIVAR " + item.nome.toUpperCase();
-                const agora = Date.now();
-                if (usuarioDados.statusAtivo?.dobrador_moedas && agora < usuarioDados.statusAtivo.dobrador_moedas) {
-                    titulo.innerText = "ATENÇÃO INVOCADOR";
-                    msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um bônus de moedas ativo!</span><br><br>Substituir o efeito atual pelo novo bônus (${item.multiplicadorMoedas}x)?`;
-                } else {
-                    msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de Moedas por ${item.multiplicadorMoedas} durante ${item.duracaoHoras} horas.`;
-                }
-                novoBtnSim.onclick = () => ativarMultiplicadorMoedas(id);
+    // --- LÓGICA DE AÇÕES E MODAIS (MANTIDA INTEGRALMENTE) ---
+    window.acaoItem = (id, tipo) => {
+        const item = DATA_BASE[id];
+        const modal = document.getElementById('modal-confirm');
+        const msg = document.getElementById('modal-message');
+        const titulo = document.getElementById('modal-title');
+        
+        document.getElementById('container-btns-modal').innerHTML = `
+            <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        `;
+        const novoBtnSim = document.getElementById('btn-sim');
+
+        if (tipo === 'icone') {
+            titulo.innerText = "EQUIPAR ÍCONE";
+            msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
+            novoBtnSim.onclick = () => equiparIcone(id);
+        } else if (tipo === 'carga') {
+            titulo.innerText = "ATIVAR REVELAÇÃO";
+            msg.innerText = `Deseja ativar "${item.nome}"? Isso adicionará ${item.unidades} cargas de revelação ao seu Quiz.`;
+            novoBtnSim.onclick = () => ativarSentinela(id);
+        } else if (tipo === 'multiplicador') {
+            titulo.innerText = "ATIVAR MULTIPLICADOR";
+            const agora = Date.now();
+            if (usuarioDados.statusAtivo?.dobrador_pdl && agora < usuarioDados.statusAtivo.dobrador_pdl) {
+                titulo.innerText = "ATENÇÃO INVOCADOR";
+                msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um multiplicador de PDL ativo!</span><br><br>Se ativar este agora, o tempo e o valor (${item.multiplicadorPDL}x) do novo item substituirão o anterior. Deseja prosseguir?`;
             } else {
-                titulo.innerText = "ATIVAR CONSUMÍVEL";
-                msg.innerText = `Deseja ativar "${item.nome}" agora? Isso iniciará o tempo de ${item.duracao} dias (acumulativo).`;
-                novoBtnSim.onclick = () => ativarConsumivel(id);
+                msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de PDL por ${item.multiplicadorPDL} durante ${item.duracaoHoras} horas.`;
             }
-            modal.style.display = 'flex';
-        };
-
-        window.fecharModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
-
-        function mostrarModalSucesso(titulo, htmlConteudo) {
-            const modal = document.getElementById('modal-confirm');
-            document.getElementById('modal-title').innerText = titulo;
-            document.getElementById('modal-message').innerHTML = htmlConteudo;
-            document.getElementById('container-btns-modal').innerHTML = `<button class="btn-confirm" onclick="fecharModal()">OK</button>`;
-            modal.style.display = 'flex';
-        }
-
-        // --- FUNÇÃO CORRIGIDA PARA FUNCIONAR COM O RANKING ---
-        async function equiparIcone(id) {
-            fecharModal();
-            try {
-                const item = DATA_BASE[id];
-                if (!item) return;
-
-                // Extrai o nome real do arquivo (ex: aatrox-primordiano-prismatico)
-                const nomeArquivo = item.img.split('/').pop().replace('.png', '');
-
-                const userRef = doc(db, "usuarios", auth.currentUser.uid);
-                
-                // Salva o nome exato que o Ranking precisa encontrar no GitHub
-                await updateDoc(userRef, { iconeAtual: nomeArquivo });
-                
-            } catch (e) { console.error(e); }
-        }
-
-        async function ativarSentinela(id) {
-            fecharModal();
-            const item = DATA_BASE[id];
-            const userRef = doc(db, "usuarios", auth.currentUser.uid);
-            try {
-                await updateDoc(userRef, {
-                    mochila: arrayRemove(id),
-                    "statusAtivo.sentinelas": increment(3)
-                });
-                mostrarModalSucesso("SUCESSO", `<p style="color:var(--raro)">${item.nome} Ativada!</p><p>Cargas adicionadas com sucesso.</p>`);
-            } catch (e) { console.error(e); }
-        }
-
-        async function ativarMultiplicador(id) {
-            fecharModal();
-            const item = DATA_BASE[id];
-            const userRef = doc(db, "usuarios", auth.currentUser.uid);
+            novoBtnSim.onclick = () => ativarMultiplicador(id);
+        } else if (tipo === 'multiplicadorMoedas') {
+            titulo.innerText = "ATIVAR " + item.nome.toUpperCase();
             const agora = Date.now();
-            const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
-            const multiplicador = item.multiplicadorPDL;
-
-            try {
-                await updateDoc(userRef, {
-                    mochila: arrayRemove(id),
-                    "statusAtivo.dobrador_pdl": agora + duracaoMs,
-                    "statusAtivo.valor_multiplicador": multiplicador
-                });
-                
-                let textoEfeito = "DOBRADOS";
-                if (multiplicador === 4) textoEfeito = "QUADRUPLICADOS";
-                if (multiplicador === 6) textoEfeito = "SEXTUPLICADOS";
-                
-                mostrarModalSucesso("BÔNUS ATIVADO", `<p>Seus ganhos de PDL estão <strong>${textoEfeito}</strong> por ${item.duracaoHoras}h.</p>`);
-            } catch (e) { console.error(e); }
+            if (usuarioDados.statusAtivo?.dobrador_moedas && agora < usuarioDados.statusAtivo.dobrador_moedas) {
+                titulo.innerText = "ATENÇÃO INVOCADOR";
+                msg.innerHTML = `<span style="color:var(--ouro)">Você já possui um bônus de moedas ativo!</span><br><br>Substituir o efeito atual pelo novo bônus (${item.multiplicadorMoedas}x)?`;
+            } else {
+                msg.innerText = `Deseja ativar "${item.nome}" agora? Isso multiplicará seus ganhos de Moedas por ${item.multiplicadorMoedas} durante ${item.duracaoHoras} horas.`;
+            }
+            novoBtnSim.onclick = () => ativarMultiplicadorMoedas(id);
+        } else {
+            titulo.innerText = "ATIVAR CONSUMÍVEL";
+            msg.innerText = `Deseja ativar "${item.nome}" agora? Isso iniciará o tempo de ${item.duracao} dias (acumulativo).`;
+            novoBtnSim.onclick = () => ativarConsumivel(id);
         }
+        modal.style.display = 'flex';
+    };
 
-        async function ativarMultiplicadorMoedas(id) {
-            fecharModal();
+    window.fecharModal = () => { document.getElementById('modal-confirm').style.display = 'none'; };
+
+    function mostrarModalSucesso(titulo, htmlConteudo) {
+        const modal = document.getElementById('modal-confirm');
+        document.getElementById('modal-title').innerText = titulo;
+        document.getElementById('modal-message').innerHTML = htmlConteudo;
+        document.getElementById('container-btns-modal').innerHTML = `<button class="btn-confirm" onclick="fecharModal()">OK</button>`;
+        modal.style.display = 'flex';
+    }
+
+    // --- FUNÇÕES DE BANCO DE DADOS (MANTIDAS INTEGRALMENTE) ---
+    async function equiparIcone(id) {
+        fecharModal();
+        try {
             const item = DATA_BASE[id];
+            if (!item) return;
+            const nomeArquivo = item.img.split('/').pop().replace('.png', '');
             const userRef = doc(db, "usuarios", auth.currentUser.uid);
-            const agora = Date.now();
-            const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
-            const multiplicador = item.multiplicadorMoedas;
+            await updateDoc(userRef, { iconeAtual: nomeArquivo });
+        } catch (e) { console.error(e); }
+    }
 
-            try {
-                await updateDoc(userRef, {
-                    mochila: arrayRemove(id),
-                    "statusAtivo.dobrador_moedas": agora + duracaoMs,
-                    "statusAtivo.valor_multiplicador_moedas": multiplicador
-                });
+    async function ativarSentinela(id) {
+        fecharModal();
+        const item = DATA_BASE[id];
+        const userRef = doc(db, "usuarios", auth.currentUser.uid);
+        try {
+            await updateDoc(userRef, {
+                mochila: arrayRemove(id),
+                "statusAtivo.sentinelas": increment(3)
+            });
+            mostrarModalSucesso("SUCESSO", `<p style="color:var(--raro)">${item.nome} Ativada!</p><p>Cargas adicionadas com sucesso.</p>`);
+        } catch (e) { console.error(e); }
+    }
 
-                let textoEfeito = "DOBRADOS";
-                if (multiplicador === 4) textoEfeito = "QUADRUPLICADOS";
-                if (multiplicador === 6) textoEfeito = "SEXTUPLICADOS";
+    async function ativarMultiplicador(id) {
+        fecharModal();
+        const item = DATA_BASE[id];
+        const userRef = doc(db, "usuarios", auth.currentUser.uid);
+        const agora = Date.now();
+        const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
+        const multiplicador = item.multiplicadorPDL;
+        try {
+            await updateDoc(userRef, {
+                mochila: arrayRemove(id),
+                "statusAtivo.dobrador_pdl": agora + duracaoMs,
+                "statusAtivo.valor_multiplicador": multiplicador
+            });
+            let textoEfeito = "DOBRADOS";
+            if (multiplicador === 4) textoEfeito = "QUADRUPLICADOS";
+            if (multiplicador === 6) textoEfeito = "SEXTUPLICADOS";
+            mostrarModalSucesso("BÔNUS ATIVADO", `<p>Seus ganhos de PDL estão <strong>${textoEfeito}</strong> por ${item.duracaoHoras}h.</p>`);
+        } catch (e) { console.error(e); }
+    }
 
-                mostrarModalSucesso("BÔNUS ATIVADO", `<p>O item <strong>${item.nome}</strong> está ativo! Ganhos de moedas estão <strong>${textoEfeito}</strong> (${multiplicador}x) por ${item.duracaoHoras}h.</p>`);
-            } catch (e) { console.error(e); }
-        }
+    async function ativarMultiplicadorMoedas(id) {
+        fecharModal();
+        const item = DATA_BASE[id];
+        const userRef = doc(db, "usuarios", auth.currentUser.uid);
+        const agora = Date.now();
+        const duracaoMs = item.duracaoHoras * 60 * 60 * 1000;
+        const multiplicador = item.multiplicadorMoedas;
+        try {
+            await updateDoc(userRef, {
+                mochila: arrayRemove(id),
+                "statusAtivo.dobrador_moedas": agora + duracaoMs,
+                "statusAtivo.valor_multiplicador_moedas": multiplicador
+            });
+            let textoEfeito = "DOBRADOS";
+            if (multiplicador === 4) textoEfeito = "QUADRUPLICADOS";
+            if (multiplicador === 6) textoEfeito = "SEXTUPLICADOS";
+            mostrarModalSucesso("BÔNUS ATIVADO", `<p>O item <strong>${item.nome}</strong> está ativo! Ganhos de moedas estão <strong>${textoEfeito}</strong> (${multiplicador}x) por ${item.duracaoHoras}h.</p>`);
+        } catch (e) { console.error(e); }
+    }
 
-        async function ativarConsumivel(id) {
-            fecharModal();
-            const item = DATA_BASE[id];
-            const userRef = doc(db, "usuarios", auth.currentUser.uid);
-            const agora = Date.now();
-            const tempoMs = item.duracao * 24 * 60 * 60 * 1000; 
-            try {
-                const snap = await getDoc(userRef);
-                const dados = snap.data();
-                const tempoAtual = (dados.statusAtivo && dados.statusAtivo[id] > agora) ? dados.statusAtivo[id] : agora;
-                const novaValidade = tempoAtual + tempoMs;
-                await updateDoc(userRef, {
-                    mochila: arrayRemove(id),
-                    [`statusAtivo.${id}`]: novaValidade
-                });
-                mostrarModalSucesso("SUCESSO", `<p>${item.nome} Ativado!</p>`);
-            } catch (e) { console.error(e); }
-        }
-    </script>
-</body>
+    async function ativarConsumivel(id) {
+        fecharModal();
+        const item = DATA_BASE[id];
+        const userRef = doc(db, "usuarios", auth.currentUser.uid);
+        const agora = Date.now();
+        const tempoMs = item.duracao * 24 * 60 * 60 * 1000; 
+        try {
+            const snap = await getDoc(userRef);
+            const dados = snap.data();
+            const tempoAtual = (dados.statusAtivo && dados.statusAtivo[id] > agora) ? dados.statusAtivo[id] : agora;
+            const novaValidade = tempoAtual + tempoMs;
+            await updateDoc(userRef, {
+                mochila: arrayRemove(id),
+                [`statusAtivo.${id}`]: novaValidade
+            });
+            mostrarModalSucesso("SUCESSO", `<p>${item.nome} Ativado!</p>`);
+        } catch (e) { console.error(e); }
+    }
+              </script>
+        </body>
 </html>
