@@ -9,6 +9,7 @@
             --ouro: #c89b3c;
             --fundo-profundo: #010a13;
             --hextech-blue: #0ac8b9;
+            --azul-escuro: #091428;
         }
 
         body {
@@ -40,6 +41,36 @@
             letter-spacing: 2px;
         }
 
+        /* ESTILO DO CAMPO DE PESQUISA HEXTECH */
+        .busca-container {
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .busca-container input {
+            width: 100%;
+            background: rgba(1, 10, 19, 0.8);
+            border: 1px solid var(--ouro);
+            padding: 12px 40px 12px 15px;
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+        }
+
+        .busca-container span {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ouro);
+            pointer-events: none;
+        }
+
         #lista-ranking {
             display: flex;
             flex-direction: column;
@@ -54,6 +85,12 @@
             padding: 10px 15px;
             border-radius: 4px;
             height: 70px; 
+            transition: transform 0.2s;
+        }
+
+        /* Classe para esconder itens filtrados */
+        .hidden {
+            display: none !important;
         }
 
         .posicao {
@@ -136,6 +173,12 @@
         <div class="header-ranking">
             <h1>Ranking Global</h1>
         </div>
+
+        <div class="busca-container">
+            <input type="text" id="input-busca-ranking" placeholder="PROCURAR INVOCADOR..." onkeyup="filtrarRanking()">
+            <span>🔍</span>
+        </div>
+
         <div id="lista-ranking"></div>
         <a href="resgate.html" class="btn-voltar">Voltar</a>
     </div>
@@ -161,12 +204,10 @@
         const ICONE_PADRAO = URL_ICONES + "0.png";
 
         function getEloInfo(xp) {
-            // Elos que não possuem divisão
             if (xp >= 1000000) return { nome: "Desafiante", arquivo: "desafiante.png" };
             if (xp >= 600000) return { nome: "Grão-Mestre", arquivo: "graomestre.png" };
-            if (xp >= 300000) return { nome: "Mestre", arquivo: "mestre.png" }; // Ajustado para 300k conforme seu código
+            if (xp >= 300000) return { nome: "Mestre", arquivo: "mestre.png" };
 
-            // Configuração dos elos com divisões
             const elosConfig = [
                 { nome: "Diamante", min: 150000, max: 300000, arq: "diamante.png" },
                 { nome: "Esmeralda", min: 100000, max: 150000, arq: "esmeralda.png" },
@@ -195,6 +236,25 @@
             return { nome: "Ferro IV", arquivo: "ferro.png" };
         }
 
+        // FUNÇÃO DE FILTRAGEM ADICIONADA AO ESCOPO GLOBAL
+        window.filtrarRanking = function() {
+            const input = document.getElementById('input-busca-ranking');
+            const filtro = input.value.toLowerCase();
+            const itens = document.getElementsByClassName('ranking-item');
+
+            for (let i = 0; i < itens.length; i++) {
+                const nomeElemento = itens[i].getElementsByClassName('nome')[0];
+                if (nomeElemento) {
+                    const txtValue = nomeElemento.textContent || nomeElemento.innerText;
+                    if (txtValue.toLowerCase().indexOf(filtro) > -1) {
+                        itens[i].classList.remove('hidden');
+                    } else {
+                        itens[i].classList.add('hidden');
+                    }
+                }
+            }
+        };
+
         async function carregarRanking() {
             try {
                 const q = query(collection(db, "usuarios"), orderBy("xp", "desc"), limit(50));
@@ -207,10 +267,7 @@
                     const user = docSnap.data();
                     const elo = getEloInfo(user.xp || 0);
                     
-                    // LÓGICA DE DETECÇÃO AUTOMÁTICA DE GIF:
                     let idEquipado = String(user.iconeAtual || "0");
-                    
-                    // Remove qualquer extensão que possa ter vindo do banco por erro
                     idEquipado = idEquipado.replace('.png', '').replace('.gif', '');
 
                     const item = document.createElement('div');
