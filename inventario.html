@@ -303,15 +303,14 @@
 
     <div class="modal-overlay" id="modal-confirm">
         <div class="modal-content">
-            <div id="modal-title" class="modal-nome">CONFIRMAR AÇÃO</div>
-            <div id="modal-message" class="modal-msg">Deseja realizar esta ação?</div>
-            <div id="container-btns-modal" class="modal-btns">
+            <div id="modal-title" class="modal-nome">ATIVAR ITEM?</div>
+            <div id="modal-message" class="modal-msg"></div>
+            <div class="modal-btns" id="container-btns-modal">
                 <button class="btn-confirm" id="btn-sim">Sim, Confirmar</button>
                 <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
             </div>
         </div>
     </div>
-
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, arrayRemove, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
