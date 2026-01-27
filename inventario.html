@@ -536,11 +536,11 @@
             msg.innerText = `Deseja ativar "${item.nome}"? Isso adicionará ${item.unidades} cargas.`;
             novoBtnSim.onclick = () => ativarSentinela(id);
         } else if (tipo === 'multiplicador') {
-            titulo.innerText = "ATIVAR MULTIPLICADOR";
+            titulo.innerText = "ATIVAR MULTIPLICADOR (NÃO ACUMULATIVO)";
             msg.innerText = `Deseja ativar "${item.nome}"?`;
             novoBtnSim.onclick = () => ativarMultiplicador(id);
         } else if (tipo === 'multiplicadorMoedas') {
-            titulo.innerText = "ATIVAR " + item.nome.toUpperCase();
+            titulo.innerText = "ATIVAR (NÃO ACUMULATIVO)" + item.nome.toUpperCase();
             msg.innerText = `Deseja ativar "${item.nome}"?`;
             novoBtnSim.onclick = () => ativarMultiplicadorMoedas(id);
         } else {
