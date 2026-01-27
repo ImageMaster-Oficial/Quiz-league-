@@ -532,7 +532,7 @@
             msg.innerText = `Deseja equipar "${item.nome}" como seu ícone de perfil?`;
             novoBtnSim.onclick = () => equiparIcone(id);
         } else if (tipo === 'carga') {
-            titulo.innerText = "ATIVAR REVELAÇÃO";
+            titulo.innerText = "ATIVAR REVELAÇÃO (ACUMULATIVO)";
             msg.innerText = `Deseja ativar "${item.nome}"? Isso adicionará ${item.unidades} cargas.`;
             novoBtnSim.onclick = () => ativarSentinela(id);
         } else if (tipo === 'multiplicador') {
