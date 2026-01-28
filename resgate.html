@@ -637,14 +637,12 @@ function atualizarVisualPodio(posicao, nome, dadosFoto) {
         const eloAntes = getEloInfo(pdlInterno).nome;
 
         if (tipoRecompensa === "moeda") {
-            // Mantido 'saldo' para alinhar com seu Firebase
             up = { saldo: increment(500), videosAssistidos: increment(1), totalVideosHoje: increment(1) };
             msg = "Você ganhou 500 moedas!";
         } else if (tipoRecompensa === "pdl") {
             up = { xp: increment(500), pdlSemanal: increment(500), videosAssistidos: increment(1) };
             msg = "Você ganhou 500 PDL!";
         } else if (tipoRecompensa === "livre") {
-            // Mantido 'saldo' para alinhar com seu Firebase
             up = { saldo: increment(100), xp: increment(100), pdlSemanal: increment(100) };
             msg = "Bônus Livre: +100 Moedas e +100 PDL!";
             iniciarCooldownLivre(120);
@@ -661,7 +659,6 @@ function atualizarVisualPodio(posicao, nome, dadosFoto) {
             if (infoNovo.nome !== eloAntes) exibirAnimacaoElo(infoNovo, true);
         });
     }
-
     async function carregarBanco() {
         const statusText = document.getElementById('perguntaTexto');
         let tentativas = 0;
