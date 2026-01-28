@@ -15,6 +15,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="appicon-quiz512.png">
     <link rel="apple-touch-icon" sizes="512x512" href="appicon-quiz512.png">
     <link rel="shortcut icon" href="appicon-quiz512.png">
+</head>
     <style>
         :root {
             --ouro: #c89b3c;
@@ -25,17 +26,17 @@
         }
 
         body { 
-            background: url('admin-vertical.png') no-repeat center center fixed; 
-            background-size: cover;
-            color: white; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0;
-            overflow: hidden;
-        }
+    background: url('admin-vertical.png') no-repeat center center fixed; 
+    background-size: cover;
+    color: white; 
+    font-family: 'Segoe UI', Roboto, sans-serif; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh; 
+    margin: 0;
+    overflow: hidden;
+}
 
         .login-box { 
             position: relative;
@@ -195,6 +196,7 @@
 </div>
 
 <script>
+    // Remove a imagem após 3 segundos
     window.addEventListener('load', () => {
         setTimeout(() => {
             const splash = document.getElementById('custom-splash');
@@ -290,7 +292,7 @@
                             Seja Bem-vindo!<br><br>
                             Você acaba de entrar no <b>Quiz Legends</b>, o campo de batalha onde o raciocínio é sua habilidade mais valiosa. 
                             Aqui, a diversão caminha lado a lado com a competição implacável. Esteja avisado: nossas questões não perdoam e foram forjadas para testar até os limites do seu conhecimento. 
-                            Muchos tentam, mas apenas os verdadeiros mestres de Runeterra possuem a precisão necessária para dominar o Ranking.<br><br>
+                            Muitos tentam, mas apenas os verdadeiros mestres de Runeterra possuem a precisão necessária para dominar o Ranking.<br><br>
                             Prepare-se. O Top 3 é um trono reservado apenas para a elite.<br><br>
                             Agora pegue o seu bônus de Boas-vindas para começarmos com o pé direito!
                         `;
@@ -301,19 +303,15 @@
 
                         exibirModal("SAUDAÇÕES, INVOCADOR!", textoEpico, "var(--ouro)", async () => {
                             try {
-                                // MUDANÇA AQUI: de 'moedas' para 'saldo' para alinhar com seu banco de dados
+                                // Gravação direta e verificação de sucesso
                                 await updateDoc(userRef, { 
                                     saldo: increment(50000), 
                                     boasVindasResgatado: true 
                                 });
-                                // Aguarda um pequeno delay para o Firebase processar antes de mudar de página
-                                setTimeout(() => {
-                                    window.location.href = "resgate.html";
-                                }, 500);
                             } catch (e) { 
                                 console.error("Erro ao creditar bônus:", e); 
-                                window.location.href = "resgate.html";
                             }
+                            window.location.href = "resgate.html";
                         });
                     } else {
                         window.location.href = "resgate.html";
@@ -342,6 +340,7 @@
 
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, emailInput, senhaInput);
+                // Executa a verificação e aguarda o resultado antes de redirecionar
                 await verificarBoasVindas(userCredential.user);
             } catch (error) {
                 console.error(error);
@@ -353,6 +352,7 @@
             }
         };
 
+        // PWA E SERVICE WORKER
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
         if ('serviceWorker' in navigator) {
