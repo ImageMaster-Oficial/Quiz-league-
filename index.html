@@ -15,7 +15,6 @@
     <link rel="icon" type="image/png" sizes="512x512" href="appicon-quiz512.png">
     <link rel="apple-touch-icon" sizes="512x512" href="appicon-quiz512.png">
     <link rel="shortcut icon" href="appicon-quiz512.png">
-</head>
     <style>
         :root {
             --ouro: #c89b3c;
@@ -26,17 +25,17 @@
         }
 
         body { 
-    background: url('admin-vertical.png') no-repeat center center fixed; 
-    background-size: cover;
-    color: white; 
-    font-family: 'Segoe UI', Roboto, sans-serif; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    height: 100vh; 
-    margin: 0;
-    overflow: hidden;
-}
+            background: url('admin-vertical.png') no-repeat center center fixed; 
+            background-size: cover;
+            color: white; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0;
+            overflow: hidden;
+        }
 
         .login-box { 
             position: relative;
@@ -196,7 +195,6 @@
 </div>
 
 <script>
-    // Remove a imagem após 3 segundos
     window.addEventListener('load', () => {
         setTimeout(() => {
             const splash = document.getElementById('custom-splash');
@@ -303,15 +301,19 @@
 
                         exibirModal("SAUDAÇÕES, INVOCADOR!", textoEpico, "var(--ouro)", async () => {
                             try {
-                                // Gravação direta e verificação de sucesso
+                                // CORREÇÃO AQUI: Mudado de 'saldo' para 'moedas'
                                 await updateDoc(userRef, { 
-                                    saldo: increment(50000), 
+                                    moedas: increment(50000), 
                                     boasVindasResgatado: true 
                                 });
+                                // Aguarda um pequeno delay para o Firebase processar antes de mudar de página
+                                setTimeout(() => {
+                                    window.location.href = "resgate.html";
+                                }, 500);
                             } catch (e) { 
                                 console.error("Erro ao creditar bônus:", e); 
+                                window.location.href = "resgate.html";
                             }
-                            window.location.href = "resgate.html";
                         });
                     } else {
                         window.location.href = "resgate.html";
@@ -340,7 +342,6 @@
 
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, emailInput, senhaInput);
-                // Executa a verificação e aguarda o resultado antes de redirecionar
                 await verificarBoasVindas(userCredential.user);
             } catch (error) {
                 console.error(error);
@@ -352,7 +353,6 @@
             }
         };
 
-        // PWA E SERVICE WORKER
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
         if ('serviceWorker' in navigator) {
