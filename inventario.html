@@ -311,6 +311,7 @@
             </div>
         </div>
     </div>
+
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, arrayRemove, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -450,8 +451,9 @@
         const icones = usuarioDados.iconesAdquiridos || [];
         const mochila = usuarioDados.mochila || [];
         const iconeEquipado = usuarioDados.iconeAtual || "";
+        const cargasSentinela = (usuarioDados.statusAtivo && usuarioDados.statusAtivo.sentinelas) || 0;
 
-        if (icones.length === 0 && mochila.length === 0) {
+        if (icones.length === 0 && mochila.length === 0 && cargasSentinela === 0) {
             grid.innerHTML = '<p class="vazio">Você ainda não possui itens ou ícones.</p>';
             return;
         }
@@ -459,7 +461,21 @@
         let itensVisiveis = 0;
         let htmlFinal = "";
 
+        // --- LÓGICA ESPECIAL SENTINELA ---
+        // Se o usuário tem cargas OU tem o item na mochila, o card aparece
+        if (mochila.includes("sentinela-epico") || cargasSentinela > 0) {
+            const itemSenti = DATA_BASE["sentinela-epico"];
+            if (itemSenti && passaNoFiltro(itemSenti)) {
+                const temNaMochila = mochila.includes("sentinela-epico");
+                const labelBotao = temNaMochila ? "ATIVAR" : `CARGAS: ${cargasSentinela}`;
+                htmlFinal += criarCard("sentinela-epico", itemSenti, labelBotao, false, true, !temNaMochila, cargasSentinela);
+                itensVisiveis++;
+            }
+        }
+
+        // Renderiza outros itens da mochila (exceto sentinela que já tratamos acima)
         mochila.forEach(id => {
+            if (id === "sentinela-epico") return; 
             const item = DATA_BASE[id];
             if (item && passaNoFiltro(item)) {
                 htmlFinal += criarCard(id, item, "ATIVAR", false, true);
@@ -467,6 +483,7 @@
             }
         });
 
+        // Renderiza ícones
         icones.forEach(id => {
             const item = DATA_BASE[id];
             if (item && passaNoFiltro(item)) {
@@ -484,10 +501,10 @@
         }
     }
 
-    function criarCard(id, item, txtBotao, isEquipado, isQuadrado) {
+    function criarCard(id, item, txtBotao, isEquipado, isQuadrado, isDisabled = false, contador = 0) {
         let tagTexto = "Consumível";
         if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
-        if (item.tipo === 'carga') tagTexto = "Utilizável";
+        if (item.tipo === 'carga') tagTexto = contador > 0 ? `Cargas Ativas: ${contador}` : "Utilizável";
         if (item.tipo === 'multiplicador') tagTexto = `Bônus ${item.multiplicadorPDL}x PDL`;
         if (item.tipo === 'multiplicadorMoedas') tagTexto = `Bônus ${item.multiplicadorMoedas}x Moedas`;
 
@@ -508,7 +525,7 @@
                 <div class="item-nome">${item.nome}</div>
                 <div class="raridade-label">${labelRaridade}</div>
                 <button class="btn-acao ${isEquipado ? 'equipado' : ''}" 
-                    onclick="acaoItem('${id}', '${item.tipo}')" ${isEquipado ? 'disabled' : ''}>
+                    onclick="acaoItem('${id}', '${item.tipo}')" ${(isEquipado || isDisabled) ? 'disabled' : ''}>
                     ${txtBotao}
                 </button>
             </div>
@@ -540,7 +557,7 @@
             msg.innerText = `Deseja ativar "${item.nome}"? (NÃO ACUMULATIVO)`;
             novoBtnSim.onclick = () => ativarMultiplicador(id);
         } else if (tipo === 'multiplicadorMoedas') {
-            titulo.innerText = "ATIVAR" + item.nome.toUpperCase();
+            titulo.innerText = "ATIVAR " + item.nome.toUpperCase();
             msg.innerText = `Deseja ativar "${item.nome}"? (NÃO ACUMULATIVO)`;
             novoBtnSim.onclick = () => ativarMultiplicadorMoedas(id);
         } else {
@@ -576,7 +593,11 @@
         const item = DATA_BASE[id];
         const userRef = doc(db, "usuarios", auth.currentUser.uid);
         try {
-            await updateDoc(userRef, { mochila: arrayRemove(id), "statusAtivo.sentinelas": increment(3) });
+            // Remove o item da mochila e adiciona +3 cargas ao status numérico
+            await updateDoc(userRef, { 
+                mochila: arrayRemove(id), 
+                "statusAtivo.sentinelas": increment(3) 
+            });
             mostrarModalSucesso("SUCESSO", `<p>${item.nome} Ativado!</p>`);
         } catch (e) { console.error(e); }
     }
