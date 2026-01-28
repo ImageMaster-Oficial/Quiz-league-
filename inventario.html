@@ -452,7 +452,7 @@
         const mochila = usuarioDados.mochila || [];
         const iconeEquipado = usuarioDados.iconeAtual || "";
         
-        // AQUI ESTÁ A LÓGICA DA SENTINELA: Pega do campo 'estoque_sentinelas' (compras feitas)
+        // --- LÓGICA DA SENTINELA ---
         const estoqueSentinela = usuarioDados.estoque_sentinelas || 0;
 
         if (icones.length === 0 && mochila.length === 0 && estoqueSentinela === 0) {
@@ -463,11 +463,10 @@
         let itensVisiveis = 0;
         let htmlFinal = "";
 
-        // --- EXIBIÇÃO DA SENTINELA BASEADA NO ESTOQUE DE COMPRAS ---
+        // --- EXIBIÇÃO DA SENTINELA BASEADA NO ESTOQUE ---
         if (estoqueSentinela > 0) {
             const itemSenti = DATA_BASE["sentinela-epico"];
             if (itemSenti && passaNoFiltro(itemSenti)) {
-                // O número exibido no card é o estoque (quantas vezes ele comprou)
                 htmlFinal += criarCard("sentinela-epico", itemSenti, "ATIVAR", false, true, false, estoqueSentinela);
                 itensVisiveis++;
             }
@@ -504,8 +503,8 @@
         let tagTexto = "Consumível";
         if (item.tipo === 'icone') tagTexto = "Ícone de Perfil";
         
-        // Se for carga (Sentinela), mostra a quantidade que ele tem disponível para ativar (o Estoque)
-        if (item.tipo === 'carga') tagTexto = `Disponíveis: ${contador}`;
+        // Se for carga (Sentinela), mostra a quantidade de caixas no estoque
+        if (item.tipo === 'carga') tagTexto = `Estoques: ${contador}`;
         
         if (item.tipo === 'multiplicador') tagTexto = `Bônus ${item.multiplicadorPDL}x PDL`;
         if (item.tipo === 'multiplicadorMoedas') tagTexto = `Bônus ${item.multiplicadorMoedas}x Moedas`;
@@ -552,7 +551,7 @@
             novoBtnSim.onclick = () => equiparIcone(id);
         } else if (tipo === 'carga') {
             titulo.innerText = "ATIVAR REVELAÇÃO";
-            msg.innerText = `Deseja usar 1 unidade de "${item.nome}"? Isso adicionará 3 cargas ao seu jogo.`;
+            msg.innerText = `Deseja usar 1 estoque de "${item.nome}"? Isso adicionará 3 cargas de revelação ao seu jogo atual.`;
             novoBtnSim.onclick = () => ativarSentinela(id);
         } else if (tipo === 'multiplicador') {
             titulo.innerText = "ATIVAR MULTIPLICADOR";
@@ -594,13 +593,16 @@
         fecharModal();
         const userRef = doc(db, "usuarios", auth.currentUser.uid);
         try {
-            // REDUZ 1 do estoque do inventário e ADICIONA 3 nas cargas de uso (statusAtivo)
+            // REDUZ 1 do 'estoque_sentinelas' e ADICIONA 3 em 'statusAtivo.sentinelas'
             await updateDoc(userRef, { 
                 estoque_sentinelas: increment(-1), 
                 "statusAtivo.sentinelas": increment(3) 
             });
-            mostrarModalSucesso("SENTINELA ATIVADA", `<p>Você ativou 3 cargas de revelação!</p>`);
-        } catch (e) { console.error(e); }
+            mostrarModalSucesso("SENTINELA ATIVADA", `<p>Você usou 1 estoque e agora possui +3 cargas de revelação no jogo!</p>`);
+        } catch (e) { 
+            console.error(e); 
+            mostrarModalSucesso("ERRO", "<p>Não foi possível ativar a sentinela. Verifique sua conexão.</p>");
+        }
     }
 
     async function ativarMultiplicador(id) {
