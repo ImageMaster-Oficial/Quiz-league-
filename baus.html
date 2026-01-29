@@ -41,38 +41,28 @@
             position: relative;
         }
 
-        /* Estilização do Baú Hextech */
-        .bau-hextech {
-            width: 120px;
-            height: 100px;
-            background: linear-gradient(135deg, #051e3e 0%, #0078ff 100%);
-            margin: 30px auto;
-            border: 3px solid var(--blue);
-            border-radius: 8px;
-            position: relative;
-            box-shadow: 0 0 20px var(--blue), inset 0 0 15px rgba(0,0,0,0.5);
+        .bau-container-image {
+            width: 220px;
+            height: 220px;
+            margin: 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            transition: all 0.3s ease;
+            position: relative;
         }
 
-        /* Linhas Neon */
-        .bau-hextech::before {
-            content: '';
-            position: absolute;
+        .bau-gif {
             width: 100%;
-            height: 4px;
-            background: var(--blue);
-            top: 30%;
-            box-shadow: 0 0 10px var(--blue);
+            height: auto;
+            filter: drop-shadow(0 0 10px var(--blue));
+            transition: all 0.4s ease;
+            user-select: none;
         }
 
-        .bau-hextech.aberto {
-            background: var(--gold);
-            border-color: #fff;
-            box-shadow: 0 0 40px var(--gold);
+        /* Efeito de brilho quando o baú abre */
+        .bau-gif.aberto {
+            filter: drop-shadow(0 0 30px var(--gold));
+            transform: scale(1.1);
         }
 
         .animar {
@@ -81,14 +71,14 @@
 
         @keyframes tremer {
             0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.1) rotate(3deg); }
+            25% { transform: scale(1.05) rotate(3deg); }
             50% { transform: scale(1) rotate(0deg); }
-            75% { transform: scale(1.1) rotate(-3deg); }
+            75% { transform: scale(1.05) rotate(-3deg); }
             100% { transform: scale(1) rotate(0deg); }
         }
 
         h1 { color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; margin: 0; }
-        .status-msg { margin: 20px 0; min-height: 25px; font-size: 1rem; color: var(--blue); font-weight: bold; }
+        .status-msg { margin: 20px 0; min-height: 30px; font-size: 1.1rem; color: var(--blue); font-weight: bold; }
 
         .btn-abrir {
             background: linear-gradient(to bottom, #c89b3c, #785a28);
@@ -110,11 +100,10 @@
 
         .btn-abrir:disabled { background: #333; border-color: #555; cursor: not-allowed; opacity: 0.6; }
 
-        /* Botão Receber Recompensa */
         .btn-resgatar {
             background: linear-gradient(to bottom, #0ac8b9, #005a5a);
             border: 1px solid #fff;
-            box-shadow: 0 0 15px var(--blue);
+            box-shadow: 0 0 20px var(--blue);
         }
 
         .btn-voltar {
@@ -133,11 +122,11 @@
     <div class="container-bau">
         <h1>Cofre Hextech</h1>
         
-        <div id="bau-container">
-            <div id="bau-visual" class="bau-hextech">💎</div>
+        <div class="bau-container-image">
+            <img id="bau-imagem" src="https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/bau-hextec.gif" class="bau-gif" alt="Baú Hextech">
         </div>
 
-        <p class="status-msg" id="mensagem">Conectando ao inventário...</p>
+        <p class="status-msg" id="mensagem">Conectando ao sistema...</p>
         
         <button id="btn-acao" class="btn-abrir" onclick="abrirBau()" disabled>Abrir Baú</button>
         <br>
@@ -162,6 +151,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        const URL_GIF = "https://raw.githubusercontent.com/QuizLegends/quizlegends.github.io/main/ícones/bau-hextec.gif";
+        
         let usuarioAtual = null;
         const somMoedas = new Audio('https://www.soundjay.com/misc/sounds/coins-spilled-1.mp3');
 
@@ -184,13 +175,11 @@
                 const hojeStr = agora.toISOString().split('T')[0];
 
                 if (dados.ultimoBau === hojeStr) {
-                    document.getElementById('mensagem').innerText = "Baú já aberto hoje. Volte amanhã!";
+                    document.getElementById('mensagem').innerText = "BAÚ JÁ ABERTO HOJE!";
                     document.getElementById('btn-acao').disabled = true;
-                    document.getElementById('bau-visual').innerText = "📦";
-                    document.getElementById('bau-visual').style.background = "#333";
-                    document.getElementById('bau-visual').style.borderColor = "#555";
+                    document.getElementById('bau-imagem').style.filter = "grayscale(1) opacity(0.5)";
                 } else {
-                    document.getElementById('mensagem').innerText = "O Cofre Hextech está pronto!";
+                    document.getElementById('mensagem').innerText = "O COFRE ESTÁ PRONTO!";
                     document.getElementById('btn-acao').disabled = false;
                 }
             } catch (e) { console.error(e); }
@@ -199,14 +188,18 @@
         window.abrirBau = async function() {
             const btn = document.getElementById('btn-acao');
             const msg = document.getElementById('mensagem');
-            const visual = document.getElementById('bau-visual');
+            const imgBau = document.getElementById('bau-imagem');
             
             btn.disabled = true;
-            msg.innerText = "Descriptografando cofre...";
-            visual.classList.add('animar');
+            msg.innerText = "DESCRIPTOGRAFANDO...";
+            imgBau.classList.add('animar');
 
             const recompensa = Math.floor(Math.random() * (5000 - 500 + 1)) + 500;
             const hojeStr = new Date().toISOString().split('T')[0];
+
+            // Forçar o GIF a reiniciar a animação ao abrir
+            imgBau.src = "";
+            imgBau.src = URL_GIF + "?t=" + new Date().getTime();
 
             setTimeout(async () => {
                 try {
@@ -219,51 +212,45 @@
                         ultimoBau: hojeStr
                     }, { merge: true });
 
-                    // Efeitos de Sucesso
-                    visual.classList.remove('animar');
-                    visual.classList.add('aberto');
-                    visual.innerText = "💰";
+                    imgBau.classList.remove('animar');
+                    imgBau.classList.add('aberto');
                     
-                    // Disparar Fogos de Artifício
                     dispararFogos();
-                    
-                    // Tocar som de moedas
                     somMoedas.play();
 
-                    msg.innerHTML = `<span style="color: #ff0; font-size: 1.4rem;">+ ${recompensa.toLocaleString()} Moedas!</span>`;
+                    msg.innerHTML = `<span style="color: #ff0; font-size: 1.6rem; text-shadow: 0 0 10px rgba(255,255,0,0.5);">+ ${recompensa.toLocaleString()} MOEDAS!</span>`;
                     
-                    // Transformar botão em botão de Resgate Hextech
-                    btn.innerText = "Receber Recompensa";
+                    btn.innerText = "COLETAR RECOMPENSA";
                     btn.disabled = false;
                     btn.classList.add('btn-resgatar');
                     btn.onclick = () => window.location.reload();
 
                 } catch (error) {
                     console.error(error);
-                    msg.innerText = "Erro no sistema Hextech.";
+                    msg.innerText = "ERRO NA CONEXÃO HEXTECH.";
                     btn.disabled = false;
-                    visual.classList.remove('animar');
+                    imgBau.classList.remove('animar');
                 }
-            }, 2500);
+            }, 2000); 
         }
 
         function dispararFogos() {
-            var duration = 3 * 1000;
+            var duration = 4 * 1000;
             var end = Date.now() + duration;
 
             (function frame() {
               confetti({
-                particleCount: 7,
+                particleCount: 10,
                 angle: 60,
-                spread: 55,
-                origin: { x: 0 },
+                spread: 70,
+                origin: { x: 0, y: 0.6 },
                 colors: ['#c89b3c', '#0ac8b9', '#ffffff']
               });
               confetti({
-                particleCount: 7,
+                particleCount: 10,
                 angle: 120,
-                spread: 55,
-                origin: { x: 1 },
+                spread: 70,
+                origin: { x: 1, y: 0.6 },
                 colors: ['#c89b3c', '#0ac8b9', '#ffffff']
               });
 
